@@ -1,0 +1,14 @@
+{
+  "name": "sales-app",
+  "version": "1.0.0",
+  "description": "sales REST API",
+  "main": "server.js",
+  "scripts": {
+    "docker": "docker-compose up -d"
+  },
+  "author": "adrian",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
