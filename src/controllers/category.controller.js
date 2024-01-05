@@ -1,0 +1,44 @@
+const categoryService = require('../services/category.service');
+
+const getCategorysController = async (req, res, next) => {
+    try {
+        const response = await categoryService.getCategorysService();
+
+        res.status(response.response.status).json({
+            ...response
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
+const addCategoryController = async (req, res, next) => {
+    try {
+        const response = await categoryService.addCategoryService(req.body);
+
+        res.status(response.response.status).json({
+            ...response
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
+const deleteCategoryController = async (req, res, next) => {
+    try {
+        const response = await categoryService.deleteCategoryService(req.params);
+        
+        res.status(response.response.status).json({
+            ...response
+        });
+    } catch(err) {
+        next(err);
+    }
+};
+
+
+module.exports = {
+    getCategorysController,
+    addCategoryController,
+    deleteCategoryController
+}

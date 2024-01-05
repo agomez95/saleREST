@@ -75,3 +75,45 @@ CREATE table presales(
 ALTER TABLE presales ADD CONSTRAINT fk_presales_sales FOREIGN KEY (sale_id) REFERENCES sales (id);
 ALTER TABLE presales ADD CONSTRAINT fk_presales_products FOREIGN KEY (product_id) REFERENCES products (id);
 
+
+/****************
+    FUNCIONES
+*****************/
+
+--CATEGORYS
+
+CREATE OR REPLACE FUNCTION getCategorys()
+RETURNS TABLE(id INTEGER, name VARCHAR, state BOOLEAN, created_at DATE)
+LANGUAGE plpgsql AS
+$func$
+BEGIN
+	RETURN QUERY
+	SELECT c.id as id, c.name as name, c.state as state, date(c.created_at) as creation_date FROM categorys as c;
+END
+$func$;
+
+CREATE OR REPLACE FUNCTION addCategory(name_in VARCHAR)
+RETURNS INTEGER AS 
+$func$
+DECLARE
+	c_new_id INTEGER;
+BEGIN
+	INSERT INTO categorys(name, state, created_at, modified_at) VALUES (name_in, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+	RETURNING id INTO c_new_id;
+	RETURN c_new_id;
+END;
+$func$
+LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION deleteCategory(id_in INTEGER)
+RETURNS INTEGER AS
+$func$
+DECLARE
+	c_delete_count INTEGER;	
+BEGIN
+	DELETE FROM categorys where id = id_in
+	RETURNING * INTO c_delete_count;
+	RETURN c_delete_count;
+END;
+$func$
+LANGUAGE plpgsql;

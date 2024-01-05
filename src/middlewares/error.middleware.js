@@ -12,17 +12,18 @@ const errorHandlerMiddleware = (err, req, res, next) => {
         //error personalizado
         console.error('------------------DETAILS BELOW-------------------');
         console.error('ERROR:', err.message);
-        console.error(err);
+        console.error(err.status);
         
         res.status(err.status).json({
-        err_code: 1,
-        status: err.status,
-        err_msg: 'ERROR, SEE LOGS',
+            err_code: 1,
+            status: err.status,
+            err_msg: 'ERROR, SEE LOGS',
         });
     } else {
         //error normal
         console.error('------------------DETAILS BELOW-------------------');
         console.error('ERROR:', err.message);
+        console.error(err.status);
 
         res.status(500).json({
             err_code: 1,

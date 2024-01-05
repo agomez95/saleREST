@@ -8,11 +8,11 @@ const config = require('../config/main.config');
 class Database {
     constructor() {
         this.client = new Client({
-            user: config.PG_LOCAL_USER,
-            host: config.PG_LOCAL_HOST,
-            database: config.PG_LOCAL_DB,
-            password: config.PG_LOCAL_PASSWORD,
-            port: config.PG_LOCAL_PORT
+            user: config.PG_USER_LOCAL,
+            host: config.PG_HOST_LOCAL,
+            database: config.PG_DB_LOCAL,
+            password: config.PG_PASSWORD_LOCAL,
+            port: config.PG_PORT_LOCAL
         });
         this.client.connect();
     };
@@ -38,6 +38,7 @@ class Database {
             }
 
             const query = `SELECT ${functionName}(${variables});`;
+            console.log(query, values)
             const result = await this.client.query(query, values);
             return result.rows;
         } catch (error) {
