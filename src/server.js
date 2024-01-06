@@ -6,6 +6,7 @@ const cors = require('cors');
 const errorHandlerMiddleware = require('./middlewares/error.middleware')
 
 const categoryRouter = require('./routes/category.route');
+const subcategoryRouter = require('./routes/subcategory.route');
 
 const serverStart = () => {
     try {        
@@ -14,6 +15,7 @@ const serverStart = () => {
         app.use(cors());
 
         app.use("/sales/api/category/",categoryRouter);
+        app.use("/sales/api/subcategory/",subcategoryRouter);
 
         app.use(errorHandlerMiddleware);
 

@@ -72,7 +72,6 @@ const deleteCategoryController = async (req, res, next) => {
     }
 };
 
-
 module.exports = {
     getCategorysController,
     addCategoryController,

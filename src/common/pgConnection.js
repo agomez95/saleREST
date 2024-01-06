@@ -38,7 +38,6 @@ class Database {
             }
 
             const query = `SELECT ${functionName}(${variables});`;
-            console.log(query, values)
             const result = await this.client.query(query, values);
             return result.rows;
         } catch (error) {
