@@ -117,3 +117,36 @@ BEGIN
 END;
 $func$
 LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION activateCategory(id_in INTEGER)
+RETURNS INTEGER AS
+$func$
+DECLARE
+	c_activate_count INTEGER;	
+BEGIN
+	UPDATE categorys SET state = TRUE WHERE id = id_in
+	RETURNING * INTO c_activate_count;
+	RETURN c_activate_count;
+END;
+$func$
+LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION deactivateCategory(id_in INTEGER)
+RETURNS INTEGER AS
+$func$
+DECLARE
+	c_deactivate_count INTEGER;	
+BEGIN
+	UPDATE categorys SET state = FALSE WHERE id = id_in
+	RETURNING * INTO c_deactivate_count;
+	RETURN c_deactivate_count;
+END;
+$func$
+LANGUAGE plpgsql;
+
+--CATEGORYS: EXAMPLES
+-- SELECT addCategory('pantalones');
+-- SELECT * FROM getCategorys();
+-- SELECT deleteCategory(5);
+-- SELECT deactivateCategory(4); -- FALSE
+-- SELECT activateCategory(4); -- TRUE

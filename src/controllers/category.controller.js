@@ -24,6 +24,42 @@ const addCategoryController = async (req, res, next) => {
     }
 };
 
+const editCategoryController = async (req, res, next) => {
+    try {
+        const response = await categoryService.editCategoryService(req.params, req.body);
+        
+        res.status(response.response.status).json({
+            ...response
+        });
+    } catch(err) {
+        next(err);
+    }
+};
+
+const activateCategoryController = async (req, res, next) => {
+    try {
+        const response = await categoryService.activateCategoryService(req.params);
+        
+        res.status(response.response.status).json({
+            ...response
+        });
+    } catch(err) {
+        next(err);
+    }
+};
+
+const deactivateCategoryController = async (req, res, next) => {
+    try {
+        const response = await categoryService.deactivateCategoryService(req.params);
+        
+        res.status(response.response.status).json({
+            ...response
+        });
+    } catch(err) {
+        next(err);
+    }
+};
+
 const deleteCategoryController = async (req, res, next) => {
     try {
         const response = await categoryService.deleteCategoryService(req.params);
@@ -40,5 +76,8 @@ const deleteCategoryController = async (req, res, next) => {
 module.exports = {
     getCategorysController,
     addCategoryController,
+    editCategoryController,
+    activateCategoryController,
+    deactivateCategoryController,
     deleteCategoryController
 }

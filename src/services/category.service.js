@@ -42,7 +42,7 @@ const addCategoryService = async (data) => {
 
         const result = await pgDB.selectFunction(categoryQuery.addCategory, { name: name });
 
-        if(!result || result === undefined) throw new CustomError('ERROR AL GUARDAR LOS DATOS DE CURSOS');
+        if(!result || result === undefined) throw new CustomError('SOMETHING WRONG WHEN TRY TO SAVE DATA');
 
         await pgDB.query('COMMIT');
 
@@ -61,16 +61,113 @@ const addCategoryService = async (data) => {
     }
 };
 
-const editCategoryService = () => {
+const editCategoryService = async (params, body) => {
+    const pgDB = new pgConnection();
 
+    const id = params.id;
+    const { name } = body;
+
+    try {
+        await pgDB.query('BEGIN');
+
+        const result = await pgDB.selectFunction(categoryQuery.editCategory, { id: Number(id), name: name });
+
+        if(!result || result === undefined) throw new CustomError('SOMETHING WRONG WHEN TRY TO UPDATE DATA');
+
+        let message = 'SUCCES';
+
+        const count = result.length;
+
+        await pgDB.query('COMMIT');
+
+        if (result.length === 0) message = 'NO CONTENT';
+
+        const response = {
+            status: 200,
+            service: 'editCategoryService',
+            message: message,
+            count: count,
+            result: result
+        };
+
+        return { response: response }
+    } catch (err) {
+        throw new CustomError(err);
+    } finally {
+        pgDB.close();
+    }
 };
 
-const activateCategoryService = () => {
+const activateCategoryService = async (data) => {
+    const pgDB = new pgConnection();
 
+    const id = data.id;
+
+    try {
+        await pgDB.query('BEGIN');
+
+        const result = await pgDB.selectFunction(categoryQuery.activateCategory, { id: Number(id) });
+
+        if(!result || result === undefined) throw new CustomError('SOMETHING WRONG WHEN TRY TO UPDATE DATA');
+
+        let message = 'SUCCES';
+
+        const count = result.length;
+
+        await pgDB.query('COMMIT');
+
+        if (result.length === 0) message = 'NO CONTENT';
+
+        const response = {
+            status: 200,
+            service: 'activateCategoryService',
+            message: message,
+            count: count,
+            result: result
+        };
+
+        return { response: response }
+    } catch (err) {
+        throw new CustomError(err);
+    } finally {
+        pgDB.close();
+    }
 };
 
-const deactivateCategoryService = () => {
+const deactivateCategoryService = async (data) => {
+    const pgDB = new pgConnection();
 
+    const id = data.id;
+
+    try {
+        await pgDB.query('BEGIN');
+
+        const result = await pgDB.selectFunction(categoryQuery.deactivateCategory, { id: Number(id) });
+
+        if(!result || result === undefined) throw new CustomError('SOMETHING WRONG WHEN TRY TO UPDATE DATA');
+
+        let message = 'SUCCES';
+
+        const count = result.length;
+
+        await pgDB.query('COMMIT');
+
+        if (result.length === 0) message = 'NO CONTENT';
+
+        const response = {
+            status: 200,
+            service: 'deactivateCategoryService',
+            message: message,
+            count: count,
+            result: result
+        };
+
+        return { response: response }
+    } catch (err) {
+        throw new CustomError(err);
+    } finally {
+        pgDB.close();
+    }
 };
 
 const deleteCategoryService = async (data) => {
@@ -83,7 +180,7 @@ const deleteCategoryService = async (data) => {
 
         const result = await pgDB.selectFunction(categoryQuery.deleteCategory, { id: Number(id) });
 
-        if(!result || result === undefined) throw new CustomError('ERROR AL GUARDAR LOS DATOS DE CURSOS');
+        if(!result || result === undefined) throw new CustomError('SOMETHING WRONG WHEN TRY TO DELETE DATA');
 
         let message = 'SUCCES';
 

@@ -6,6 +6,9 @@ const categoryController = require('../controllers/category.controller');
 router
     .get('/', categoryController.getCategorysController)
     .post('/', categoryController.addCategoryController)
+    .patch('/:id', categoryController.editCategoryController)
+    .patch('/activate/:id', categoryController.activateCategoryController)
+    .patch('/deactivate/:id', categoryController.deactivateCategoryController)
     .delete('/:id', categoryController.deleteCategoryController)
 
 module.exports = router;

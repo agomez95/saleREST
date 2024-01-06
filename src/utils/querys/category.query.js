@@ -2,9 +2,9 @@
 
 const getCategorys = 'SELECT * FROM getCategorys();';
 const addCategory = 'addCategory';
-const editCategory = '';
-const activateCategory = '';
-const deactivateCategory = '';
+const editCategory = 'editCategory';
+const activateCategory = 'activateCategory';
+const deactivateCategory = 'deactivateCategory';
 const deleteCategory = 'deleteCategory';
 
 module.exports = {
