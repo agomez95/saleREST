@@ -213,7 +213,7 @@ LANGUAGE plpgsql AS
 $func$
 BEGIN
 	RETURN QUERY
-	SELECT sc.id AS id, sc.name AS name, sc.state AS state, c.name as category, date(sc.created_at) AS creation_date 
+	SELECT sc.id AS id, sc.name AS name, c.name as category, sc.state AS state, date(sc.created_at) AS creation_date 
     FROM subcategorys AS sc
     INNER JOIN categorys AS c ON c.id = sc.category_id;
 END
