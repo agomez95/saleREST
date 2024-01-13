@@ -22,7 +22,7 @@ class Database {
             const result = await this.client.query(query, values);
             return result.rows;
         } catch (error) {
-            throw CustomError(`SOMETHING IS WRONG WITH THIS QUERY: '${query}':`);
+            throw new CustomError(`SOMETHING IS WRONG WITH THIS QUERY: '${query}':`);
         }
     };
 
@@ -42,7 +42,7 @@ class Database {
             return result.rows;
         } catch (error) {
             //console.error(`error al llamar a la funcion '${funcName}':`);
-            throw CustomError(`SOMETHING IS WRONG WITH THIS FUNCTION: '${functionName}':`);
+            throw new CustomError(`SOMETHING IS WRONG WITH THIS FUNCTION: '${functionName}':`);
         }
     };
 
