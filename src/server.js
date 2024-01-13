@@ -7,6 +7,10 @@ const errorHandlerMiddleware = require('./middlewares/error.middleware')
 
 const categoryRouter = require('./routes/category.route');
 const subcategoryRouter = require('./routes/subcategory.route');
+const brandRouter = require('./routes/brand.route');
+const productRouter = require('./routes/product.route');
+const variantRouter =  require('./routes/variant.route');
+const specificationRouter = require('./routes/specification.route');
 
 const serverStart = () => {
     try {        
@@ -16,6 +20,10 @@ const serverStart = () => {
 
         app.use("/sales/api/category/",categoryRouter);
         app.use("/sales/api/subcategory/",subcategoryRouter);
+        app.use("/sales/api/brand/",brandRouter);
+        app.use("/sales/api/product/",productRouter);
+        app.use("/sales/api/variant/",variantRouter);
+        app.use("/sales/api/specification/",specificationRouter);
 
         app.use(errorHandlerMiddleware);
 
