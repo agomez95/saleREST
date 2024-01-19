@@ -139,12 +139,17 @@ const listProductsTwoQuerys = (dataProducts, dataSpecs, type) => {
                 let product = products.find(product => product.code === row.product_code);
 
                 if(product) {
-                    let description = {
-                        name: row.name,
-                        information: row.information
-                    };
+                    let description = product.descriptions.find(description => description.name === row.name);
 
-                    product.descriptions.push(description);
+                    if (!description) {
+                        let newDescription = {
+                            product_code: row.product_code, 
+                            name: row.name,
+                            information: row.information
+                        };
+                        
+                        product.descriptions.push(newDescription);
+                    }
                 }
             }
             
@@ -280,14 +285,19 @@ const listProductsTwoQuerys = (dataProducts, dataSpecs, type) => {
                 // DO SPECS
                 for(let row of dataSpecs) {
                     let product = products.find(product => product.code === row.product_code);
-    
+
                     if(product) {
-                        let description = {
-                            name: row.name,
-                            information: row.information
-                        };
-    
-                        product.descriptions.push(description);
+                        let description = product.descriptions.find(description => description.name === row.name);
+
+                        if (!description) {
+                            let newDescription = {
+                                product_code: row.product_code, 
+                                name: row.name,
+                                information: row.information
+                            };
+                            
+                            product.descriptions.push(newDescription);
+                        }
                     }
                 }
                 
@@ -441,17 +451,7 @@ const listProductsTwoQuerys = (dataProducts, dataSpecs, type) => {
                         };
                         
                         product.descriptions.push(newDescription);
-                    } 
-                    // else {
-
-                    // }
-                    // let newDescription = {
-                    //     product_code: row.product_code, 
-                    //     name: row.name,
-                    //     information: row.information
-                    // };
-
-                    // product.Descriptions.push(newDescription);
+                    }
                 }
             }
             
@@ -568,16 +568,21 @@ const listProductsOneQuery = (dataProductsSpecs) => {
     }
 
     // DO SPECS
-    for(let row of dataProductsSpecs) {
+    for(let row of dataSpecs) {
         let product = products.find(product => product.code === row.product_code);
-    
+
         if(product) {
-            let description = {
-                name: row.name,
-                information: row.information
+            let description = product.descriptions.find(description => description.name === row.name);
+
+            if (!description) {
+                let newDescription = {
+                    product_code: row.product_code, 
+                    name: row.name,
+                    information: row.information
             };
-    
-            product.descriptions.push(description);
+                        
+            product.descriptions.push(newDescription);
+            }
         }
     }
     
