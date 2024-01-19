@@ -11,6 +11,7 @@ const brandRouter = require('./routes/brand.route');
 const productRouter = require('./routes/product.route');
 const variantRouter =  require('./routes/variant.route');
 const specificationRouter = require('./routes/specification.route');
+const searchRouter = require('./routes/search.route');
 
 const serverStart = () => {
     try {        
@@ -24,6 +25,7 @@ const serverStart = () => {
         app.use("/sales/api/product/",productRouter);
         app.use("/sales/api/variant/",variantRouter);
         app.use("/sales/api/specification/",specificationRouter);
+        app.use("/sales/api/search/",searchRouter);
 
         app.use(errorHandlerMiddleware);
 
