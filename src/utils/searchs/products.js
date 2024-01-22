@@ -568,7 +568,7 @@ const listProductsOneQuery = (dataProductsSpecs) => {
     }
 
     // DO SPECS
-    for(let row of dataSpecs) {
+    for(let row of dataProductsSpecs) {
         let product = products.find(product => product.code === row.product_code);
 
         if(product) {
