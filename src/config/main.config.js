@@ -17,6 +17,7 @@ const loadEnv = (variable, required = false) => {
 
 const config = {
     PORT: loadEnv('PORT', true),
+    ACCESS_SECRET: loadEnv('ACCESS_SECRET', true),
     
     API_LOCAL: loadEnv('API_LOCAL', true),
 

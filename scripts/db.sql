@@ -28,8 +28,6 @@ CREATE TABLE brands(
     modified_at TIMESTAMP
 );
 
-
-
 CREATE TABLE products(
     id SERIAL NOT NULL PRIMARY KEY,
     name VARCHAR(250) NOT NULL,
@@ -73,17 +71,25 @@ CREATE TABLE specifications(
 
 ALTER TABLE specifications ADD CONSTRAINT fk_specifications_variants FOREIGN KEY (variant_id) REFERENCES variants (id);
 
+CREATE TABLE userTypes(
+    id SERIAL NOT NULL PRIMARY KEY,
+    name VARCHAR(250) NOT NULL
+);
+
 CREATE TABLE users(
     id SERIAL NOT NULL PRIMARY KEY,
     firstname VARCHAR(250) NOT NULL,
     lastname VARCHAR(250) NOT NULL,
     username VARCHAR(250) NOT NULL,
     password VARCHAR(250) NOT NULL,
-    email VARCHAR(250) NOT NULL,
+    email VARCHAR(250) NOT NULL UNIQUE,
     state BOOLEAN NOT NULL,
     created_at TIMESTAMP,
-    modified_at TIMESTAMP
+    modified_at TIMESTAMP,
+	type_id INTEGER NOT NULL
 );
+
+ALTER TABLE users ADD CONSTRAINT fk_users_usertypes FOREIGN KEY (type_id) REFERENCES userTypes (id);
 
 CREATE TABLE statesales(
     id SERIAL NOT NULL PRIMARY KEY,
@@ -1383,3 +1389,103 @@ SELECT addSpecification(FALSE, FALSE, TRUE, 'País de origen', 'China', 12);
 SELECT addSpecification(FALSE, FALSE, TRUE, 'Capacidad de almacenamiento', '64GB', 12);
 
 */
+
+/*
+-------------------- USERS --------------------
+*/
+
+CREATE OR REPLACE FUNCTION addUserType(name_in VARCHAR)
+RETURNS INTEGER AS 
+$func$
+DECLARE
+	ut_new_id INTEGER;
+BEGIN
+	INSERT INTO usertypes (name) VALUES (name_in)
+	RETURNING id INTO ut_new_id;
+	RETURN ut_new_id;
+END;
+$func$
+LANGUAGE plpgsql;
+
+SELECT addUserType('admin');
+SELECT addUserType('client');
+
+-- CREATION OF USERS (ADMINS AND CLIENTS)
+
+CREATE OR REPLACE FUNCTION addUserAdmin(firstname_in VARCHAR, lastname_in VARCHAR, username_in VARCHAR, password_in VARCHAR, email_in VARCHAR)
+RETURNS INTEGER AS 
+$func$
+DECLARE
+	u_new_id INTEGER;
+BEGIN
+	INSERT INTO users (firstname, lastname, username, password, email, state, created_at, modified_at,type_id) VALUES (firstname_in, lastname_in, username_in, password_in, email_in, TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1)
+	RETURNING id INTO u_new_id;
+	RETURN u_new_id;
+END;
+$func$
+LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION addUserClient(firstname_in VARCHAR, lastname_in VARCHAR, username_in VARCHAR, password_in VARCHAR, email_in VARCHAR)
+RETURNS INTEGER AS 
+$func$
+DECLARE
+	u_new_id INTEGER;
+BEGIN
+	INSERT INTO users (firstname, lastname, username, password, email, state, created_at, modified_at,type_id) VALUES (firstname_in, lastname_in, username_in, password_in, email_in, TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 2)
+	RETURNING id INTO u_new_id;
+	RETURN u_new_id;
+END;
+$func$
+LANGUAGE plpgsql;
+
+-- USER CREATION AND AUTHENTICATION
+
+CREATE OR REPLACE FUNCTION signupUser (firstname_in VARCHAR, lastname_in VARCHAR, username_in VARCHAR, password_in VARCHAR, email_in VARCHAR, typeId_in INTEGER)
+RETURNS INTEGER AS 
+$func$
+DECLARE
+	u_new_id INTEGER;
+BEGIN
+	INSERT INTO users (firstname, lastname, username, password, email, state, created_at, modified_at, type_id) VALUES (firstname_in, lastname_in, username_in, password_in, email_in, TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, typeId_in)
+	RETURNING id INTO u_new_id;
+	RETURN u_new_id;
+END;
+$func$
+LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION signinUser (username_in VARCHAR)
+	RETURNS TABLE(id INTEGER, firstname VARCHAR, lastname VARCHAR, username VARCHAR, password VARCHAR, email VARCHAR, state BOOLEAN, type VARCHAR)
+LANGUAGE plpgsql AS
+$func$
+BEGIN
+	RETURN QUERY
+	SELECT u.id AS id, u.firstname AS firstname, u.lastname AS lastname, u.username AS username, u.password AS password, u.email AS email, u.state AS state, ut.name AS type 
+	FROM users as u 
+	INNER JOIN usertypes as ut on u.type_id = ut.id
+	WHERE u.username = username_in;
+END
+$func$;
+
+/*
+-------------------- SALES --------------------
+*/
+
+CREATE OR REPLACE FUNCTION addSaleState(name_in VARCHAR)
+RETURNS INTEGER AS 
+$func$
+DECLARE
+	ss_new_id INTEGER;
+BEGIN
+	INSERT INTO statesales (name) VALUES (name_in)
+	RETURNING id INTO ss_new_id;
+	RETURN ss_new_id;
+END;
+$func$
+LANGUAGE plpgsql;
+
+SELECT addSaleState('pendiente');
+SELECT addSaleState('pagada');
+SELECT addSaleState('cancelada');
+
+	

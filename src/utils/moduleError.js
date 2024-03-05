@@ -27,18 +27,28 @@ class CustomError extends Error {
 class BadRequestError extends CustomError {
     constructor(cause = 'No Content') {
         super(cause, 400);
-    }
-};
-
-class NotFoundError extends CustomError {
-    constructor(cause = 'Not Found') {
-        super(cause, 404);
+        this.code = 'BAD_REQUEST_ERROR';
     }
 };
 
 class UnauthorizedError extends CustomError {
     constructor(cause = 'Unauthorized') {
         super(cause, 401);
+        this.code = 'UNAUTHORIZED_ERROR';
+    }
+};
+
+class NotFoundError extends CustomError {
+    constructor(cause = 'Not Found') {
+        super(cause, 404);
+        this.code = 'NOT_FOUND_ERROR';
+    }
+};
+
+class ConflictError extends CustomError {
+    constructor(cause = 'Conflict') {
+        super(cause, 409);
+        this.code = 'CONFLICT_ERROR';
     }
 };
 
@@ -47,4 +57,5 @@ module.exports = {
     NotFoundError,
     UnauthorizedError,
     BadRequestError,
+    ConflictError,
 };

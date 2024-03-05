@@ -31,7 +31,7 @@ class Database {
             const propertys = Object.keys(params);
             const variables = [];
             const values = [];
-
+            
             for(let property of propertys) {
                 variables.push(`$${variables.length + 1}`);
                 values.push(params[property]);
@@ -41,8 +41,8 @@ class Database {
             const result = await this.client.query(query, values);
             return result.rows;
         } catch (error) {
-            //console.error(`error al llamar a la funcion '${funcName}':`);
-            throw new CustomError(`SOMETHING IS WRONG WITH THIS FUNCTION: '${functionName}':`);
+            //throw new CustomError(`SOMETHING IS WRONG WITH THIS FUNCTION: '${functionName}':`);
+            throw error;
         }
     };
 
