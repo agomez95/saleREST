@@ -1,61 +1,44 @@
 'use strict';
 
-class CustomError extends Error {
-    constructor(cause, status = 500) {
-        let causeAux;
-        let causeMessageAux;
+const { CustomError, BadRequestError, UnauthorizedError, ForbiddendError, NotFoundError, ConflictError, InternalServerError, ServiceUnavailableError, GatewayTimeoutError } = require('./httpError');
 
-        if (cause instanceof Error) {
-        causeMessageAux = cause.message;
-        causeAux = cause;
+class moduleErrorHandler {
+    static handleError(error) {
+        if (error.code === '23505') {
+            throw new ConflictError(409, 'ERROR: DUPLICATE KEY VALUE', error.code);
+        } else if (error.code === '23503') {
+            throw new ConflictError(409, 'ERROR: FOREIGN KEY VIOLATION', error.code);
+        } else if (error.code === '42703') {
+            throw new BadRequestError(400, 'ERROR: UNDEFINED COLUMN', error.code);
+        } else if (error.code === '42P01') {
+            throw new NotFoundError(404, 'ERROR: UNDEFINED TABLE', error.code);
+        } else if (error.code === '08001') {
+            throw new ServiceUnavailableError(503, 'ERROR: CONNECTION FAILURE', error.code);
+        } else if (error.code === '53300') {
+            throw new GatewayTimeoutError(504, 'ERROR: CONNECTION TIMED OUT', error.code);
+        } else if (error.code === '28000') {
+            throw new InternalServerError(500, 'ERROR: INVALID DATABASE AUTHORIZATION CREDENTIALS', error.code);
+        } else if (error.code === '3D000') {
+            throw new NotFoundError(404, 'ERROR: ' + error.message.toUpperCase(), error.code);
+        } else if (error.code === '42883') {
+            throw new NotFoundError(409, `ERROR: FUNCTION DOESN'T EXIST`, error.code);
+        } else if (error.code === '08006') {
+            let message = (error.message) ? error.message : 'ERROR: AUTHENTICATION ERROR, CREDENTIALS FAILED';
+            throw new UnauthorizedError(401, message, error.code);
+        } else if (error.code === '08007') {
+            throw new InternalServerError(500, 'ERROR: CONNECTION FAILED, ' + error.message.toUpperCase(), error.code);
+        } else if (error.code === '08003') {
+            throw new ServiceUnavailableError(503, 'ERROR: DATABASE SERVER REFUSE THE CONNECTION', error.code);
+        } else if (error.code === '08000') {
+            throw new InternalServerError(500, `ERROR: THE BACKEND CAN'T CONNECT TO THE DATABASE SERVER`, error.code);
+        } else if (error.code === 'ECONNREFUSED') {
+            throw new ServiceUnavailableError(503, `ERROR: THE DATABASE SERVER IS NOT WORKING OR HAVE PERMISSIONS ISSUES`, error.code);
+        } else if (error.code === 'P0001') {
+            throw new NotFoundError(409, `ERROR: DATA NOT FOUND`, error.code);
         } else {
-        causeMessageAux = cause;
+            throw new CustomError(500, 'ERROR: INTERNAL SERVER ERROR', error.code, error.message);
         }
-
-        super(causeMessageAux);
-        
-        if (causeAux) {
-        this.cause = causeAux;
-        }
-
-        this.status = status;
-        this.name = this.constructor.name;
-        this.message = causeMessageAux;
-    }
+    };
 };
 
-class BadRequestError extends CustomError {
-    constructor(cause = 'No Content') {
-        super(cause, 400);
-        this.code = 'BAD_REQUEST_ERROR';
-    }
-};
-
-class UnauthorizedError extends CustomError {
-    constructor(cause = 'Unauthorized') {
-        super(cause, 401);
-        this.code = 'UNAUTHORIZED_ERROR';
-    }
-};
-
-class NotFoundError extends CustomError {
-    constructor(cause = 'Not Found') {
-        super(cause, 404);
-        this.code = 'NOT_FOUND_ERROR';
-    }
-};
-
-class ConflictError extends CustomError {
-    constructor(cause = 'Conflict') {
-        super(cause, 409);
-        this.code = 'CONFLICT_ERROR';
-    }
-};
-
-module.exports = {
-    CustomError,
-    NotFoundError,
-    UnauthorizedError,
-    BadRequestError,
-    ConflictError,
-};
+module.exports = moduleErrorHandler;

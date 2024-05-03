@@ -1,6 +1,6 @@
 const pgConnection = require('../common/pgConnection');
 
-const { CustomError } = require('../utils/moduleError');
+const moduleErrorHandler = require('../utils/moduleError');
 
 const productQuery = require('../utils/querys/product.query');
 
@@ -9,25 +9,31 @@ const addProductService = async (data) => {
 
     const { name, code, subcategoryId, brandId } = data;
 
+    let result;
+
     try {
+        await pgDB.connect();
+
         await pgDB.query('BEGIN');
 
-        const result = await pgDB.selectFunction(productQuery.addProduct, { name: name, code: code, subcategoryId: subcategoryId, brandId: brandId });
-
-        if(!result || result === undefined) throw new CustomError('SOMETHING WRONG WHEN TRY TO SAVE DATA');
+        try {
+            result = await pgDB.selectFunction(productQuery.addProduct, { name: name, code: code, subcategoryId: subcategoryId, brandId: brandId });
+        } catch (error) {
+            await pgDB.query('ROLLBACK');
+            throw error;
+        }
 
         await pgDB.query('COMMIT');
 
         const response = {
             status: 200,
             service: 'addProductService',
-            message: 'SUCCES',
             result: result,
         };
 
         return { response: response }
     } catch (err) {
-        throw new CustomError(err);
+        moduleErrorHandler.handleError(error);
     } finally {
         pgDB.close();
     }

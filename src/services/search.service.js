@@ -1,6 +1,7 @@
 const pgConnection = require('../common/pgConnection');
 
 const { CustomError } = require('../utils/moduleError');
+const moduleErrorHandler = require('../utils/moduleError');
 
 const { resolveSearchBrandQuery, resolveSearchSubcategoryQuery, resolveSearchProductQuery } = require('../utils/searchs/specifications');
 const { listProductsOneQuery, listProductsTwoQuerys } = require('../utils/searchs/products')
@@ -13,34 +14,30 @@ const getProductsByBrandService = async (data) => {
     const id = data.id;
 
     try {
-        let message = 'SUCCES';
         let products = [];
 
-        // TYPE OF SPECS GET IT
-        const SPECS = await pgDB.selectFunction(searchQuery.searchSpecificationsByBrand, { id: Number(id) });
+        let SPECS;
 
-        if (!SPECS || SPECS === undefined) throw new CustomError('SOMETHING WRONG WHEN GET DATA');
+        await pgDB.connect();
+        // TYPE OF SPECS GET IT: First we get the type of specifications from db from the brand
+        SPECS = await pgDB.selectFunction(searchQuery.searchSpecificationsByBrand, { id: Number(id) }).catch((error) => { throw error; });
 
-        if (SPECS.length === 0) message = 'NO CONTENT'; // MEJORAR ESTO PARA QUE RETORNE 0 Y EL MENSAJE
+        // this 'no content' is for specify that BRAND doesn't have any SPECS
+        if (SPECS.length === 0) return { response: { status: 204 } }; 
 
-        // RECIVE QUERYS
+        // RECIVE QUERYS: this function give some querys by SPECS when we can get the 2 kind of searches of specifications
         const reciveQuery = resolveSearchBrandQuery(SPECS);
+        let resultProducts = [];
         let resultSpecs = [];
 
-        if (!reciveQuery) message = 'NO CONTENT'; // MEJORAR ESTO PARA QUE RETORNE 0 Y EL MENSAJE
+        // this 'no content' is for specify that QUERYS doesn't have any results
+        if (!reciveQuery) return { response: { status: 204 } };
 
-        // EXECUTE QUERYS
-        const resultProducts = await pgDB.selectFunction(reciveQuery.firstQuery, { id: Number(id) });
-        if (reciveQuery.secondQuery) resultSpecs = await pgDB.selectFunction(reciveQuery.secondQuery, { id: Number(id) });
-
-        // VALIDATE RESULTS
-        if (!resultProducts || resultProducts === undefined) throw new CustomError('SOMETHING WRONG WHEN GET DATA');
-        if (reciveQuery.secondQuery) if (!resultSpecs || resultSpecs === undefined) throw new CustomError('SOMETHING WRONG WHEN GET DATA');
-
-        if (resultProducts.length === 0) message = 'NO CONTENT'; 
-        if (reciveQuery.secondQuery) if (resultSpecs.length === 0) message = 'NO CONTENT';
+        // EXECUTE QUERYS: its time for execute the QUERYS recived and GET the PRODUCTS
+        resultProducts = await pgDB.selectFunction(reciveQuery.firstQuery, { id: Number(id) }).catch((error) => { throw error; });
+        if (reciveQuery.secondQuery) resultSpecs = await pgDB.selectFunction(reciveQuery.secondQuery, { id: Number(id) }).catch((error) => { throw error; });
         
-        // MAKE LIST OF PRODUCTS
+        // MAKE LIST OF PRODUCTS: Iterating the products get it
         if (reciveQuery.secondQuery) {
             products = listProductsTwoQuerys(resultProducts, resultSpecs, SPECS);
         } else {
@@ -50,14 +47,13 @@ const getProductsByBrandService = async (data) => {
         const response = {
             status: 200,
             service: 'getProductsByBrandService',
-            message: message,
             count: products.length,
             data: products
         };
 
         return { response: response }
     } catch (err) {
-        throw new CustomError(err);
+        moduleErrorHandler.handleError(error);
     } finally {
         pgDB.close();
     }
@@ -69,34 +65,31 @@ const getProductsBySubcategoryService = async (data) => {
     const id = data.id;
 
     try {
-        let message = 'SUCCES';
         let products = [];
+
+        let SPECS;
+
+        await pgDB.connect();
         
-        // TYPE OF SPECS GET IT
-        const SPECS = await pgDB.selectFunction(searchQuery.searchSpecificationsBySubcategory, { id: Number(id) });
+        // TYPE OF SPECS GET IT: First we get the type of specifications from db from the SUBCATEGORY
+        SPECS = await pgDB.selectFunction(searchQuery.searchSpecificationsBySubcategory, { id: Number(id) }).catch((error) => { throw error; });
 
-        if (!SPECS || SPECS === undefined) throw new CustomError('SOMETHING WRONG WHEN GET DATA');
+        // this 'no content' is for specify that SUBCATEGORY doesn't have any SPECS
+        if (SPECS.length === 0) return { response: { status: 204 } }; 
 
-        if (SPECS.length === 0) message = 'NO CONTENT'; // MEJORAR ESTO PARA QUE RETORNE 0 Y EL MENSAJE
-
-        // RECIVE QUERYS
+        // RECIVE QUERYS: this function give some querys by SPECS when we can get the 2 kind of searches of specifications
         const reciveQuery = resolveSearchSubcategoryQuery(SPECS);
+        let resultProducts = [];
         let resultSpecs = [];
 
-        if (!reciveQuery) message = 'NO CONTENT'; // MEJORAR ESTO PARA QUE RETORNE 0 Y EL MENSAJE
+        // this 'no content' is for specify that QUERYS doesn't have any results
+        if (!reciveQuery) return { response: { status: 204 } };
 
-        // EXECUTE QUERYS
-        const resultProducts = await pgDB.selectFunction(reciveQuery.firstQuery, { id: Number(id) });
-        if (reciveQuery.secondQuery) resultSpecs = await pgDB.selectFunction(reciveQuery.secondQuery, { id: Number(id) });
-
-        // VALIDATE RESULTS
-        if (!resultProducts || resultProducts === undefined) throw new CustomError('SOMETHING WRONG WHEN GET DATA');
-        if (reciveQuery.secondQuery) if (!resultSpecs || resultSpecs === undefined) throw new CustomError('SOMETHING WRONG WHEN GET DATA');
-
-        if (resultProducts.length === 0) message = 'NO CONTENT'; 
-        if (reciveQuery.secondQuery) if (resultSpecs.length === 0) message = 'NO CONTENT';
+        // EXECUTE QUERYS: its time for execute the QUERYS recived and GET the PRODUCTS
+        resultProducts = await pgDB.selectFunction(reciveQuery.firstQuery, { id: Number(id) }).catch((error) => { throw error; });
+        if (reciveQuery.secondQuery) resultSpecs = await pgDB.selectFunction(reciveQuery.secondQuery, { id: Number(id) }).catch((error) => { throw error; });
         
-        // MAKE LIST OF PRODUCTS
+        // MAKE LIST OF PRODUCTS: Iterating the products get it
         if (reciveQuery.secondQuery) {
             products = listProductsTwoQuerys(resultProducts, resultSpecs, SPECS);
         } else {
@@ -106,14 +99,13 @@ const getProductsBySubcategoryService = async (data) => {
         const response = {
             status: 200,
             service: 'getProductsBySubcategoryService',
-            message: message,
             count: products.length,
             result: products
         };
 
         return { response: response }
     } catch (err) {
-        throw new CustomError(err);
+        moduleErrorHandler.handleError(error);
     } finally {
         pgDB.close();
     }
@@ -125,34 +117,31 @@ const getDataByProductService = async (data) => {
     const id = data.id;
 
     try {
-        let message = 'SUCCES';
         let products = [];
 
-        // TYPE OF SPECS GET IT
-        const SPECS = await pgDB.selectFunction(searchQuery.searchSpecificationsByProduct, { id: Number(id) });
+        let SPECS;
 
-        if (!SPECS || SPECS === undefined) throw new CustomError('SOMETHING WRONG WHEN GET DATA');
+        await pgDB.connect();
 
-        if (SPECS.length === 0) message = 'NO CONTENT'; // MEJORAR ESTO PARA QUE RETORNE 0 Y EL MENSAJE
+        // TYPE OF SPECS GET IT: First we get the type of specifications from db from the PRODUCTS
+        SPECS = await pgDB.selectFunction(searchQuery.searchSpecificationsByProduct, { id: Number(id) }).catch((error) => { throw error; });
+        
+        // this 'no content' is for specify that SUBCATEGORY doesn't have any SPECS
+        if (SPECS.length === 0) return { response: { status: 204 } }; 
 
-        // RECIVE QUERYS
+        // RECIVE QUERYS: this function give some querys by SPECS when we can get the 2 kind of searches of specifications
         const reciveQuery = resolveSearchProductQuery(SPECS);
+        let resultProducts = [];
         let resultSpecs = [];
 
-        if (!reciveQuery) message = 'NO CONTENT'; // MEJORAR ESTO PARA QUE RETORNE 0 Y EL MENSAJE
+        // this 'no content' is for specify that QUERYS doesn't have any results
+        if (!reciveQuery) return { response: { status: 204 } }; 
 
-        // EXECUTE QUERYS
-        const resultProducts = await pgDB.selectFunction(reciveQuery.firstQuery, { id: Number(id) });
-        if (reciveQuery.secondQuery) resultSpecs = await pgDB.selectFunction(reciveQuery.secondQuery, { id: Number(id) });
-
-        // VALIDATE RESULTS
-        if (!resultProducts || resultProducts === undefined) throw new CustomError('SOMETHING WRONG WHEN GET DATA');
-        if (reciveQuery.secondQuery) if (!resultSpecs || resultSpecs === undefined) throw new CustomError('SOMETHING WRONG WHEN GET DATA');
-
-        if (resultProducts.length === 0) message = 'NO CONTENT'; 
-        if (reciveQuery.secondQuery) if (resultSpecs.length === 0) message = 'NO CONTENT';
+        // EXECUTE QUERYS: its time for execute the QUERYS recived and GET the PRODUCTS and SPECIFICATIONS
+        resultProducts = await pgDB.selectFunction(reciveQuery.firstQuery, { id: Number(id) }).catch((error) => { throw error; });
+        if (reciveQuery.secondQuery) resultSpecs = await pgDB.selectFunction(reciveQuery.secondQuery, { id: Number(id) }).catch((error) => { throw error; });
         
-        // MAKE LIST OF PRODUCTS
+        // MAKE LIST OF PRODUCTS: Iterating the products get it
         if (reciveQuery.secondQuery) {
             products = listProductsTwoQuerys(resultProducts, resultSpecs, SPECS);
         } else {
@@ -162,14 +151,13 @@ const getDataByProductService = async (data) => {
         const response = {
             status: 200,
             service: 'getDataByProductService',
-            message: message,
             count: products.length,
             result: products
         };
 
         return { response: response }
     } catch (err) {
-        throw new CustomError(err);
+        moduleErrorHandler.handleError(error);
     } finally {
         pgDB.close();
     }

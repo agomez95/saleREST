@@ -1,6 +1,7 @@
 'use strict';
 
 const { CustomError } = require('../utils/moduleError');
+const moduleErrorHandler = require('../utils/moduleError')
 
 const { Client } = require('pg');
 const config = require('../config/main.config');
@@ -14,15 +15,22 @@ class Database {
             password: config.PG_PASSWORD_LOCAL,
             port: config.PG_PORT_LOCAL
         });
-        this.client.connect();
     };
+
+    async connect() {
+        try {
+            await this.client.connect();
+        } catch (error) {
+            throw error;
+        }
+    }
 
     async query(query, values) {
         try {
             const result = await this.client.query(query, values);
             return result.rows;
         } catch (error) {
-            throw new CustomError(`SOMETHING IS WRONG WITH THIS QUERY: '${query}':`);
+            throw error;
         }
     };
 
@@ -41,7 +49,6 @@ class Database {
             const result = await this.client.query(query, values);
             return result.rows;
         } catch (error) {
-            //throw new CustomError(`SOMETHING IS WRONG WITH THIS FUNCTION: '${functionName}':`);
             throw error;
         }
     };

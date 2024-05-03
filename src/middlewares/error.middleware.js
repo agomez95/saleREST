@@ -1,4 +1,4 @@
-const { CustomError } = require('../utils/moduleError');
+const { HttpError } = require('../utils/httpError');
 
 /**
  * 
@@ -8,11 +8,12 @@ const { CustomError } = require('../utils/moduleError');
  * @param {*} next 
  */
 const errorHandlerMiddleware = (err, req, res, next) => {
-    if (err instanceof CustomError) {
+    if (err instanceof HttpError) {
         //error personalizado
         console.error('------------------DETAILS BELOW-------------------');
-        console.error('ERROR:', err.message);
-        console.error(err.status);
+        console.error(err.message);
+        console.error('STATUS:', err.status);
+        console.error('CÓDIGO DE ERROR:', err.code);
         
         res.status(err.status).json({
             err_code: 1,
@@ -22,8 +23,9 @@ const errorHandlerMiddleware = (err, req, res, next) => {
     } else {
         //error normal
         console.error('------------------DETAILS BELOW-------------------');
-        console.error('ERROR:', err.message);
-        console.error(err.status);
+        console.error(err.type);
+        console.error('STATUS:', err.status);
+        console.error('CÓDIGO DE ERROR:', err.code);
 
         res.status(500).json({
             err_code: 1,

@@ -1464,6 +1464,10 @@ BEGIN
 	FROM users as u 
 	INNER JOIN usertypes as ut on u.type_id = ut.id
 	WHERE u.username = username_in;
+	-- SI NO EXISTE EL USUARIO EN LA DATA, ENVIO UNA EXCEPCION CONTROLADA DE CODIGO 'P0001'
+    IF NOT FOUND THEN
+		RAISE EXCEPTION 'USER NOT FOUND';
+    END IF;
 END
 $func$;
 
