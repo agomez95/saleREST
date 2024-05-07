@@ -53,14 +53,26 @@ ALTER TABLE products ADD CONSTRAINT fk_products_brands FOREIGN KEY (product_bran
 --     product_id INTEGER NOT NULL
 -- );
 
-CREATE TABLE product_specifications(
+CREATE TABLE specificaction_constants(
     id SERIAL NOT NULL PRIMARY KEY,
     name VARCHAR(250) NOT NULL,
     created_at TIMESTAMP,
+    modified_at TIMESTAMP
+);
+
+INSERT INTO specificaction_constants (name, created_at, modified_at) VALUES ('COLOR', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP); 
+INSERT INTO specificaction_constants (name, created_at, modified_at) VALUES ('SIZE', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP); 
+INSERT INTO specificaction_constants (name, created_at, modified_at) VALUES ('TEXT', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP); 
+
+CREATE TABLE product_specifications(
+    id SERIAL NOT NULL PRIMARY KEY,
+    created_at TIMESTAMP,
     modified_at TIMESTAMP,
+    specification_constant_id INTEGER NOT NULL,
     product_subcategory_id INTEGER NOT NULL
 );
 
+ALTER TABLE product_specifications ADD CONSTRAINT fk_products_specifications_constants FOREIGN KEY (specification_constant_id) REFERENCES specificaction_constants (id);
 ALTER TABLE product_specifications ADD CONSTRAINT fk_products_specifications_subcategorys FOREIGN KEY (product_subcategory_id) REFERENCES product_subcategorys (id);
 
 CREATE TABLE product_specification_values (
@@ -109,7 +121,7 @@ LANGUAGE plpgsql AS
 $func$
 BEGIN
 	RETURN QUERY
-	SELECT c.id as id, c.name as name, c.state as state, date(c.created_at) as creation_date FROM product_categorys as c;
+	SELECT c.id AS id, c.name AS name, c.state AS state, date(c.created_at) AS creation_date FROM product_categorys AS c;
 END
 $func$;
 
@@ -119,7 +131,7 @@ LANGUAGE plpgsql AS
 $func$
 BEGIN
 	RETURN QUERY
-	SELECT c.id as id, c.name as name, c.state as state, date(c.created_at) as creation_date FROM product_categorys as c where c.id = id_in;
+	SELECT c.id AS id, c.name AS name, c.state AS state, date(c.created_at) AS creation_date FROM product_categorys AS c where c.id = id_in;
 END
 $func$;
 
@@ -198,7 +210,7 @@ LANGUAGE plpgsql AS
 $func$
 BEGIN
 	RETURN QUERY
-	SELECT sc.id AS id, sc.name AS name, c.name as category, sc.state AS state, date(sc.created_at) AS creation_date 
+	SELECT sc.id AS id, sc.name AS name, c.name AS category, sc.state AS state, date(sc.created_at) AS creation_date 
     FROM product_subcategorys AS sc
     INNER JOIN product_categorys AS c ON c.id = sc.product_category_id;
 END
@@ -210,7 +222,7 @@ LANGUAGE plpgsql AS
 $func$
 BEGIN
 	RETURN QUERY
-	SELECT sc.id AS id, sc.name AS name, c.name as category, sc.state AS state, date(sc.created_at) AS creation_date 
+	SELECT sc.id AS id, sc.name AS name, c.name AS category, sc.state AS state, date(sc.created_at) AS creation_date 
     FROM product_subcategorys AS sc
     INNER JOIN product_categorys AS c ON c.id = sc.product_category_id
     WHERE sc.id = id_in;
@@ -305,7 +317,7 @@ LANGUAGE plpgsql AS
 $func$
 BEGIN
 	RETURN QUERY
-	SELECT b.id as id, b.name as name, b.state as state, date(b.created_at) as creation_date FROM product_brands as b;
+	SELECT b.id AS id, b.name AS name, b.state AS state, date(b.created_at) AS creation_date FROM product_brands AS b;
 END
 $func$;
 
@@ -315,7 +327,7 @@ LANGUAGE plpgsql AS
 $func$
 BEGIN
 	RETURN QUERY
-	SELECT b.id as id, b.name as name, b.state as state, date(b.created_at) as creation_date FROM product_brands as b where b.id = id_in;
+	SELECT b.id AS id, b.name AS name, b.state AS state, date(b.created_at) AS creation_date FROM product_brands AS b where b.id = id_in;
 END
 $func$;
 
@@ -405,13 +417,13 @@ LANGUAGE plpgsql;
 /* PRODUCT SPECIFICATIONS */
 
 
-CREATE OR REPLACE FUNCTION add_product_specifications(name_in VARCHAR, subcategory_id_in INTEGER)
+CREATE OR REPLACE FUNCTION add_product_specification(specification_constant_id_in INTEGER, subcategory_id_in INTEGER)
 RETURNS INTEGER AS 
 $func$
 DECLARE
 	s_new_id INTEGER;
 BEGIN
-	INSERT INTO product_specifications(name, created_at, modified_at, product_subcategory_id) VALUES (name_in, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, subcategory_id_in)
+	INSERT INTO product_specifications(created_at, modified_at, specification_constant_id, product_subcategory_id) VALUES (CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, specification_constant_id_in, subcategory_id_in)
 	RETURNING id INTO s_new_id;
 	RETURN s_new_id;
 END;
@@ -451,3 +463,60 @@ BEGIN
 END;
 $func$
 LANGUAGE plpgsql;
+
+
+/* PRODUCT VARIANT SPECIFICATION VALUES */
+
+
+CREATE OR REPLACE FUNCTION add_product_variant_specification_value(variant_id_in INTEGER, specification_value_id_in)
+RETURNS INTEGER AS 
+$func$
+DECLARE
+	v_new_id INTEGER;
+BEGIN
+	INSERT INTO product_variants(created_at, modified_at, product_variant_id, product_specification_value_id) VALUES (CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, variant_id_in, specification_value_id_in)
+	RETURNING id INTO v_new_id;
+	RETURN v_new_id;
+END;
+$func$
+LANGUAGE plpgsql;
+
+
+/* SEARCHES */
+
+
+CREATE OR REPLACE FUNCTION search_spectifications_subcategory(subcategory_id_in INTEGER)
+RETURNS TABLE(specification_type INTEGER)
+LANGUAGE plpgsql AS
+$func$
+BEGIN
+	RETURN QUERY
+	-- SELECT
+    -- CASE
+    --     WHEN COUNT(DISTINCT CASE WHEN s.color THEN s.id END) > 0 AND COUNT(DISTINCT CASE WHEN s.size THEN s.id END) = 0 THEN 1  -- ONLY COLOR
+    --     WHEN COUNT(DISTINCT CASE WHEN s.size THEN s.id END) > 0 AND COUNT(DISTINCT CASE WHEN s.color THEN s.id END) = 0 THEN 2  -- ONLY SIZE
+    --     WHEN COUNT(DISTINCT CASE WHEN s.color THEN s.id END) > 0 AND COUNT(DISTINCT CASE WHEN s.size THEN s.id END) > 0 THEN 3  -- COLOR AND SIZE
+    --     WHEN COUNT(DISTINCT CASE WHEN s.text THEN s.id END) > 0 AND COUNT(DISTINCT CASE WHEN s.color THEN s.id END) = 0 AND COUNT(DISTINCT CASE WHEN s.size THEN s.id END) = 0 THEN 4  -- ONLY TEXT
+    --     ELSE 0  -- NO SPEC
+	--     END AS specification_type
+	-- FROM products p
+	-- JOIN variants v ON p.id = v.product_id
+	-- LEFT JOIN specifications s ON v.id = s.variant_id
+	-- WHERE p.subcategory_id = subcategoryId_in;
+    SELECT
+    CASE
+        WHEN 
+    FROM products p
+    JOIN product_variants v ON p.id = v.product_id
+    JOIN product_variant_specification_values vsv ON v.id = vsv.product_variant_id
+    JOIN product_specification_values sv ON vsv.product_specification_value_id = sv.id
+    JOIN product_specifications s ON sv.product_specification_id = s.id
+    WHERE p.product_subcategory_id = subcategory_id_in;
+	RETURN;
+END
+$func$;
+
+CREATE OR REPLACE FUNCTION search_spectifications_brand(brand_id_in INTEGER)
+
+
+CREATE OR REPLACE FUNCTION search_spectifications_product(product_id_in INTEGER)
