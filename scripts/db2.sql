@@ -468,13 +468,13 @@ LANGUAGE plpgsql;
 /* PRODUCT VARIANT SPECIFICATION VALUES */
 
 
-CREATE OR REPLACE FUNCTION add_product_variant_specification_value(variant_id_in INTEGER, specification_value_id_in)
+CREATE OR REPLACE FUNCTION add_product_variant_specification_value(variant_id_in INTEGER, specification_value_id_in INTEGER)
 RETURNS INTEGER AS 
 $func$
 DECLARE
 	v_new_id INTEGER;
 BEGIN
-	INSERT INTO product_variants(created_at, modified_at, product_variant_id, product_specification_value_id) VALUES (CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, variant_id_in, specification_value_id_in)
+	INSERT INTO product_variant_specification_values(created_at, modified_at, product_variant_id, product_specification_value_id) VALUES (CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, variant_id_in, specification_value_id_in)
 	RETURNING id INTO v_new_id;
 	RETURN v_new_id;
 END;
@@ -482,8 +482,63 @@ $func$
 LANGUAGE plpgsql;
 
 
-/* SEARCHES */
+/* INFORMATION */
 
+
+-- SELECT add_product_category('ropa'); -- agregado categoria 'ropa'
+-- SELECT add_product_subcategory('jeans hombre', 1); -- agregado sub-categoria 'jeans de hombre'
+-- SELECT add_product_brand('American Cold'); -- agregado marca 'amercian cold'
+-- SELECT add_product('Pantalon Hombre Basement', 'PRO12', 1, 1); -- agregado producto 'Pantalon Hombre Basement'
+
+
+-- SELECT add_product_specification(1, 1); -- agregado especificacion COLOR para la subcategoria de 'jeans de hombre'
+-- SELECT add_product_specification(2, 1); -- agregado especificacion SIZE para la subcategoria de 'jeans de hombre'
+-- SELECT add_product_specification(3, 1); -- agregado especificacion TEXT para la subcategoria de 'jeans de hombre'
+
+
+-- SELECT add_product_specification_value('NEGRO', 1); -- agregado valor 'NEGRO' a la especificacion COLOR para la subcategoria de 'jeans de hombre'
+-- SELECT add_product_specification_value('AZUL', 1); -- agregado valor 'AZUL' a la  especificacion COLOR para la subcategoria de 'jeans de hombre'
+-- SELECT add_product_specification_value('BEIGE', 1); -- agregado valor 'BEIGE' a la  especificacion COLOR para la subcategoria de 'jeans de hombre'
+
+
+-- SELECT add_product_specification_value('32', 2); -- agregada talla '32' a la especificacion SIZE para la subcategoria de 'jeans de hombre'
+-- SELECT add_product_specification_value('30', 2); -- agregada talla '30' a la especificacion SIZE para la subcategoria de 'jeans de hombre'
+-- SELECT add_product_specification_value('28', 2); -- agregada talla '28' a la especificacion SIZE para la subcategoria de 'jeans de hombre'
+
+
+-- SELECT add_product_specification_value('Material: Drill', 3); -- agregado valor informativo 'Material: Drill' a la especificacion TEXT para la subcategoria de 'jeans de hombre'
+
+
+-- SELECT add_product_variant('PANTALON NEGRO 32', 10, 59.9, 1); -- agregada variante 'PANTALON NEGRO 32' del producto 'Pantalon Hombre Basement'
+-- SELECT add_product_variant('PANTALON AZUL 32', 10, 59.9, 1); -- agregada variante 'PANTALON AZUL 32' del producto 'Pantalon Hombre Basement'
+-- SELECT add_product_variant('PANTALON BEIGE 32', 10, 59.9, 1); -- agregada variante 'PANTALON BEIGE 32' del producto 'Pantalon Hombre Basement'
+
+-- SELECT add_product_variant('PANTALON NEGRO 30', 10, 59.9, 1); -- agregada variante 'PANTALON NEGRO 30' del producto 'Pantalon Hombre Basement'
+-- SELECT add_product_variant('PANTALON AZUL 30', 10, 59.9, 1); -- agregada variante 'PANTALON AZUL 30' del producto 'Pantalon Hombre Basement'
+-- SELECT add_product_variant('PANTALON BEIGE 30', 10, 59.9, 1); -- agregada variante 'PANTALON BEIGE 30' del producto 'Pantalon Hombre Basement'
+
+
+-- SELECT add_product_variant('PANTALON NEGRO 28', 10, 59.9, 1); -- agregada variante 'PANTALON NEGRO 28' del producto 'Pantalon Hombre Basement'
+-- SELECT add_product_variant('PANTALON AZUL 28', 10, 59.9, 1); -- agregada variante 'PANTALON AZUL 28' del producto 'Pantalon Hombre Basement'
+-- SELECT add_product_variant('PANTALON BEIGE 28', 10, 59.9, 1); -- agregada variante 'PANTALON BEIGE 28' del producto 'Pantalon Hombre Basement'
+
+
+-- SELECT add_product_variant_specification_value(1,1); -- agregada valor 'NEGRO' de las especificaciones a la variante 'PANTALON NEGRO 32' del producto 'Pantalon Hombre Basement'
+-- SELECT add_product_variant_specification_value(1,4); -- agregada valor '32' de las especificaciones a la variante 'PANTALON NEGRO 32' del producto 'Pantalon Hombre Basement'
+-- SELECT add_product_variant_specification_value(1,7); -- agregada valor 'Material: Dril' de las especificaciones a la variante 'PANTALON NEGRO 32' del producto 'Pantalon Hombre Basement'
+
+
+-- SELECT add_product_variant_specification_value(2,2); -- agregada valor 'AZUL' de las especificaciones a la variante 'PANTALON AZUL 32' del producto 'Pantalon Hombre Basement'
+-- SELECT add_product_variant_specification_value(2,4); -- agregada valor '32' de las especificaciones a la variante 'PANTALON AZUL 32' del producto 'Pantalon Hombre Basement'
+-- SELECT add_product_variant_specification_value(2,7); -- agregada valor 'Material: Dril' de las especificaciones a la variante 'PANTALON AZUL 32' del producto 'Pantalon Hombre Basement'
+
+
+-- SELECT add_product_variant_specification_value(3,3); -- agregada valor 'BEIGE' de las especificaciones a la variante 'PANTALON BEIGE 32' del producto 'Pantalon Hombre Basement'
+-- SELECT add_product_variant_specification_value(3,4); -- agregada valor '32' de las especificaciones a la variante 'PANTALON BEIGE 32' del producto 'Pantalon Hombre Basement'
+-- SELECT add_product_variant_specification_value(3,7); -- agregada valor 'Material: Dril' de las especificaciones a la variante 'PANTALON BEIGE 32' del producto 'Pantalon Hombre Basement'
+
+
+/* SEARCHES */
 
 CREATE OR REPLACE FUNCTION search_spectifications_subcategory(subcategory_id_in INTEGER)
 RETURNS TABLE(specification_type INTEGER)
@@ -491,32 +546,265 @@ LANGUAGE plpgsql AS
 $func$
 BEGIN
 	RETURN QUERY
-	-- SELECT
-    -- CASE
-    --     WHEN COUNT(DISTINCT CASE WHEN s.color THEN s.id END) > 0 AND COUNT(DISTINCT CASE WHEN s.size THEN s.id END) = 0 THEN 1  -- ONLY COLOR
-    --     WHEN COUNT(DISTINCT CASE WHEN s.size THEN s.id END) > 0 AND COUNT(DISTINCT CASE WHEN s.color THEN s.id END) = 0 THEN 2  -- ONLY SIZE
-    --     WHEN COUNT(DISTINCT CASE WHEN s.color THEN s.id END) > 0 AND COUNT(DISTINCT CASE WHEN s.size THEN s.id END) > 0 THEN 3  -- COLOR AND SIZE
-    --     WHEN COUNT(DISTINCT CASE WHEN s.text THEN s.id END) > 0 AND COUNT(DISTINCT CASE WHEN s.color THEN s.id END) = 0 AND COUNT(DISTINCT CASE WHEN s.size THEN s.id END) = 0 THEN 4  -- ONLY TEXT
-    --     ELSE 0  -- NO SPEC
-	--     END AS specification_type
-	-- FROM products p
-	-- JOIN variants v ON p.id = v.product_id
-	-- LEFT JOIN specifications s ON v.id = s.variant_id
-	-- WHERE p.subcategory_id = subcategoryId_in;
-    SELECT
+    SELECT 
     CASE
-        WHEN 
+    	WHEN COUNT (CASE WHEN sc.id = 1 THEN sc.id END) > 0 AND COUNT (CASE WHEN sc.id = 2 THEN sc.id END) = 0 THEN 1 -- ONLY COLOR
+    	WHEN COUNT (CASE WHEN sc.id = 2 THEN sc.id END) > 0 AND COUNT (CASE WHEN sc.id = 1 THEN sc.id END) = 0 THEN 2 -- ONLY SIZE
+    	WHEN COUNT (CASE WHEN sc.id = 1 THEN sc.id END) > 0 AND COUNT (CASE WHEN sc.id = 2 THEN sc.id END) > 0 THEN 3 -- COLOR AND SIZE
+    	WHEN COUNT (CASE WHEN sc.id = 3 THEN sc.id END) > 0 AND COUNT (CASE WHEN sc.id = 1 THEN sc.id END) = 0 AND COUNT (CASE WHEN sc.id = 2 THEN sc.id END) = 0 THEN 4 -- ONLY TEXT
+        ELSE 0  -- NO SPEC
+	    END AS specification_type
     FROM products p
     JOIN product_variants v ON p.id = v.product_id
     JOIN product_variant_specification_values vsv ON v.id = vsv.product_variant_id
     JOIN product_specification_values sv ON vsv.product_specification_value_id = sv.id
     JOIN product_specifications s ON sv.product_specification_id = s.id
+  	JOIN specificaction_constants sc ON s.specification_constant_id = sc.id
     WHERE p.product_subcategory_id = subcategory_id_in;
 	RETURN;
 END
 $func$;
 
 CREATE OR REPLACE FUNCTION search_spectifications_brand(brand_id_in INTEGER)
-
+RETURNS TABLE(specification_type INTEGER)
+LANGUAGE plpgsql AS
+$func$
+BEGIN
+	RETURN QUERY
+    SELECT 
+    CASE
+    	WHEN COUNT (CASE WHEN sc.id = 1 THEN sc.id END) > 0 AND COUNT (CASE WHEN sc.id = 2 THEN sc.id END) = 0 THEN 1 -- ONLY COLOR
+    	WHEN COUNT (CASE WHEN sc.id = 2 THEN sc.id END) > 0 AND COUNT (CASE WHEN sc.id = 1 THEN sc.id END) = 0 THEN 2 -- ONLY SIZE
+    	WHEN COUNT (CASE WHEN sc.id = 1 THEN sc.id END) > 0 AND COUNT (CASE WHEN sc.id = 2 THEN sc.id END) > 0 THEN 3 -- COLOR AND SIZE
+    	WHEN COUNT (CASE WHEN sc.id = 3 THEN sc.id END) > 0 AND COUNT (CASE WHEN sc.id = 1 THEN sc.id END) = 0 AND COUNT (CASE WHEN sc.id = 2 THEN sc.id END) = 0 THEN 4 -- ONLY TEXT
+        ELSE 0  -- NO SPEC
+	    END AS specification_type
+    FROM products p
+    JOIN product_variants v ON p.id = v.product_id
+    JOIN product_variant_specification_values vsv ON v.id = vsv.product_variant_id
+    JOIN product_specification_values sv ON vsv.product_specification_value_id = sv.id
+    JOIN product_specifications s ON sv.product_specification_id = s.id
+  	JOIN specificaction_constants sc ON s.specification_constant_id = sc.id
+    WHERE p.product_brand_id = brand_id_in;
+	RETURN;
+END
+$func$;
 
 CREATE OR REPLACE FUNCTION search_spectifications_product(product_id_in INTEGER)
+RETURNS TABLE(specification_type INTEGER)
+LANGUAGE plpgsql AS
+$func$
+BEGIN
+	RETURN QUERY
+    SELECT 
+    CASE
+    	WHEN COUNT (CASE WHEN sc.id = 1 THEN sc.id END) > 0 AND COUNT (CASE WHEN sc.id = 2 THEN sc.id END) = 0 THEN 1 -- ONLY COLOR
+    	WHEN COUNT (CASE WHEN sc.id = 2 THEN sc.id END) > 0 AND COUNT (CASE WHEN sc.id = 1 THEN sc.id END) = 0 THEN 2 -- ONLY SIZE
+    	WHEN COUNT (CASE WHEN sc.id = 1 THEN sc.id END) > 0 AND COUNT (CASE WHEN sc.id = 2 THEN sc.id END) > 0 THEN 3 -- COLOR AND SIZE
+    	WHEN COUNT (CASE WHEN sc.id = 3 THEN sc.id END) > 0 AND COUNT (CASE WHEN sc.id = 1 THEN sc.id END) = 0 AND COUNT (CASE WHEN sc.id = 2 THEN sc.id END) = 0 THEN 4 -- ONLY TEXT
+        ELSE 0  -- NO SPEC
+	    END AS specification_type
+    FROM products p
+    JOIN product_variants v ON p.id = v.product_id
+    JOIN product_variant_specification_values vsv ON v.id = vsv.product_variant_id
+    JOIN product_specification_values sv ON vsv.product_specification_value_id = sv.id
+    JOIN product_specifications s ON sv.product_specification_id = s.id
+  	JOIN specificaction_constants sc ON s.specification_constant_id = sc.id
+    WHERE p.id = product_id_in;
+	RETURN;
+END
+$func$;
+
+
+/* GET SEARCHS */
+
+
+CREATE OR REPLACE FUNCTION get_sizes_colors_bySubcategory(subcategory_id_in INTEGER)
+RETURNS TABLE(
+	product VARCHAR, 
+	product_code INTEGER,
+	brand VARCHAR,
+	brand_code INTEGER,
+	subcategory VARCHAR,
+	subcategory_code INTEGER,
+	category VARCHAR,
+	category_code INTEGER,
+	product_variant VARCHAR,
+	product_variant_id INTEGER,
+	product_cost NUMERIC, 
+	product_stock INTEGER,
+	available BOOLEAN, 
+	color VARCHAR, 
+	size VARCHAR, 
+	creation_date DATE
+)
+LANGUAGE plpgsql AS
+$func$
+BEGIN
+	RETURN QUERY
+	SELECT 
+		p.name AS product, 
+		p.id AS product_code, 
+		pb.name AS brand, 
+		pb.id AS brand_code, 
+		ps.name AS subcategory, 
+		ps.id AS subcategory_code, 
+		pc.name AS category, 
+		pc.id AS category_code, 
+		pv.name AS product_variant, 
+		pv.id AS product_variant_id, 
+		pv.cost AS product_cost, 
+		pv.stock AS product_stock, 
+		pv.is_available AS available, 
+		c.color AS color, 
+		s.size AS size, 
+		date(pv.created_at) AS creation_date
+	FROM product_variants pv
+	JOIN products p ON pv.product_id = p.id
+	JOIN ( 
+		SELECT vsv.product_variant_id AS variant, sv.value AS color 
+		FROM product_variant_specification_values vsv 
+		INNER JOIN product_specification_values sv ON vsv.product_specification_value_id = sv.id
+		INNER JOIN product_specifications s ON sv.product_specification_id = s.id
+		INNER JOIN specificaction_constants sc ON s.specification_constant_id = sc.id
+		WHERE sc.name = 'COLOR') AS c ON pv.id = c.variant
+	JOIN ( 
+		SELECT vsv.product_variant_id AS variant, sv.value AS size 
+		FROM product_variant_specification_values vsv 
+		INNER JOIN product_specification_values sv ON vsv.product_specification_value_id = sv.id
+		INNER JOIN product_specifications s ON sv.product_specification_id = s.id
+		INNER JOIN specificaction_constants sc ON s.specification_constant_id = sc.id
+		WHERE sc.name = 'SIZE') AS s ON pv.id = s.variant
+	JOIN product_brands pb ON p.product_brand_id = pb.id
+	JOIN product_subcategorys ps ON p.product_subcategory_id = ps.id
+	JOIN product_categorys pc ON ps.product_category_id = pc.id
+	WHERE p.state = TRUE AND ps.id = subcategory_id_in;
+END
+$func$;
+
+CREATE OR REPLACE FUNCTION get_sizes_colors_byBrand(brand_id_in INTEGER)
+RETURNS TABLE(
+	product VARCHAR, 
+	product_code INTEGER,
+	brand VARCHAR,
+	brand_code INTEGER,
+	subcategory VARCHAR,
+	subcategory_code INTEGER,
+	category VARCHAR,
+	category_code INTEGER,
+	product_variant VARCHAR,
+	product_variant_id INTEGER,
+	product_cost NUMERIC, 
+	product_stock INTEGER, 
+	available BOOLEAN, 
+	color VARCHAR, 
+	size VARCHAR, 
+	creation_date DATE
+)
+LANGUAGE plpgsql AS
+$func$
+BEGIN
+	RETURN QUERY
+	SELECT 
+		p.name AS product, 
+		p.id AS product_code, 
+		pb.name AS brand, 
+		pb.id AS brand_code, 
+		ps.name AS subcategory, 
+		ps.id AS subcategory_code, 
+		pc.name AS category, 
+		pc.id AS category_code, 
+		pv.name AS product_variant, 
+		pv.id AS product_variant_id, 
+		pv.cost AS product_cost, 
+		pv.stock AS product_stock, 
+		pv.is_available AS available, 
+		c.color AS color, 
+		s.size AS size, 
+		date(pv.created_at) AS creation_date
+	FROM product_variants pv
+	JOIN products p ON pv.product_id = p.id
+	JOIN ( 
+		SELECT vsv.product_variant_id AS variant, sv.value AS color 
+		FROM product_variant_specification_values vsv 
+		INNER JOIN product_specification_values sv ON vsv.product_specification_value_id = sv.id
+		INNER JOIN product_specifications s ON sv.product_specification_id = s.id
+		INNER JOIN specificaction_constants sc ON s.specification_constant_id = sc.id
+		WHERE sc.name = 'COLOR') AS c ON pv.id = c.variant
+	JOIN ( 
+		SELECT vsv.product_variant_id AS variant, sv.value AS size 
+		FROM product_variant_specification_values vsv 
+		INNER JOIN product_specification_values sv ON vsv.product_specification_value_id = sv.id
+		INNER JOIN product_specifications s ON sv.product_specification_id = s.id
+		INNER JOIN specificaction_constants sc ON s.specification_constant_id = sc.id
+		WHERE sc.name = 'SIZE') AS s ON pv.id = s.variant
+	JOIN product_brands pb ON p.product_brand_id = pb.id
+	JOIN product_subcategorys ps ON p.product_subcategory_id = ps.id
+	JOIN product_categorys pc ON ps.product_category_id = pc.id
+	WHERE p.state = TRUE AND pb.id = brand_id_in;
+END
+$func$;
+
+
+CREATE OR REPLACE FUNCTION get_sizes_colors_byProduct(product_id_in INTEGER)
+RETURNS TABLE(
+	product VARCHAR, 
+	product_code INTEGER,
+	brand VARCHAR,
+	brand_code INTEGER,
+	subcategory VARCHAR,
+	subcategory_code INTEGER,
+	category VARCHAR,
+	category_code INTEGER,
+	product_variant VARCHAR,
+	product_variant_id INTEGER,
+	product_cost NUMERIC, 
+	product_stock INTEGER,
+	available BOOLEAN, 
+	color VARCHAR, 
+	size VARCHAR, 
+	creation_date DATE)
+LANGUAGE plpgsql AS
+$func$
+BEGIN
+	RETURN QUERY
+	SELECT 
+		p.name AS product, 
+		p.id AS product_code, 
+		pb.name AS brand, 
+		pb.id AS brand_code, 
+		ps.name AS subcategory, 
+		ps.id AS subcategory_code, 
+		pc.name AS category, 
+		pc.id AS category_code, 
+		pv.name AS product_variant, 
+		pv.id AS product_variant_id, 
+		pv.cost AS product_cost, 
+		pv.stock AS product_stock, 
+		pv.is_available AS available, 
+		c.color AS color, 
+		s.size AS size, 
+		date(pv.created_at) AS creation_date
+	FROM product_variants pv
+	JOIN products p ON pv.product_id = p.id
+	JOIN ( 
+		SELECT vsv.product_variant_id AS variant, sv.value AS color 
+		FROM product_variant_specification_values vsv 
+		INNER JOIN product_specification_values sv ON vsv.product_specification_value_id = sv.id
+		INNER JOIN product_specifications s ON sv.product_specification_id = s.id
+		INNER JOIN specificaction_constants sc ON s.specification_constant_id = sc.id
+		WHERE sc.name = 'COLOR') AS c ON pv.id = c.variant
+	JOIN ( 
+		SELECT vsv.product_variant_id AS variant, sv.value AS size 
+		FROM product_variant_specification_values vsv 
+		INNER JOIN product_specification_values sv ON vsv.product_specification_value_id = sv.id
+		INNER JOIN product_specifications s ON sv.product_specification_id = s.id
+		INNER JOIN specificaction_constants sc ON s.specification_constant_id = sc.id
+		WHERE sc.name = 'SIZE') AS s ON pv.id = s.variant
+	JOIN product_brands pb ON p.product_brand_id = pb.id
+	JOIN product_subcategorys ps ON p.product_subcategory_id = ps.id
+	JOIN product_categorys pc ON ps.product_category_id = pc.id
+	WHERE p.state = TRUE AND pv.product_id = product_id_in
+	ORDER BY pv.id;
+END
+$func$;

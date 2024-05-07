@@ -544,7 +544,6 @@ BEGIN
 	JOIN variants v ON p.id = v.product_id
 	LEFT JOIN specifications s ON v.id = s.variant_id
 	WHERE p.brand_id = brandId_in;
-
 	RETURN;
 END
 $func$;
