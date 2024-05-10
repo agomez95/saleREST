@@ -20,19 +20,19 @@ const errorHandlerMiddleware = (err, req, res, next) => {
             status: err.status,
             err_msg: 'ERROR, SEE LOGS',
         });
-    } else {
-        //error normal
-        console.error('------------------DETAILS BELOW-------------------');
-        console.error(err.type);
-        console.error('STATUS:', err.status);
-        console.error('CÓDIGO DE ERROR:', err.code);
-
-        res.status(500).json({
-            err_code: 1,
-            status: 500,
-            err_msg: 'ERROR, SEE LOGS',
-        });
     }
+    
+    //error normal
+    console.error('------------------DETAILS BELOW-------------------');
+    console.error(err.type);
+    console.error('STATUS:', err.status);
+    console.error('CÓDIGO DE ERROR:', err.code);
+
+    res.status(500).json({
+        err_code: 1,
+        status: 500,
+        err_msg: 'ERROR, SEE LOGS',
+    });
 };
 
 module.exports = errorHandlerMiddleware;
