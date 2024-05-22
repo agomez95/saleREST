@@ -1,7 +1,12 @@
 'use strict';
 
-const addSpecification = 'addSpecification';
+// POST one
+const add_PRO_specification = 'add_PRO_specification';
+
+// POST one
+const add_PRO_specification_value = 'add_PRO_specification_value';
 
 module.exports = {
-    addSpecification,
+    add_PRO_specification,
+    add_PRO_specification_value
 }

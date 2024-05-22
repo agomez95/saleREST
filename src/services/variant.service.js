@@ -4,6 +4,7 @@ const moduleErrorHandler = require('../utils/moduleError');
 
 const variantQuery = require('../utils/querys/variant.query');
 
+/*** AQUI SI AGREGAR SERVICIO PARA SPECIFICATION VALUE */
 const addVariantService = async (data) => {
     const pgDB = new pgConnection();
 
@@ -17,7 +18,7 @@ const addVariantService = async (data) => {
         await pgDB.query('BEGIN');
 
         try {
-            result = await pgDB.selectFunction(variantQuery.addVariant, { name: name, stock: stock, cost: cost, productId: productId });    
+            result = await pgDB.selectFunction(variantQuery.add_PRO_variant, { name: name, stock: stock, cost: cost, productId: productId });    
         } catch (error) {
             await pgDB.query('ROLLBACK');
             throw error;

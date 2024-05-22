@@ -14,25 +14,25 @@ const resolveSearchBrandQuery = (data) => {
             break;
         case 1:
             // this kind of specifications BY BRAND is ONLY FOR COLOR
-            firstQuery = searchQuery.getColorsProductsByBrand;
-            secondQuery = searchQuery.getDescriptionsProductsByBrand;
+            firstQuery = searchQuery.get_colors_byBrand;
+            secondQuery = searchQuery.get_specifications_byBrand;
             return { firstQuery, secondQuery};
             break;
         case 2:
             // this kind of specifications BY BRAND is ONLY FOR SIZE
-            firstQuery = searchQuery.getSizesProductsByBrand;
-            secondQuery = searchQuery.getDescriptionsProductsByBrand;
+            firstQuery = searchQuery.get_sizes_byBrand;
+            secondQuery = searchQuery.get_specifications_byBrand;
             return { firstQuery, secondQuery};
             break;
         case 3:
             // this kind of specifications BY BRAND is FOR COLOR AN SIZE
-            firstQuery = searchQuery.getSizesColorsProductsByBrand;
-            secondQuery = searchQuery.getDescriptionsProductsByBrand;
+            firstQuery = searchQuery.get_sizes_colors_byBrand;
+            secondQuery = searchQuery.get_specifications_byBrand;
             return { firstQuery, secondQuery};
             break;
         case 4:
             // this kind is for only TEXT TYPE
-            firstQuery = searchQuery.getVariantsDescriptionsProductsByBrand;
+            firstQuery = searchQuery.get_variants_details_byBrand;
             return { firstQuery };
             break;
     }
@@ -50,25 +50,25 @@ const resolveSearchSubcategoryQuery = (data) => {
             break;
         case 1:
             // this kind of specifications BY SUBCATEGORY is ONLY FOR COLOR
-            firstQuery = searchQuery.getColorsProductsBySubcategory;
-            secondQuery = searchQuery.getDescriptionsProductsBySubcategory;
+            firstQuery = searchQuery.get_colors_bySubcategory;
+            secondQuery = searchQuery.get_specifications_bySubcategory;
             return { firstQuery, secondQuery};
             break;
         case 2:
             // this kind of specifications BY SUBCATEGORY is ONLY FOR SIZE
-            firstQuery = searchQuery.getSizesProductsBySubcategory;
-            secondQuery = searchQuery.getDescriptionsProductsBySubcategory;
+            firstQuery = searchQuery.get_colors_bySubcategory;
+            secondQuery = searchQuery.get_specifications_bySubcategory;
             return { firstQuery, secondQuery};
             break;
         case 3:
             // this kind of specifications BY SUBCATEGORY is FOR COLOR AN SIZE
-            firstQuery = searchQuery.getSizesColorsProductsBySubcategory;
-            secondQuery = searchQuery.getDescriptionsProductsBySubcategory;
+            firstQuery = searchQuery.get_sizes_colors_bySubcategory;
+            secondQuery = searchQuery.get_specifications_bySubcategory;
             return { firstQuery, secondQuery};
             break;
         case 4:
             // this kind is for only TEXT TYPE
-            firstQuery = searchQuery.getVariantsDescriptionsProductsBySubcategory;
+            firstQuery = searchQuery.get_variants_details_bySubcategory;
             return { firstQuery };
             break;
     }
@@ -86,25 +86,25 @@ const resolveSearchProductQuery = (data) => {
             break;
         case 1:
             // this kind of specifications BY PRODUCT is ONLY FOR COLOR
-            firstQuery = searchQuery.getColorsDataByProduct;
-            secondQuery = searchQuery.getDescriptionsDataByProduct;
+            firstQuery = searchQuery.get_colors_byProduct;
+            secondQuery = searchQuery.get_specifications_byProduct;
             return { firstQuery, secondQuery};
             break;
         case 2:
             // this kind of specifications BY PRODUCT is ONLY FOR SIZE
-            firstQuery = searchQuery.getSizesDataByProduct;
-            secondQuery = searchQuery.getDescriptionsDataByProduct;
+            firstQuery = searchQuery.get_sizes_byProduct;
+            secondQuery = searchQuery.get_specifications_byProduct;
             return { firstQuery, secondQuery};
             break;
         case 3:
             // this kind of specifications BY PRODUCT is FOR COLOR AN SIZE
-            firstQuery = searchQuery.getSizesColorsDataByProduct;
-            secondQuery = searchQuery.getDescriptionsDataByProduct;
+            firstQuery = searchQuery.get_sizes_colors_byProduct;
+            secondQuery = searchQuery.get_specifications_byProduct;
             return { firstQuery, secondQuery};
             break;
         case 4:
             // this kind is for only TEXT TYPE
-            firstQuery = searchQuery.getVariantsDescriptionsDataByProduct;
+            firstQuery = searchQuery.get_variants_details_byProduct;
             return { firstQuery };
             break;
     }

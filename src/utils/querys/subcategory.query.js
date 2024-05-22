@@ -1,19 +1,32 @@
 'use strict';
 
-const getSubcategorys = 'SELECT * FROM getSubcategorys();';
-const addSubcategory = 'addSubcategory';
-const editNameSubcategory = 'editNameSubcategory';
-const editCategorySubcategory = 'editCategorySubcategory';
-const activateSubcategory = 'activateSubcategory';
-const deactivateSubcategory = 'deactivateSubcategory';
-const deleteSubcategory = 'deleteSubcategory';
+// GET all
+const get_PRO_subcategorys = 'SELECT * FROM get_PRO_subcategorys();';
+
+// POST one
+const add_PRO_subcategory = 'add_PRO_subcategory';
+
+// PUT one
+const edit_PRO_subcategory = 'edit_PRO_subcategory';
+
+// GET one
+const get_PRO_subcategory = 'get_PRO_subcategory';
+
+// PUT one
+const delete_PRO_subcategory = 'delete_PRO_subcategory';
+
+// PUT one
+const activate_PRO_subcategory = 'activate_PRO_subcategory';
+
+// PUT one
+const deactivate_PRO_subcategory = 'deactivate_PRO_subcategory';
 
 module.exports = {
-    getSubcategorys,
-    addSubcategory,
-    editNameSubcategory,
-    editCategorySubcategory,
-    activateSubcategory,
-    deactivateSubcategory,
-    deleteSubcategory
+    get_PRO_subcategorys,
+    add_PRO_subcategory,
+    edit_PRO_subcategory,
+    get_PRO_subcategory,
+    delete_PRO_subcategory,
+    activate_PRO_subcategory,
+    deactivate_PRO_subcategory
 }

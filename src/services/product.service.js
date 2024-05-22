@@ -17,7 +17,7 @@ const addProductService = async (data) => {
         await pgDB.query('BEGIN');
 
         try {
-            result = await pgDB.selectFunction(productQuery.addProduct, { name: name, code: code, subcategoryId: subcategoryId, brandId: brandId });
+            result = await pgDB.selectFunction(productQuery.add_product, { name: name, code: code, subcategoryId: subcategoryId, brandId: brandId });
         } catch (error) {
             await pgDB.query('ROLLBACK');
             throw error;

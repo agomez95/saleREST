@@ -12,7 +12,7 @@ const getCategorysService = async () => {
     try {
         await pgDB.connect();
 
-        result = await pgDB.query(categoryQuery.getCategorys).catch((error) => { throw error; });
+        result = await pgDB.query(categoryQuery.get_PRO_categorys).catch((error) => { throw error; });
 
         const count = result.length;
 
@@ -44,7 +44,7 @@ const addCategoryService = async (data) => {
         await pgDB.query('BEGIN');
 
         try {
-            result = await pgDB.selectFunction(categoryQuery.addCategory, { name: name });
+            result = await pgDB.selectFunction(categoryQuery.add_PRO_category, { name: name });
         } catch (error) {
             await pgDB.query('ROLLBACK');
             throw error;
@@ -81,7 +81,7 @@ const editCategoryService = async (params, body) => {
         await pgDB.query('BEGIN');
 
         try {
-            result = await pgDB.selectFunction(categoryQuery.editCategory, { id: Number(id), name: name });
+            result = await pgDB.selectFunction(categoryQuery.edit_PRO_category, { id: Number(id), name: name });
         } catch (error) {
             await pgDB.query('ROLLBACK');
             throw error;
@@ -119,7 +119,7 @@ const activateCategoryService = async (data) => {
         await pgDB.query('BEGIN');
 
         try {
-            result = await pgDB.selectFunction(categoryQuery.activateCategory, { id: Number(id) });
+            result = await pgDB.selectFunction(categoryQuery.activate_PRO_category, { id: Number(id) });
         } catch (error) {
             await pgDB.query('ROLLBACK');
             throw error;
@@ -157,7 +157,7 @@ const deactivateCategoryService = async (data) => {
         await pgDB.query('BEGIN');
 
         try {
-            result = await pgDB.selectFunction(categoryQuery.deactivateCategory, { id: Number(id) });
+            result = await pgDB.selectFunction(categoryQuery.deactivate_PRO_category, { id: Number(id) });
         } catch (error) {
             await pgDB.query('ROLLBACK');
             throw error;
@@ -195,7 +195,7 @@ const deleteCategoryService = async (data) => {
         await pgDB.query('BEGIN');
 
         try {
-            result = await pgDB.selectFunction(categoryQuery.deleteCategory, { id: Number(id) });
+            result = await pgDB.selectFunction(categoryQuery.deactivate_PRO_category, { id: Number(id) });
         } catch (error) {
             await pgDB.query('ROLLBACK');
             throw error;

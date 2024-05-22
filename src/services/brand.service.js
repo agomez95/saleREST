@@ -17,7 +17,7 @@ const addBrandService = async (data) => {
         await pgDB.query('BEGIN');
 
         try {
-            result = await pgDB.selectFunction(brandQuery.addBrand, { name: name });
+            result = await pgDB.selectFunction(brandQuery.add_PRO_brand, { name: name });
         } catch (error) {
             await pgDB.query('ROLLBACK');
             throw error;

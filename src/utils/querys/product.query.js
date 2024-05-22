@@ -1,11 +1,8 @@
 'use strict';
 
-// const getDataProducts = 'SELECT * FROM getDataProducts();';
-// const getDataByProduct = 'getDataByProduct';
-const addProduct = 'addProduct';
+// POST one
+const add_product = 'add_product';
 
 module.exports = {
-    // getDataProducts,
-    // getDataByProduct,
-    addProduct,
+    add_product,
 }

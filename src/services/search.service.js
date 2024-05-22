@@ -20,7 +20,7 @@ const getProductsByBrandService = async (data) => {
 
         await pgDB.connect();
         // TYPE OF SPECS GET IT: First we get the type of specifications from db from the brand
-        SPECS = await pgDB.selectFunction(searchQuery.searchSpecificationsByBrand, { id: Number(id) }).catch((error) => { throw error; });
+        SPECS = await pgDB.selectFunction(searchQuery.search_spectifications_brand, { id: Number(id) }).catch((error) => { throw error; });
 
         // this 'no content' is for specify that BRAND doesn't have any SPECS
         if (SPECS.length === 0) return { response: { status: 204 } }; 
@@ -72,7 +72,7 @@ const getProductsBySubcategoryService = async (data) => {
         await pgDB.connect();
         
         // TYPE OF SPECS GET IT: First we get the type of specifications from db from the SUBCATEGORY
-        SPECS = await pgDB.selectFunction(searchQuery.searchSpecificationsBySubcategory, { id: Number(id) }).catch((error) => { throw error; });
+        SPECS = await pgDB.selectFunction(searchQuery.search_spectifications_subcategory, { id: Number(id) }).catch((error) => { throw error; });
 
         // this 'no content' is for specify that SUBCATEGORY doesn't have any SPECS
         if (SPECS.length === 0) return { response: { status: 204 } }; 
@@ -124,7 +124,7 @@ const getDataByProductService = async (data) => {
         await pgDB.connect();
 
         // TYPE OF SPECS GET IT: First we get the type of specifications from db from the PRODUCTS
-        SPECS = await pgDB.selectFunction(searchQuery.searchSpecificationsByProduct, { id: Number(id) }).catch((error) => { throw error; });
+        SPECS = await pgDB.selectFunction(searchQuery.search_spectifications_product, { id: Number(id) }).catch((error) => { throw error; });
         
         // this 'no content' is for specify that SUBCATEGORY doesn't have any SPECS
         if (SPECS.length === 0) return { response: { status: 204 } }; 

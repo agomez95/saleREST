@@ -4,6 +4,8 @@ const moduleErrorHandler = require('../utils/moduleError');
 
 const specificationQuery = require('../utils/querys/specification.query');
 
+
+/*** AQUI SI AGREGAR SERVICIO PARA SPECIFICATION VALUE */
 const addSpecificationService = async (data) => {
     const pgDB = new pgConnection();
 
@@ -17,7 +19,7 @@ const addSpecificationService = async (data) => {
         await pgDB.query('BEGIN');
 
         try {
-            result = await pgDB.selectFunction(specificationQuery.addSpecification, { color: color, size: size, text: text, name: name, information: information, variantId: variantId });    
+            result = await pgDB.selectFunction(specificationQuery.add, { color: color, size: size, text: text, name: name, information: information, variantId: variantId });    
         } catch (error) {
             throw error;
         }
