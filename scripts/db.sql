@@ -1,7 +1,9 @@
 CREATE DATABASE sales;
 \c sales
 
-CREATE TABLE categorys(
+/* TABLES */
+
+CREATE TABLE PRO_categorys(
     id SERIAL NOT NULL PRIMARY KEY,
     name VARCHAR(250) NOT NULL,
     state BOOLEAN NOT NULL,
@@ -9,19 +11,19 @@ CREATE TABLE categorys(
     modified_at TIMESTAMP
 );
 
-CREATE TABLE subcategorys(
+CREATE TABLE PRO_subcategorys(
     id SERIAL NOT NULL PRIMARY KEY,
     name VARCHAR(250) NOT NULL,
     state BOOLEAN NOT NULL,
     created_at TIMESTAMP,
     modified_at TIMESTAMP,
-    category_id INTEGER NOT NULL
+    PRO_category_id INTEGER NOT NULL
 );
 
-ALTER TABLE subcategorys ADD CONSTRAINT fk_subcategorys_categorys FOREIGN KEY (category_id) REFERENCES categorys (id);
+ALTER TABLE PRO_subcategorys ADD CONSTRAINT fk_subcategorys_categorys FOREIGN KEY (PRO_category_id) REFERENCES PRO_categorys (id);
 
-CREATE TABLE brands(
-	id SERIAL NOT NULL PRIMARY KEY,
+CREATE TABLE PRO_brands(
+    id SERIAL NOT NULL PRIMARY KEY,
     name VARCHAR(250) NOT NULL,
     state BOOLEAN NOT NULL,
     created_at TIMESTAMP,
@@ -35,268 +37,270 @@ CREATE TABLE products(
     state BOOLEAN NOT NULL,
     created_at TIMESTAMP,
     modified_at TIMESTAMP,
-    subcategory_id INTEGER NOT NULL,
-	brand_id INTEGER NOT NULL
+    PRO_subcategory_id INTEGER NOT NULL,
+    PRO_brand_id INTEGER NOT NULL
 );
 
-ALTER TABLE products ADD CONSTRAINT fk_products_subcategorys FOREIGN KEY (subcategory_id) REFERENCES subcategorys (id);
-ALTER TABLE products ADD CONSTRAINT fk_products_brands FOREIGN KEY (brand_id) REFERENCES brands (id);
+ALTER TABLE products ADD CONSTRAINT fk_products_subcategorys FOREIGN KEY (PRO_subcategory_id) REFERENCES PRO_subcategorys (id);
+ALTER TABLE products ADD CONSTRAINT fk_products_brands FOREIGN KEY (PRO_brand_id) REFERENCES PRO_brands (id);
 
-CREATE TABLE variants(
+-- CREATE TABLE PRO_prices(
+--     id SERIAL NOT NULL PRIMARY KEY,
+--     price DECIMAL(10,2) NOT NULL,
+--     state BOOLEAN NOT NULL,
+--     created_at TIMESTAMP,
+--     modified_at TIMESTAMP,
+--     PRO_id INTEGER NOT NULL
+-- );
+
+CREATE TABLE specificaction_constants(
+    id SERIAL NOT NULL PRIMARY KEY,
+    name VARCHAR(250) NOT NULL,
+    created_at TIMESTAMP,
+    modified_at TIMESTAMP
+);
+
+INSERT INTO specificaction_constants (name, created_at, modified_at) VALUES ('COLOR', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP); 
+INSERT INTO specificaction_constants (name, created_at, modified_at) VALUES ('SIZE', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP); 
+INSERT INTO specificaction_constants (name, created_at, modified_at) VALUES ('TEXT', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP); 
+
+CREATE TABLE PRO_specifications(
+    id SERIAL NOT NULL PRIMARY KEY,
+    created_at TIMESTAMP,
+    modified_at TIMESTAMP,
+    specification_constant_id INTEGER NOT NULL,
+    PRO_subcategory_id INTEGER NOT NULL
+);
+
+ALTER TABLE PRO_specifications ADD CONSTRAINT fk_products_specifications_constants FOREIGN KEY (specification_constant_id) REFERENCES specificaction_constants (id);
+ALTER TABLE PRO_specifications ADD CONSTRAINT fk_products_specifications_subcategorys FOREIGN KEY (PRO_subcategory_id) REFERENCES PRO_subcategorys (id);
+
+CREATE TABLE PRO_specification_values (
+    id SERIAL NOT NULL PRIMARY KEY,
+    value VARCHAR(250) NOT NULL,
+    created_at TIMESTAMP,
+    modified_at TIMESTAMP,
+    PRO_specification_id INTEGER NOT NULL
+);
+
+ALTER TABLE PRO_specification_values ADD CONSTRAINT fk_products_specification_values_specifications FOREIGN KEY (PRO_specification_id) REFERENCES PRO_specifications (id);
+
+CREATE TABLE PRO_variants(
     id SERIAL NOT NULL PRIMARY KEY,
     name VARCHAR(250) NOT NULL,
     stock INTEGER NOT NULL,
     cost NUMERIC NOT NULL,
-    isAvailable BOOLEAN NOT NULL,
-    state BOOLEAN NOT NULL,
+    is_available BOOLEAN NOT NULL,
     created_at TIMESTAMP,
     modified_at TIMESTAMP,
-    product_id INTEGER NOT NULL
+    PRO_id INTEGER NOT NULL
 );
 
-ALTER TABLE variants ADD CONSTRAINT fk_variants_products FOREIGN KEY (product_id) REFERENCES products (id);
+ALTER TABLE PRO_variants ADD CONSTRAINT fk_products_variants_products FOREIGN KEY (PRO_id) REFERENCES products (id);
 
-CREATE TABLE specifications(
+CREATE TABLE PRO_variant_specification_values(
     id SERIAL NOT NULL PRIMARY KEY,
-    color BOOLEAN NOT NULL,
-    size BOOLEAN NOT NULL,
-    text BOOLEAN NOT NULL,
-    name VARCHAR NOT NULL,
-	information VARCHAR NOT NULL,
-    state BOOLEAN NOT NULL,
     created_at TIMESTAMP,
     modified_at TIMESTAMP,
-    variant_id INTEGER NOT NULL
+    PRO_variant_id INTEGER NOT NULL,
+    PRO_specification_value_id INTEGER NOT NULL
 );
 
-ALTER TABLE specifications ADD CONSTRAINT fk_specifications_variants FOREIGN KEY (variant_id) REFERENCES variants (id);
-
-CREATE TABLE userTypes(
-    id SERIAL NOT NULL PRIMARY KEY,
-    name VARCHAR(250) NOT NULL
-);
-
-CREATE TABLE users(
-    id SERIAL NOT NULL PRIMARY KEY,
-    firstname VARCHAR(250) NOT NULL,
-    lastname VARCHAR(250) NOT NULL,
-    username VARCHAR(250) NOT NULL,
-    password VARCHAR(250) NOT NULL,
-    email VARCHAR(250) NOT NULL UNIQUE,
-    state BOOLEAN NOT NULL,
-    created_at TIMESTAMP,
-    modified_at TIMESTAMP,
-	type_id INTEGER NOT NULL
-);
-
-ALTER TABLE users ADD CONSTRAINT fk_users_usertypes FOREIGN KEY (type_id) REFERENCES userTypes (id);
-
-CREATE TABLE statesales(
-    id SERIAL NOT NULL PRIMARY KEY,
-    name VARCHAR(250) NOT NULL
-);
-
-CREATE TABLE sales(
-    id SERIAL NOT NULL PRIMARY KEY,
-    sales_code VARCHAR(250) NOT NULL,
-    created_at TIMESTAMP,
-    modified_at TIMESTAMP,
-    state_id INTEGER NOT NULL,
-    user_id INTEGER NOT NULL
-);
-
-ALTER TABLE sales ADD CONSTRAINT fk_sales_users FOREIGN KEY (state_id) REFERENCES users (id);
-ALTER TABLE sales ADD CONSTRAINT fk_sales_statesales FOREIGN KEY (user_id) REFERENCES statesales (id);
-
-CREATE TABLE presales(
-    id SERIAL NOT NULL PRIMARY KEY,
-    quanty INTEGER NOT NULL,
-    created_at TIMESTAMP,
-    modified_at TIMESTAMP,
-    sale_id INTEGER NOT NULL,
-    product_id INTEGER NOT NULL
-);
-
-ALTER TABLE presales ADD CONSTRAINT fk_presales_sales FOREIGN KEY (sale_id) REFERENCES sales (id);
-ALTER TABLE presales ADD CONSTRAINT fk_presales_products FOREIGN KEY (product_id) REFERENCES products (id);
+ALTER TABLE PRO_variant_specification_values ADD CONSTRAINT fk_products_variant_specification_values_variants FOREIGN KEY (PRO_variant_id) REFERENCES PRO_variants (id);
+ALTER TABLE PRO_variant_specification_values ADD CONSTRAINT fk_products_variant_specification_values_specification_values FOREIGN KEY (PRO_specification_value_id) REFERENCES PRO_specification_values (id);
 
 
-/****************
-    FUNCIONES: LAS FUNCIONES DE ESTADO HAY QUE CORREGIRLAS AUN, CASCADA?
-*****************/
 
---CATEGORYS
+/* FUNCTIONS */
 
-CREATE OR REPLACE FUNCTION getCategorys()
+/* PRODUCT CATEGORYS */
+
+CREATE OR REPLACE FUNCTION get_PRO_categorys()
 RETURNS TABLE(id INTEGER, name VARCHAR, state BOOLEAN, created_at DATE)
 LANGUAGE plpgsql AS
 $func$
 BEGIN
 	RETURN QUERY
-	SELECT c.id as id, c.name as name, c.state as state, date(c.created_at) as creation_date FROM categorys as c;
+	SELECT c.id AS id, c.name AS name, c.state AS state, date(c.created_at) AS creation_date FROM PRO_categorys AS c;
 END
 $func$;
 
-CREATE OR REPLACE FUNCTION addCategory(name_in VARCHAR)
+CREATE OR REPLACE FUNCTION get_PRO_category(id_in INTEGER)
+RETURNS TABLE(id INTEGER, name VARCHAR, state BOOLEAN, created_at DATE)
+LANGUAGE plpgsql AS
+$func$
+BEGIN
+	RETURN QUERY
+	SELECT c.id AS id, c.name AS name, c.state AS state, date(c.created_at) AS creation_date FROM PRO_categorys AS c where c.id = id_in;
+END
+$func$;
+
+CREATE OR REPLACE FUNCTION add_PRO_category(name_in VARCHAR)
 RETURNS INTEGER AS 
 $func$
 DECLARE
 	c_new_id INTEGER;
 BEGIN
-	INSERT INTO categorys(name, state, created_at, modified_at) VALUES (name_in, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+	INSERT INTO PRO_categorys(name, state, created_at, modified_at) VALUES (name_in, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 	RETURNING id INTO c_new_id;
 	RETURN c_new_id;
 END;
 $func$
 LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION deleteCategory(id_in INTEGER)
+CREATE OR REPLACE FUNCTION delete_PRO_category(id_in INTEGER)
 RETURNS INTEGER AS
 $func$
 DECLARE
 	c_delete_count INTEGER;	
 BEGIN
-	DELETE FROM categorys where id = id_in
+	DELETE FROM PRO_categorys where id = id_in
 	RETURNING * INTO c_delete_count;
 	RETURN c_delete_count;
 END;
 $func$
 LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION activateCategory(id_in INTEGER)
+CREATE OR REPLACE FUNCTION activate_PRO_category(id_in INTEGER)
 RETURNS INTEGER AS
 $func$
 DECLARE
 	c_activate_count INTEGER;	
 BEGIN
-	UPDATE categorys SET state = TRUE WHERE id = id_in
+	UPDATE PRO_categorys SET state = TRUE WHERE id = id_in
 	RETURNING * INTO c_activate_count;
 	RETURN c_activate_count;
 END;
 $func$
 LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION deactivateCategory(id_in INTEGER)
+CREATE OR REPLACE FUNCTION deactivate_PRO_category(id_in INTEGER)
 RETURNS INTEGER AS
 $func$
 DECLARE
 	c_deactivate_count INTEGER;	
 BEGIN
-	UPDATE categorys SET state = FALSE WHERE id = id_in
+	UPDATE PRO_categorys SET state = FALSE WHERE id = id_in
 	RETURNING * INTO c_deactivate_count;
 	RETURN c_deactivate_count;
 END;
 $func$
 LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION editCategory(id_in INTEGER, name_in VARCHAR)
+CREATE OR REPLACE FUNCTION edit_PRO_category(id_in INTEGER, name_in VARCHAR)
 RETURNS INTEGER AS
 $func$
 DECLARE
 	c_edit_count INTEGER;	
 BEGIN
-	UPDATE categorys SET name = name_in, modified_at = CURRENT_TIMESTAMP WHERE id = id_in
+	UPDATE PRO_categorys SET name = name_in, modified_at = CURRENT_TIMESTAMP WHERE id = id_in
 	RETURNING * INTO c_edit_count;
 	RETURN c_edit_count;
 END;
 $func$
 LANGUAGE plpgsql;
 
---CATEGORYS: EXAMPLES
--- SELECT addCategory('pantalones');
--- SELECT * FROM getCategorys();
--- SELECT deleteCategory(5);
--- SELECT deactivateCategory(4); -- FALSE
--- SELECT activateCategory(4); -- TRUE
--- SELECT editCategory(4, 'CARROS');
+
+/* PRODUCT SUBCATEGORYS */
 
 
---SUBCATEGORYS
-
-CREATE OR REPLACE FUNCTION getSubcategorys()
+CREATE OR REPLACE FUNCTION get_PRO_subcategorys()
 RETURNS TABLE(id INTEGER, name VARCHAR, category VARCHAR, state BOOLEAN, created_at DATE)
 LANGUAGE plpgsql AS
 $func$
 BEGIN
 	RETURN QUERY
-	SELECT sc.id AS id, sc.name AS name, c.name as category, sc.state AS state, date(sc.created_at) AS creation_date 
-    FROM subcategorys AS sc
-    INNER JOIN categorys AS c ON c.id = sc.category_id;
+	SELECT sc.id AS id, sc.name AS name, c.name AS category, sc.state AS state, date(sc.created_at) AS creation_date 
+    FROM PRO_subcategorys AS sc
+    INNER JOIN PRO_categorys AS c ON c.id = sc.PRO_category_id;
 END
 $func$;
 
-CREATE OR REPLACE FUNCTION addSubcategory(name_in VARCHAR, categoryId_in INTEGER)
+CREATE OR REPLACE FUNCTION get_PRO_subcategory(id_in INTEGER)
+RETURNS TABLE(id INTEGER, name VARCHAR, category VARCHAR, state BOOLEAN, created_at DATE)
+LANGUAGE plpgsql AS
+$func$
+BEGIN
+	RETURN QUERY
+	SELECT sc.id AS id, sc.name AS name, c.name AS category, sc.state AS state, date(sc.created_at) AS creation_date 
+    FROM PRO_subcategorys AS sc
+    INNER JOIN PRO_categorys AS c ON c.id = sc.PRO_category_id
+    WHERE sc.id = id_in;
+END
+$func$;
+
+CREATE OR REPLACE FUNCTION add_PRO_subcategory(name_in VARCHAR, category_id_in INTEGER)
 RETURNS INTEGER AS 
 $func$
 DECLARE
 	sc_new_id INTEGER;
 BEGIN
-	INSERT INTO subcategorys(name, state, created_at, modified_at, category_id) VALUES (name_in, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, categoryId_in)
+	INSERT INTO PRO_subcategorys(name, state, created_at, modified_at, PRO_category_id) VALUES (name_in, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, category_id_in)
 	RETURNING id INTO sc_new_id;
 	RETURN sc_new_id;
 END;
 $func$
 LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION deleteSubcategory(id_in INTEGER)
+CREATE OR REPLACE FUNCTION delete_PRO_subcategory(id_in INTEGER)
 RETURNS INTEGER AS
 $func$
 DECLARE
 	sc_delete_count INTEGER;	
 BEGIN
-	DELETE FROM subcategorys where id = id_in
+	DELETE FROM PRO_subcategorys where id = id_in
 	RETURNING * INTO sc_delete_count;
 	RETURN sc_delete_count;
 END;
 $func$
 LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION activateSubcategory(id_in INTEGER)
+CREATE OR REPLACE FUNCTION activate_PRO_subcategory(id_in INTEGER)
 RETURNS INTEGER AS
 $func$
 DECLARE
 	sc_activate_count INTEGER;	
 BEGIN
-	UPDATE subcategorys SET state = TRUE WHERE id = id_in
+	UPDATE PRO_subcategorys SET state = TRUE WHERE id = id_in
 	RETURNING * INTO sc_activate_count;
 	RETURN sc_activate_count;
 END;
 $func$
 LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION deactivateSubcategory(id_in INTEGER)
+CREATE OR REPLACE FUNCTION deactivate_PRO_subcategory(id_in INTEGER)
 RETURNS INTEGER AS
 $func$
 DECLARE
 	sc_deactivate_count INTEGER;	
 BEGIN
-	UPDATE subcategorys SET state = FALSE WHERE id = id_in
+	UPDATE PRO_subcategorys SET state = FALSE WHERE id = id_in
 	RETURNING * INTO sc_deactivate_count;
 	RETURN sc_deactivate_count;
 END;
 $func$
 LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION editNameSubcategory(id_in INTEGER, name_in VARCHAR)
+CREATE OR REPLACE FUNCTION edit_name_PRO_subcategory(id_in INTEGER, name_in VARCHAR)
 RETURNS INTEGER AS
 $func$
 DECLARE
 	sc_edit_count INTEGER;	
 BEGIN
-	UPDATE subcategorys SET name = name_in, modified_at = CURRENT_TIMESTAMP WHERE id = id_in
+	UPDATE PRO_subcategorys SET name = name_in, modified_at = CURRENT_TIMESTAMP WHERE id = id_in
 	RETURNING * INTO sc_edit_count;
 	RETURN sc_edit_count;
 END;
 $func$
 LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION editCategorySubcategory(id_in INTEGER, categoryId_in INTEGER)
+CREATE OR REPLACE FUNCTION edit_category_PRO_subcategory(id_in INTEGER, category_id_in INTEGER)
 RETURNS INTEGER AS
 $func$
 DECLARE
 	sc_edit_count INTEGER;	
 BEGIN
-	UPDATE subcategorys SET category_id = categoryId_in, modified_at = CURRENT_TIMESTAMP WHERE id = id_in
+	UPDATE PRO_subcategorys SET category_id = category_id_in, modified_at = CURRENT_TIMESTAMP WHERE id = id_in
 	RETURNING * INTO sc_edit_count;
 	RETURN sc_edit_count;
 END;
@@ -304,109 +308,105 @@ $func$
 LANGUAGE plpgsql;
 
 
---SUBCATEGORYS: EXAMPLES
--- SELECT * FROM getSubcategorys();
--- SELECT addSubcategory('buzos', 1);
--- SELECT deleteSubcategory(1);
--- SELECT deactivateSubcategory(1); -- FALSE
--- SELECT activateSubcategory(1); -- TRUE
--- SELECT editNameSubcategory(1,'buzos');
--- SELECT editCategorySubcategory(1, 2);
+/* PRODUCT BRANDS */
 
---BRANDS
 
-CREATE OR REPLACE FUNCTION getBrands()
+CREATE OR REPLACE FUNCTION get_PRO_brands()
 RETURNS TABLE(id INTEGER, name VARCHAR, state BOOLEAN, created_at DATE)
 LANGUAGE plpgsql AS
 $func$
 BEGIN
 	RETURN QUERY
-	SELECT b.id as id, b.name as name, b.state as state, date(b.created_at) as creation_date FROM brands as b;
+	SELECT b.id AS id, b.name AS name, b.state AS state, date(b.created_at) AS creation_date FROM PRO_brands AS b;
 END
 $func$;
 
-CREATE OR REPLACE FUNCTION addBrand(name_in VARCHAR)
+CREATE OR REPLACE FUNCTION get_PRO_brand(id_in INTEGER)
+RETURNS TABLE(id INTEGER, name VARCHAR, state BOOLEAN, created_at DATE)
+LANGUAGE plpgsql AS
+$func$
+BEGIN
+	RETURN QUERY
+	SELECT b.id AS id, b.name AS name, b.state AS state, date(b.created_at) AS creation_date FROM PRO_brands AS b where b.id = id_in;
+END
+$func$;
+
+CREATE OR REPLACE FUNCTION add_PRO_brand(name_in VARCHAR)
 RETURNS INTEGER AS 
 $func$
 DECLARE
 	b_new_id INTEGER;
 BEGIN
-	INSERT INTO brands(name, state, created_at, modified_at) VALUES (name_in, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+	INSERT INTO PRO_brands(name, state, created_at, modified_at) VALUES (name_in, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 	RETURNING id INTO b_new_id;
 	RETURN b_new_id;
 END;
 $func$
 LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION deleteBrand(id_in INTEGER)
+CREATE OR REPLACE FUNCTION delete_PRO_brand(id_in INTEGER)
 RETURNS INTEGER AS
 $func$
 DECLARE
 	b_delete_count INTEGER;	
 BEGIN
-	DELETE FROM brands where id = id_in
+	DELETE FROM PRO_brands where id = id_in
 	RETURNING * INTO b_delete_count;
 	RETURN b_delete_count;
 END;
 $func$
 LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION activateBrand(id_in INTEGER)
+CREATE OR REPLACE FUNCTION activate_PRO_brand(id_in INTEGER)
 RETURNS INTEGER AS
 $func$
 DECLARE
 	b_activate_count INTEGER;	
 BEGIN
-	UPDATE brands SET state = TRUE WHERE id = id_in
+	UPDATE PRO_brands SET state = TRUE WHERE id = id_in
 	RETURNING * INTO b_activate_count;
 	RETURN b_activate_count;
 END;
 $func$
 LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION deactivateBrand(id_in INTEGER)
+CREATE OR REPLACE FUNCTION deactivate_PRO_brand(id_in INTEGER)
 RETURNS INTEGER AS
 $func$
 DECLARE
 	b_deactivate_count INTEGER;	
 BEGIN
-	UPDATE brands SET state = FALSE WHERE id = id_in
+	UPDATE PRO_brands SET state = FALSE WHERE id = id_in
 	RETURNING * INTO b_deactivate_count;
 	RETURN b_deactivate_count;
 END;
 $func$
 LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION editBrand(id_in INTEGER, name_in VARCHAR)
+CREATE OR REPLACE FUNCTION edit_PRO_brand(id_in INTEGER, name_in VARCHAR)
 RETURNS INTEGER AS
 $func$
 DECLARE
 	b_edit_count INTEGER;	
 BEGIN
-	UPDATE brands SET name = name_in, modified_at = CURRENT_TIMESTAMP WHERE id = id_in
+	UPDATE PRO_brands SET name = name_in, modified_at = CURRENT_TIMESTAMP WHERE id = id_in
 	RETURNING * INTO b_edit_count;
 	RETURN b_edit_count;
 END;
 $func$
 LANGUAGE plpgsql;
 
---BRANDS: EXAMPLES
--- SELECT addBrand('American Cold');
--- SELECT * FROM getBrands();
--- SELECT deleteBrand(2);
--- SELECT deactivateBrand(1);
--- SELECT activateBrand(1);
--- SELECT editBrand(1, 'American Cold');
 
---PRODUCTS
+/* PRODUCTS */
 
-CREATE OR REPLACE FUNCTION addProduct(name_in VARCHAR, code_in VARCHAR, subcategoryId_in INTEGER, brandId_in INTEGER)
+
+CREATE OR REPLACE FUNCTION add_product(name_in VARCHAR, code_in VARCHAR, subcategory_id_in INTEGER, brand_id_in INTEGER)
 RETURNS INTEGER AS 
 $func$
 DECLARE
 	p_new_id INTEGER;
 BEGIN
-	INSERT INTO products(name, code, state, created_at, modified_at, subcategory_id, brand_id) VALUES (name_in, code_in, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, subcategoryId_in, brandId_in)
+	INSERT INTO products(name, code, state, created_at, modified_at, PRO_subcategory_id, PRO_brand_id) VALUES (name_in, code_in, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, subcategory_id_in, brand_id_in)
 	RETURNING id INTO p_new_id;
 	RETURN p_new_id;
 END;
@@ -414,42 +414,16 @@ $func$
 LANGUAGE plpgsql;
 
 
---PRODUCTS: EXAMPLES
--- SELECT addProduct('Pantalon Hombre Basement', 'PRO12', 1, 1);
-
---VARIANTS
-
-CREATE OR REPLACE FUNCTION addVariant(name_in VARCHAR, stock_in INTEGER, cost_in NUMERIC, productId_in INTEGER)
-RETURNS INTEGER AS 
-$func$
-DECLARE
-	v_new_id INTEGER;
-BEGIN
-	INSERT INTO variants(name, stock, cost, isAvailable, state, created_at, modified_at, product_id) VALUES (name_in, stock_in, cost_in, TRUE, TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, productId_in)
-	RETURNING id INTO v_new_id;
-	RETURN v_new_id;
-END;
-$func$
-LANGUAGE plpgsql;
-
---VARIANTS: EXAMPLES
--- SELECT addVariant('PANTALON BEIGE 32', 10, 59.9, 1);
--- SELECT addVariant('PANTALON BEIGE 34', 10, 59.9, 1);
--- SELECT addVariant('PANTALON BEIGE 36', 10, 59.9, 1);
--- SELECT addVariant('PANTALON BLUE 30', 10, 59.9, 1);
--- SELECT addVariant('PANTALON BLUE 32', 10, 59.9, 1);
--- SELECT addVariant('PANTALON BLUE 34', 10, 59.9, 1);
+/* PRODUCT SPECIFICATIONS */
 
 
---SPECIFICATIONS
-
-CREATE OR REPLACE FUNCTION addSpecification(color_in BOOLEAN, size_in BOOLEAN, text_in BOOLEAN, name_in VARCHAR, information_in VARCHAR, variantId_in INTEGER)
+CREATE OR REPLACE FUNCTION add_PRO_specification(specification_constant_id_in INTEGER, subcategory_id_in INTEGER)
 RETURNS INTEGER AS 
 $func$
 DECLARE
 	s_new_id INTEGER;
 BEGIN
-	INSERT INTO specifications(color, size, text, name, information, state, created_at, modified_at, variant_id) VALUES (color_in, size_in, text_in, name_in, information_in, TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, variantId_in)
+	INSERT INTO PRO_specifications(created_at, modified_at, specification_constant_id, PRO_subcategory_id) VALUES (CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, specification_constant_id_in, subcategory_id_in)
 	RETURNING id INTO s_new_id;
 	RETURN s_new_id;
 END;
@@ -457,141 +431,208 @@ $func$
 LANGUAGE plpgsql;
 
 
-/*
--- the specifications works like attributes but idk i didnt write that name in first place.. whatever.
-The variant: PANTALON BEIGE 32 have 2 attributes, the first one is BEIGE and the second one is 32
-and add this two below here and 2 more attributes but different - text type
-
-SELECT addSpecification(TRUE, FALSE, FALSE, 'BEIGE', 'Buzo color beige', 1);
-SELECT addSpecification(FALSE, TRUE, FALSE, '32', 'Talla 32', 1);
-SELECT addSpecification(FALSE, FALSE, TRUE, 'Material', '55% Lino, 45% Algodón', 1);
-SELECT addSpecification(FALSE, FALSE, TRUE, 'Condición del Producto', 'Nuevo', 1);
-SELECT addSpecification(TRUE, FALSE, FALSE, 'BEIGE', 'Buzo color beige', 2);
-SELECT addSpecification(FALSE, TRUE, FALSE, '34', 'Talla 34', 2);
-SELECT addSpecification(TRUE, FALSE, FALSE, 'BEIGE', 'Buzo color beige', 3);
-SELECT addSpecification(FALSE, TRUE, FALSE, '36', 'Talla 36', 3);
-
-SELECT addSpecification(TRUE, FALSE, FALSE, 'BLUE', 'Buzo color blue', 4);
-SELECT addSpecification(FALSE, TRUE, FALSE, '30', 'Talla 30', 4);
-SELECT addSpecification(TRUE, FALSE, FALSE, 'BLUE', 'Buzo color blue', 5);
-SELECT addSpecification(FALSE, TRUE, FALSE, '32', 'Talla 32', 5);
-SELECT addSpecification(TRUE, FALSE, FALSE, 'BLUE', 'Buzo color blue', 6);
-SELECT addSpecification(FALSE, TRUE, FALSE, '34', 'Talla 34', 6);
-*/
-
-/*
-
-SELECT addBrand('Starter');
-SELECT addProduct('Pantalón Cargo Hombre Starter', 'PRO13', 1, 3);
-
-SELECT addVariant('PANTALON NEGRO 30', 10, 69.9, 3);
-SELECT addVariant('PANTALON NEGRO 32', 10, 69.9, 3);
-
-SELECT addSpecification(TRUE, FALSE, FALSE, 'BLACK', 'Pantalon color black', 7);
-SELECT addSpecification(FALSE, TRUE, FALSE, '30', 'Talla 30', 7);
-SELECT addSpecification(TRUE, FALSE, FALSE, 'BLACK', 'Pantalon color black', 8);
-SELECT addSpecification(FALSE, TRUE, FALSE, '32', 'Talla 32', 8);
-
-*/
+/* PRODUCT SPECIFICATION VALUES */
 
 
-/*
------ FINDING THE TYPE OF SPECIFICATIONS
-*/
+CREATE OR REPLACE FUNCTION add_PRO_specification_value(value_in VARCHAR, specification_id_in INTEGER)
+RETURNS INTEGER AS 
+$func$
+DECLARE
+	s_new_id INTEGER;
+BEGIN
+	INSERT INTO PRO_specification_values(value, created_at, modified_at, PRO_specification_id) VALUES (value_in, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, specification_id_in)
+	RETURNING id INTO s_new_id;
+	RETURN s_new_id;
+END;
+$func$
+LANGUAGE plpgsql;
 
--- by Subcategory
 
-CREATE OR REPLACE FUNCTION searchSpecificationsBySubcategory(subcategoryId_in INTEGER)
+/* PRODUCT VARIANTS */
+
+
+CREATE OR REPLACE FUNCTION add_PRO_variant(name_in VARCHAR, stock_in INTEGER, cost_in NUMERIC, PRO_id_in INTEGER)
+RETURNS INTEGER AS 
+$func$
+DECLARE
+	v_new_id INTEGER;
+BEGIN
+	INSERT INTO PRO_variants(name, stock, cost, is_available, created_at, modified_at, PRO_id) VALUES (name_in, stock_in, cost_in, TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, PRO_id_in)
+	RETURNING id INTO v_new_id;
+	RETURN v_new_id;
+END;
+$func$
+LANGUAGE plpgsql;
+
+
+/* PRODUCT VARIANT SPECIFICATION VALUES */
+
+
+CREATE OR REPLACE FUNCTION add_PRO_variant_specification_value(variant_id_in INTEGER, specification_value_id_in INTEGER)
+RETURNS INTEGER AS 
+$func$
+DECLARE
+	v_new_id INTEGER;
+BEGIN
+	INSERT INTO PRO_variant_specification_values(created_at, modified_at, PRO_variant_id, PRO_specification_value_id) VALUES (CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, variant_id_in, specification_value_id_in)
+	RETURNING id INTO v_new_id;
+	RETURN v_new_id;
+END;
+$func$
+LANGUAGE plpgsql;
+
+
+/* INFORMATION */
+
+
+-- SELECT add_PRO_category('ropa'); -- agregado categoria 'ropa'
+-- SELECT add_PRO_subcategory('jeans hombre', 1); -- agregado sub-categoria 'jeans de hombre'
+-- SELECT add_PRO_brand('American Cold'); -- agregado marca 'amercian cold'
+-- SELECT add_product('Pantalon Hombre Basement', 'PRO12', 1, 1); -- agregado producto 'Pantalon Hombre Basement'
+
+
+-- SELECT add_PRO_specification(1, 1); -- agregado especificacion COLOR para la subcategoria de 'jeans de hombre'
+-- SELECT add_PRO_specification(2, 1); -- agregado especificacion SIZE para la subcategoria de 'jeans de hombre'
+-- SELECT add_PRO_specification(3, 1); -- agregado especificacion TEXT para la subcategoria de 'jeans de hombre'
+
+
+-- SELECT add_PRO_specification_value('NEGRO', 1); -- agregado valor 'NEGRO' a la especificacion COLOR para la subcategoria de 'jeans de hombre'
+-- SELECT add_PRO_specification_value('AZUL', 1); -- agregado valor 'AZUL' a la  especificacion COLOR para la subcategoria de 'jeans de hombre'
+-- SELECT add_PRO_specification_value('BEIGE', 1); -- agregado valor 'BEIGE' a la  especificacion COLOR para la subcategoria de 'jeans de hombre'
+
+
+-- SELECT add_PRO_specification_value('32', 2); -- agregada talla '32' a la especificacion SIZE para la subcategoria de 'jeans de hombre'
+-- SELECT add_PRO_specification_value('30', 2); -- agregada talla '30' a la especificacion SIZE para la subcategoria de 'jeans de hombre'
+-- SELECT add_PRO_specification_value('28', 2); -- agregada talla '28' a la especificacion SIZE para la subcategoria de 'jeans de hombre'
+
+
+-- SELECT add_PRO_specification_value('Material: Drill', 3); -- agregado valor informativo 'Material: Drill' a la especificacion TEXT para la subcategoria de 'jeans de hombre'
+
+
+-- SELECT add_PRO_variant('PANTALON NEGRO 32', 10, 59.9, 1); -- agregada variante 'PANTALON NEGRO 32' del producto 'Pantalon Hombre Basement'
+-- SELECT add_PRO_variant('PANTALON AZUL 32', 10, 59.9, 1); -- agregada variante 'PANTALON AZUL 32' del producto 'Pantalon Hombre Basement'
+-- SELECT add_PRO_variant('PANTALON BEIGE 32', 10, 59.9, 1); -- agregada variante 'PANTALON BEIGE 32' del producto 'Pantalon Hombre Basement'
+
+-- SELECT add_PRO_variant('PANTALON NEGRO 30', 10, 59.9, 1); -- agregada variante 'PANTALON NEGRO 30' del producto 'Pantalon Hombre Basement'
+-- SELECT add_PRO_variant('PANTALON AZUL 30', 10, 59.9, 1); -- agregada variante 'PANTALON AZUL 30' del producto 'Pantalon Hombre Basement'
+-- SELECT add_PRO_variant('PANTALON BEIGE 30', 10, 59.9, 1); -- agregada variante 'PANTALON BEIGE 30' del producto 'Pantalon Hombre Basement'
+
+
+-- SELECT add_PRO_variant('PANTALON NEGRO 28', 10, 59.9, 1); -- agregada variante 'PANTALON NEGRO 28' del producto 'Pantalon Hombre Basement'
+-- SELECT add_PRO_variant('PANTALON AZUL 28', 10, 59.9, 1); -- agregada variante 'PANTALON AZUL 28' del producto 'Pantalon Hombre Basement'
+-- SELECT add_PRO_variant('PANTALON BEIGE 28', 10, 59.9, 1); -- agregada variante 'PANTALON BEIGE 28' del producto 'Pantalon Hombre Basement'
+
+
+-- SELECT add_PRO_variant_specification_value(1,1); -- agregada valor 'NEGRO' de las especificaciones a la variante 'PANTALON NEGRO 32' del producto 'Pantalon Hombre Basement'
+-- SELECT add_PRO_variant_specification_value(1,4); -- agregada valor '32' de las especificaciones a la variante 'PANTALON NEGRO 32' del producto 'Pantalon Hombre Basement'
+-- SELECT add_PRO_variant_specification_value(1,7); -- agregada valor 'Material: Dril' de las especificaciones a la variante 'PANTALON NEGRO 32' del producto 'Pantalon Hombre Basement'
+
+
+-- SELECT add_PRO_variant_specification_value(2,2); -- agregada valor 'AZUL' de las especificaciones a la variante 'PANTALON AZUL 32' del producto 'Pantalon Hombre Basement'
+-- SELECT add_PRO_variant_specification_value(2,4); -- agregada valor '32' de las especificaciones a la variante 'PANTALON AZUL 32' del producto 'Pantalon Hombre Basement'
+-- SELECT add_PRO_variant_specification_value(2,7); -- agregada valor 'Material: Dril' de las especificaciones a la variante 'PANTALON AZUL 32' del producto 'Pantalon Hombre Basement'
+
+
+-- SELECT add_PRO_variant_specification_value(3,3); -- agregada valor 'BEIGE' de las especificaciones a la variante 'PANTALON BEIGE 32' del producto 'Pantalon Hombre Basement'
+-- SELECT add_PRO_variant_specification_value(3,4); -- agregada valor '32' de las especificaciones a la variante 'PANTALON BEIGE 32' del producto 'Pantalon Hombre Basement'
+-- SELECT add_PRO_variant_specification_value(3,7); -- agregada valor 'Material: Dril' de las especificaciones a la variante 'PANTALON BEIGE 32' del producto 'Pantalon Hombre Basement'
+
+
+/* SEARCHES */
+
+CREATE OR REPLACE FUNCTION search_spectifications_subcategory(subcategory_id_in INTEGER)
 RETURNS TABLE(specification_type INTEGER)
 LANGUAGE plpgsql AS
 $func$
 BEGIN
 	RETURN QUERY
-	SELECT
+    SELECT 
     CASE
-        WHEN COUNT(DISTINCT CASE WHEN s.color THEN s.id END) > 0 AND COUNT(DISTINCT CASE WHEN s.size THEN s.id END) = 0 THEN 1  -- ONLY COLOR
-        WHEN COUNT(DISTINCT CASE WHEN s.size THEN s.id END) > 0 AND COUNT(DISTINCT CASE WHEN s.color THEN s.id END) = 0 THEN 2  -- ONLY SIZE
-        WHEN COUNT(DISTINCT CASE WHEN s.color THEN s.id END) > 0 AND COUNT(DISTINCT CASE WHEN s.size THEN s.id END) > 0 THEN 3  -- COLOR AND SIZE
-        WHEN COUNT(DISTINCT CASE WHEN s.text THEN s.id END) > 0 AND COUNT(DISTINCT CASE WHEN s.color THEN s.id END) = 0 AND COUNT(DISTINCT CASE WHEN s.size THEN s.id END) = 0 THEN 4  -- ONLY TEXT
+    	WHEN COUNT (CASE WHEN sc.id = 1 THEN sc.id END) > 0 AND COUNT (CASE WHEN sc.id = 2 THEN sc.id END) = 0 THEN 1 -- ONLY COLOR
+    	WHEN COUNT (CASE WHEN sc.id = 2 THEN sc.id END) > 0 AND COUNT (CASE WHEN sc.id = 1 THEN sc.id END) = 0 THEN 2 -- ONLY SIZE
+    	WHEN COUNT (CASE WHEN sc.id = 1 THEN sc.id END) > 0 AND COUNT (CASE WHEN sc.id = 2 THEN sc.id END) > 0 THEN 3 -- COLOR AND SIZE
+    	WHEN COUNT (CASE WHEN sc.id = 3 THEN sc.id END) > 0 AND COUNT (CASE WHEN sc.id = 1 THEN sc.id END) = 0 AND COUNT (CASE WHEN sc.id = 2 THEN sc.id END) = 0 THEN 4 -- ONLY TEXT
         ELSE 0  -- NO SPEC
 	    END AS specification_type
-	FROM products p
-	JOIN variants v ON p.id = v.product_id
-	LEFT JOIN specifications s ON v.id = s.variant_id
-	WHERE p.subcategory_id = subcategoryId_in;
-
+    FROM products p
+    JOIN PRO_variants v ON p.id = v.PRO_id
+    JOIN PRO_variant_specification_values vsv ON v.id = vsv.PRO_variant_id
+    JOIN PRO_specification_values sv ON vsv.PRO_specification_value_id = sv.id
+    JOIN PRO_specifications s ON sv.PRO_specification_id = s.id
+  	JOIN specificaction_constants sc ON s.specification_constant_id = sc.id
+    WHERE p.PRO_subcategory_id = subcategory_id_in;
 	RETURN;
 END
 $func$;
 
--- by Brand
-
-CREATE OR REPLACE FUNCTION searchSpecificationsByBrand(brandId_in INTEGER)
+CREATE OR REPLACE FUNCTION search_spectifications_brand(brand_id_in INTEGER)
 RETURNS TABLE(specification_type INTEGER)
 LANGUAGE plpgsql AS
 $func$
 BEGIN
 	RETURN QUERY
-	SELECT
+    SELECT 
     CASE
-        WHEN COUNT(DISTINCT CASE WHEN s.color THEN s.id END) > 0 AND COUNT(DISTINCT CASE WHEN s.size THEN s.id END) = 0 THEN 1  -- ONLY COLOR
-        WHEN COUNT(DISTINCT CASE WHEN s.size THEN s.id END) > 0 AND COUNT(DISTINCT CASE WHEN s.color THEN s.id END) = 0 THEN 2  -- ONLY SIZE
-        WHEN COUNT(DISTINCT CASE WHEN s.color THEN s.id END) > 0 AND COUNT(DISTINCT CASE WHEN s.size THEN s.id END) > 0 THEN 3  -- COLOR AND SIZE
-        WHEN COUNT(DISTINCT CASE WHEN s.text THEN s.id END) > 0 AND COUNT(DISTINCT CASE WHEN s.color THEN s.id END) = 0 AND COUNT(DISTINCT CASE WHEN s.size THEN s.id END) = 0 THEN 4  -- ONLY TEXT
+    	WHEN COUNT (CASE WHEN sc.id = 1 THEN sc.id END) > 0 AND COUNT (CASE WHEN sc.id = 2 THEN sc.id END) = 0 THEN 1 -- ONLY COLOR
+    	WHEN COUNT (CASE WHEN sc.id = 2 THEN sc.id END) > 0 AND COUNT (CASE WHEN sc.id = 1 THEN sc.id END) = 0 THEN 2 -- ONLY SIZE
+    	WHEN COUNT (CASE WHEN sc.id = 1 THEN sc.id END) > 0 AND COUNT (CASE WHEN sc.id = 2 THEN sc.id END) > 0 THEN 3 -- COLOR AND SIZE
+    	WHEN COUNT (CASE WHEN sc.id = 3 THEN sc.id END) > 0 AND COUNT (CASE WHEN sc.id = 1 THEN sc.id END) = 0 AND COUNT (CASE WHEN sc.id = 2 THEN sc.id END) = 0 THEN 4 -- ONLY TEXT
         ELSE 0  -- NO SPEC
 	    END AS specification_type
-	FROM products p
-	JOIN variants v ON p.id = v.product_id
-	LEFT JOIN specifications s ON v.id = s.variant_id
-	WHERE p.brand_id = brandId_in;
+    FROM products p
+    JOIN PRO_variants v ON p.id = v.PRO_id
+    JOIN PRO_variant_specification_values vsv ON v.id = vsv.PRO_variant_id
+    JOIN PRO_specification_values sv ON vsv.PRO_specification_value_id = sv.id
+    JOIN PRO_specifications s ON sv.PRO_specification_id = s.id
+  	JOIN specificaction_constants sc ON s.specification_constant_id = sc.id
+    WHERE p.PRO_brand_id = brand_id_in;
 	RETURN;
 END
 $func$;
 
--- by product
-
-CREATE OR REPLACE FUNCTION searchSpecificationsByProduct(productId_in INTEGER)
+CREATE OR REPLACE FUNCTION search_spectifications_product(PRO_id_in INTEGER)
 RETURNS TABLE(specification_type INTEGER)
 LANGUAGE plpgsql AS
 $func$
 BEGIN
 	RETURN QUERY
-	SELECT
+    SELECT 
     CASE
-        WHEN COUNT(DISTINCT CASE WHEN s.color THEN s.id END) > 0 AND COUNT(DISTINCT CASE WHEN s.size THEN s.id END) = 0 THEN 1  -- ONLY COLOR
-        WHEN COUNT(DISTINCT CASE WHEN s.size THEN s.id END) > 0 AND COUNT(DISTINCT CASE WHEN s.color THEN s.id END) = 0 THEN 2  -- ONLY SIZE
-        WHEN COUNT(DISTINCT CASE WHEN s.color THEN s.id END) > 0 AND COUNT(DISTINCT CASE WHEN s.size THEN s.id END) > 0 THEN 3  -- COLOR AND SIZE
-        WHEN COUNT(DISTINCT CASE WHEN s.text THEN s.id END) > 0 AND COUNT(DISTINCT CASE WHEN s.color THEN s.id END) = 0 AND COUNT(DISTINCT CASE WHEN s.size THEN s.id END) = 0 THEN 4  -- ONLY TEXT
+    	WHEN COUNT (CASE WHEN sc.id = 1 THEN sc.id END) > 0 AND COUNT (CASE WHEN sc.id = 2 THEN sc.id END) = 0 THEN 1 -- ONLY COLOR
+    	WHEN COUNT (CASE WHEN sc.id = 2 THEN sc.id END) > 0 AND COUNT (CASE WHEN sc.id = 1 THEN sc.id END) = 0 THEN 2 -- ONLY SIZE
+    	WHEN COUNT (CASE WHEN sc.id = 1 THEN sc.id END) > 0 AND COUNT (CASE WHEN sc.id = 2 THEN sc.id END) > 0 THEN 3 -- COLOR AND SIZE
+    	WHEN COUNT (CASE WHEN sc.id = 3 THEN sc.id END) > 0 AND COUNT (CASE WHEN sc.id = 1 THEN sc.id END) = 0 AND COUNT (CASE WHEN sc.id = 2 THEN sc.id END) = 0 THEN 4 -- ONLY TEXT
         ELSE 0  -- NO SPEC
 	    END AS specification_type
-	FROM products p
-	JOIN variants v ON p.id = v.product_id
-	LEFT JOIN specifications s ON v.id = s.variant_id
-	WHERE p.id = productId_in;
-
+    FROM products p
+    JOIN PRO_variants v ON p.id = v.PRO_id
+    JOIN PRO_variant_specification_values vsv ON v.id = vsv.PRO_variant_id
+    JOIN PRO_specification_values sv ON vsv.PRO_specification_value_id = sv.id
+    JOIN PRO_specifications s ON sv.PRO_specification_id = s.id
+  	JOIN specificaction_constants sc ON s.specification_constant_id = sc.id
+    WHERE p.id = PRO_id_in;
 	RETURN;
 END
 $func$;
 
 
-/*
---------SEARCHS SIZES AND COLORS -----------
-*/
+/* GET SIZES-COLORS BY */
 
-CREATE OR REPLACE FUNCTION getSizesColorsProductsByBrand(brandId_in INTEGER)
+
+CREATE OR REPLACE FUNCTION get_sizes_colors_bySubcategory(subcategory_id_in INTEGER)
 RETURNS TABLE(
 	product VARCHAR, 
-	product_code INTEGER,
+	PRO_code INTEGER,
 	brand VARCHAR,
 	brand_code INTEGER,
 	subcategory VARCHAR,
 	subcategory_code INTEGER,
 	category VARCHAR,
 	category_code INTEGER,
-	product_variant VARCHAR,
-	product_variant_id INTEGER,
-	product_cost NUMERIC, 
-	product_stock INTEGER,
+	PRO_variant VARCHAR,
+	PRO_variant_id INTEGER,
+	PRO_cost NUMERIC, 
+	PRO_stock INTEGER,
 	available BOOLEAN, 
 	color VARCHAR, 
 	size VARCHAR, 
@@ -602,54 +643,59 @@ $func$
 BEGIN
 	RETURN QUERY
 	SELECT 
-	p.name AS product,
-	p.id AS product_code,
-	b.name AS brand,
-	b.id AS brand_code,
-	sc.name AS subcategory,
-	sc.id AS subcategory_code,
-	cat.name AS category,
-	cat.id as category_code,
-	v.name AS product_variant, 
-	v.id AS product_variant_id,
-	v.cost AS product_cost,
-	v.stock as product_stock,
-	v.isavailable AS availabe, 
-	c.color AS color, 
-	s.size AS size, 
-	date(v.created_at) AS creation_date 
-	FROM variants AS v
-	JOIN products AS p ON v.product_id = p.id
-	JOIN (
-		SELECT s.variant_id as variant,s.name AS color from specifications AS s WHERE s.color = TRUE
-	) AS c ON v.id = c.variant
-	JOIN (
-		SELECT s.variant_id as variant, s.name AS size from specifications AS s WHERE s.size = TRUE
-	) AS s ON v.id = s.variant
-	JOIN brands AS b ON p.brand_id = b.id
-	JOIN subcategorys AS sc ON p.subcategory_id = sc.id
-	JOIN categorys AS cat ON sc.category_id = cat.id
-	WHERE p.state = TRUE AND b.id = brandId_in;
+		p.name AS product, 
+		p.id AS PRO_code, 
+		pb.name AS brand, 
+		pb.id AS brand_code, 
+		ps.name AS subcategory, 
+		ps.id AS subcategory_code, 
+		pc.name AS category, 
+		pc.id AS category_code, 
+		pv.name AS PRO_variant, 
+		pv.id AS PRO_variant_id, 
+		pv.cost AS PRO_cost, 
+		pv.stock AS PRO_stock, 
+		pv.is_available AS available, 
+		c.color AS color, 
+		s.size AS size, 
+		date(pv.created_at) AS creation_date
+	FROM PRO_variants pv
+	JOIN products p ON pv.PRO_id = p.id
+	JOIN ( 
+		SELECT vsv.PRO_variant_id AS variant, sv.value AS color 
+		FROM PRO_variant_specification_values vsv 
+		INNER JOIN PRO_specification_values sv ON vsv.PRO_specification_value_id = sv.id
+		INNER JOIN PRO_specifications s ON sv.PRO_specification_id = s.id
+		INNER JOIN specificaction_constants sc ON s.specification_constant_id = sc.id
+		WHERE sc.name = 'COLOR') AS c ON pv.id = c.variant
+	JOIN ( 
+		SELECT vsv.PRO_variant_id AS variant, sv.value AS size 
+		FROM PRO_variant_specification_values vsv 
+		INNER JOIN PRO_specification_values sv ON vsv.PRO_specification_value_id = sv.id
+		INNER JOIN PRO_specifications s ON sv.PRO_specification_id = s.id
+		INNER JOIN specificaction_constants sc ON s.specification_constant_id = sc.id
+		WHERE sc.name = 'SIZE') AS s ON pv.id = s.variant
+	JOIN PRO_brands pb ON p.PRO_brand_id = pb.id
+	JOIN PRO_subcategorys ps ON p.PRO_subcategory_id = ps.id
+	JOIN PRO_categorys pc ON ps.PRO_category_id = pc.id
+	WHERE p.state = TRUE AND ps.id = subcategory_id_in;
 END
 $func$;
 
--- this function is a search by the brand
--- SELECT * FROM getSizesColorsProductsByBrand(3);
-
-CREATE OR REPLACE FUNCTION getSizesColorsProductsBySubcategory(subcategoryId_in INTEGER)
+CREATE OR REPLACE FUNCTION get_sizes_colors_byBrand(brand_id_in INTEGER)
 RETURNS TABLE(
 	product VARCHAR, 
-	product_code INTEGER,
+	PRO_code INTEGER,
 	brand VARCHAR,
 	brand_code INTEGER,
 	subcategory VARCHAR,
 	subcategory_code INTEGER,
 	category VARCHAR,
 	category_code INTEGER,
-	product_variant VARCHAR,
-	product_variant_id INTEGER,
-	product_cost NUMERIC, 
-	product_stock INTEGER, 
+	PRO_variant VARCHAR,
+	PRO_variant_id INTEGER,
+	PRO_cost NUMERIC, 
+	PRO_stock INTEGER, 
 	available BOOLEAN, 
 	color VARCHAR, 
 	size VARCHAR, 
@@ -659,224 +705,60 @@ LANGUAGE plpgsql AS
 $func$
 BEGIN
 	RETURN QUERY
-	SELECT
-	p.name AS product,
-	p.id AS product_code,
-	b.name AS brand,
-	b.id AS brand_code,
-	sc.name AS subcategory,
-	sc.id AS subcategory_code,
-	cat.name AS category,
-	cat.id as category_code,
-	v.name AS product_variant, 
-	v.id AS product_variant_id,
-	v.cost AS product_cost, 
-	v.stock as product_stock,
-	v.isavailable AS availabe, 
-	c.color AS color, 
-	s.size AS size, 
-	date(v.created_at) AS creation_date 
-	FROM variants AS v
-	JOIN products AS p ON v.product_id = p.id
-	JOIN (
-		SELECT s.variant_id as variant,s.name AS color from specifications AS s WHERE s.color = TRUE
-	) AS c ON v.id = c.variant
-	JOIN (
-		SELECT s.variant_id as variant, s.name AS size from specifications AS s WHERE s.size = TRUE
-	) AS s ON v.id = s.variant
-	JOIN brands AS b ON p.brand_id = b.id
-	JOIN subcategorys AS sc ON p.subcategory_id = sc.id
-	JOIN categorys AS cat ON sc.category_id = cat.id
-	WHERE p.state = TRUE AND sc.id = subcategoryId_in;
-END
-$func$;
-
--- this function is a search by the subcategory
--- SELECT * FROM getSizesColorsProductsBySubcategory(1);
-
-CREATE OR REPLACE FUNCTION getSizesColorsDataByProduct(productId_in INTEGER)
-RETURNS TABLE(
-	product VARCHAR, 
-	product_code INTEGER,
-	brand VARCHAR,
-	brand_code INTEGER,
-	subcategory VARCHAR,
-	subcategory_code INTEGER,
-	category VARCHAR,
-	category_code INTEGER,
-	product_variant VARCHAR,
-	product_variant_id INTEGER,
-	product_cost NUMERIC, 
-	product_stock INTEGER,
-	available BOOLEAN, 
-	color VARCHAR, 
-	size VARCHAR, 
-	creation_date DATE)
-LANGUAGE plpgsql AS
-$func$
-BEGIN
-	RETURN QUERY
 	SELECT 
-	p.name AS product,
-	p.id AS product_code,
-	b.name AS brand,
-	b.id AS brand_code,
-	sc.name AS subcategory,
-	sc.id AS subcategory_code,
-	cat.name AS category,
-	cat.id as category_code,
-	v.name AS product_variant, 
-	v.id AS product_variant_id,
-	v.cost AS product_cost, 
-	v.stock as product_stock,
-	v.isavailable AS availabe, 
-	c.color AS color, 
-	s.size AS size, 
-	date(v.created_at) AS creation_date 
-	FROM variants AS v
-	JOIN products AS p ON v.product_id = p.id
-	JOIN (
-		SELECT s.variant_id as variant,s.name AS color from specifications AS s WHERE s.color = TRUE
-	) AS c ON v.id = c.variant
-	JOIN (
-		SELECT s.variant_id as variant, s.name AS size from specifications AS s WHERE s.size = TRUE
-	) AS s ON v.id = s.variant
-	JOIN brands AS b ON p.brand_id = b.id
-	JOIN subcategorys AS sc ON p.subcategory_id = sc.id
-	JOIN categorys AS cat ON sc.category_id = cat.id
-	WHERE product_id = productId_in AND p.state = TRUE
-	ORDER BY v.id;
+		p.name AS product, 
+		p.id AS PRO_code, 
+		pb.name AS brand, 
+		pb.id AS brand_code, 
+		ps.name AS subcategory, 
+		ps.id AS subcategory_code, 
+		pc.name AS category, 
+		pc.id AS category_code, 
+		pv.name AS PRO_variant, 
+		pv.id AS PRO_variant_id, 
+		pv.cost AS PRO_cost, 
+		pv.stock AS PRO_stock, 
+		pv.is_available AS available, 
+		c.color AS color, 
+		s.size AS size, 
+		date(pv.created_at) AS creation_date
+	FROM PRO_variants pv
+	JOIN products p ON pv.PRO_id = p.id
+	JOIN ( 
+		SELECT vsv.PRO_variant_id AS variant, sv.value AS color 
+		FROM PRO_variant_specification_values vsv 
+		INNER JOIN PRO_specification_values sv ON vsv.PRO_specification_value_id = sv.id
+		INNER JOIN PRO_specifications s ON sv.PRO_specification_id = s.id
+		INNER JOIN specificaction_constants sc ON s.specification_constant_id = sc.id
+		WHERE sc.name = 'COLOR') AS c ON pv.id = c.variant
+	JOIN ( 
+		SELECT vsv.PRO_variant_id AS variant, sv.value AS size 
+		FROM PRO_variant_specification_values vsv 
+		INNER JOIN PRO_specification_values sv ON vsv.PRO_specification_value_id = sv.id
+		INNER JOIN PRO_specifications s ON sv.PRO_specification_id = s.id
+		INNER JOIN specificaction_constants sc ON s.specification_constant_id = sc.id
+		WHERE sc.name = 'SIZE') AS s ON pv.id = s.variant
+	JOIN PRO_brands pb ON p.PRO_brand_id = pb.id
+	JOIN PRO_subcategorys ps ON p.PRO_subcategory_id = ps.id
+	JOIN PRO_categorys pc ON ps.PRO_category_id = pc.id
+	WHERE p.state = TRUE AND pb.id = brand_id_in;
 END
 $func$;
 
--- this function is a kind of search where see the data from variants and his specifications by product
--- SELECT * FROM getSizesColorsDataByProduct(1);
-
-
-/*
---------SEARCHS SIZES -----------
-*/
-
-
-CREATE OR REPLACE FUNCTION getSizesProductsByBrand(brandId_in INTEGER)
+CREATE OR REPLACE FUNCTION get_sizes_colors_byProduct(PRO_id_in INTEGER)
 RETURNS TABLE(
 	product VARCHAR, 
-	product_code INTEGER,
+	PRO_code INTEGER,
 	brand VARCHAR,
 	brand_code INTEGER,
 	subcategory VARCHAR,
 	subcategory_code INTEGER,
 	category VARCHAR,
 	category_code INTEGER,
-	product_variant VARCHAR,
-	product_variant_id INTEGER,
-	product_cost NUMERIC, 
-	product_stock INTEGER,
-	available BOOLEAN, 
-	size VARCHAR, 
-	creation_date DATE
-)
-LANGUAGE plpgsql AS
-$func$
-BEGIN
-	RETURN QUERY
-	SELECT 
-	p.name AS product,
-	p.id AS product_code,
-	b.name AS brand,
-	b.id AS brand_code,
-	sc.name AS subcategory,
-	sc.id AS subcategory_code,
-	cat.name AS category,
-	cat.id as category_code,
-	v.name AS product_variant, 
-	v.id AS product_variant_id,
-	v.cost AS product_cost,
-	v.stock as product_stock,
-	v.isavailable AS availabe, 
-	c.color AS color, 
-	s.size AS size, 
-	date(v.created_at) AS creation_date 
-	FROM variants AS v
-	JOIN products AS p ON v.product_id = p.id
-	JOIN (
-		SELECT s.variant_id as variant, s.name AS size from specifications AS s WHERE s.size = TRUE
-	) AS s ON v.id = s.variant
-	JOIN brands AS b ON p.brand_id = b.id
-	JOIN subcategorys AS sc ON p.subcategory_id = sc.id
-	JOIN categorys AS cat ON sc.category_id = cat.id
-	WHERE p.state = TRUE AND b.id = brandId_in;
-END
-$func$;
-
-
-
-CREATE OR REPLACE FUNCTION getSizesProductsBySubcategory(subcategoryId_in INTEGER)
-RETURNS TABLE(
-	product VARCHAR, 
-	product_code INTEGER,
-	brand VARCHAR,
-	brand_code INTEGER,
-	subcategory VARCHAR,
-	subcategory_code INTEGER,
-	category VARCHAR,
-	category_code INTEGER,
-	product_variant VARCHAR,
-	product_variant_id INTEGER,
-	product_cost NUMERIC, 
-	product_stock INTEGER, 
-	available BOOLEAN, 
-	size VARCHAR, 
-	creation_date DATE
-)
-LANGUAGE plpgsql AS
-$func$
-BEGIN
-	RETURN QUERY
-	SELECT
-	p.name AS product,
-	p.id AS product_code,
-	b.name AS brand,
-	b.id AS brand_code,
-	sc.name AS subcategory,
-	sc.id AS subcategory_code,
-	cat.name AS category,
-	cat.id as category_code,
-	v.name AS product_variant, 
-	v.id AS product_variant_id,
-	v.cost AS product_cost, 
-	v.stock as product_stock,
-	v.isavailable AS availabe, 
-	c.color AS color, 
-	s.size AS size, 
-	date(v.created_at) AS creation_date 
-	FROM variants AS v
-	JOIN products AS p ON v.product_id = p.id
-	JOIN (
-		SELECT s.variant_id as variant, s.name AS size from specifications AS s WHERE s.size = TRUE
-	) AS s ON v.id = s.variant
-	JOIN brands AS b ON p.brand_id = b.id
-	JOIN subcategorys AS sc ON p.subcategory_id = sc.id
-	JOIN categorys AS cat ON sc.category_id = cat.id
-	WHERE p.state = TRUE AND sc.id = subcategoryId_in;
-END
-$func$;
-
-
-CREATE OR REPLACE FUNCTION getSizesDataByProduct(productId_in INTEGER)
-RETURNS TABLE(
-	product VARCHAR, 
-	product_code INTEGER,
-	brand VARCHAR,
-	brand_code INTEGER,
-	subcategory VARCHAR,
-	subcategory_code INTEGER,
-	category VARCHAR,
-	category_code INTEGER,
-	product_variant VARCHAR,
-	product_variant_id INTEGER,
-	product_cost NUMERIC, 
-	product_stock INTEGER,
+	PRO_variant VARCHAR,
+	PRO_variant_id INTEGER,
+	PRO_cost NUMERIC, 
+	PRO_stock INTEGER,
 	available BOOLEAN, 
 	color VARCHAR, 
 	size VARCHAR, 
@@ -886,58 +768,66 @@ $func$
 BEGIN
 	RETURN QUERY
 	SELECT 
-	p.name AS product,
-	p.id AS product_code,
-	b.name AS brand,
-	b.id AS brand_code,
-	sc.name AS subcategory,
-	sc.id AS subcategory_code,
-	cat.name AS category,
-	cat.id as category_code,
-	v.name AS product_variant, 
-	v.id AS product_variant_id,
-	v.cost AS product_cost, 
-	v.stock as product_stock,
-	v.isavailable AS availabe, 
-	c.color AS color, 
-	s.size AS size, 
-	date(v.created_at) AS creation_date 
-	FROM variants AS v
-	JOIN products AS p ON v.product_id = p.id
-	JOIN (
-		SELECT s.variant_id as variant, s.name AS size from specifications AS s WHERE s.size = TRUE
-	) AS s ON v.id = s.variant
-	JOIN brands AS b ON p.brand_id = b.id
-	JOIN subcategorys AS sc ON p.subcategory_id = sc.id
-	JOIN categorys AS cat ON sc.category_id = cat.id
-	WHERE product_id = productId_in AND p.state = TRUE
-	ORDER BY v.id;
+		p.name AS product, 
+		p.id AS PRO_code, 
+		pb.name AS brand, 
+		pb.id AS brand_code, 
+		ps.name AS subcategory, 
+		ps.id AS subcategory_code, 
+		pc.name AS category, 
+		pc.id AS category_code, 
+		pv.name AS PRO_variant, 
+		pv.id AS PRO_variant_id, 
+		pv.cost AS PRO_cost, 
+		pv.stock AS PRO_stock, 
+		pv.is_available AS available, 
+		c.color AS color, 
+		s.size AS size, 
+		date(pv.created_at) AS creation_date
+	FROM PRO_variants pv
+	JOIN products p ON pv.PRO_id = p.id
+	JOIN ( 
+		SELECT vsv.PRO_variant_id AS variant, sv.value AS color 
+		FROM PRO_variant_specification_values vsv 
+		INNER JOIN PRO_specification_values sv ON vsv.PRO_specification_value_id = sv.id
+		INNER JOIN PRO_specifications s ON sv.PRO_specification_id = s.id
+		INNER JOIN specificaction_constants sc ON s.specification_constant_id = sc.id
+		WHERE sc.name = 'COLOR') AS c ON pv.id = c.variant
+	JOIN ( 
+		SELECT vsv.PRO_variant_id AS variant, sv.value AS size 
+		FROM PRO_variant_specification_values vsv 
+		INNER JOIN PRO_specification_values sv ON vsv.PRO_specification_value_id = sv.id
+		INNER JOIN PRO_specifications s ON sv.PRO_specification_id = s.id
+		INNER JOIN specificaction_constants sc ON s.specification_constant_id = sc.id
+		WHERE sc.name = 'SIZE') AS s ON pv.id = s.variant
+	JOIN PRO_brands pb ON p.PRO_brand_id = pb.id
+	JOIN PRO_subcategorys ps ON p.PRO_subcategory_id = ps.id
+	JOIN PRO_categorys pc ON ps.PRO_category_id = pc.id
+	WHERE p.state = TRUE AND pv.PRO_id = PRO_id_in
+	ORDER BY pv.id;
 END
 $func$;
 
 
-
-/*
---------SEARCHS COLORS -----------
-*/
+/* GET COLORS BY */
 
 
-CREATE OR REPLACE FUNCTION getColorsProductsByBrand(brandId_in INTEGER)
+CREATE OR REPLACE FUNCTION get_colors_bySubcategory(subcategory_id_in INTEGER)
 RETURNS TABLE(
 	product VARCHAR, 
-	product_code INTEGER,
+	PRO_code INTEGER,
 	brand VARCHAR,
 	brand_code INTEGER,
 	subcategory VARCHAR,
 	subcategory_code INTEGER,
 	category VARCHAR,
 	category_code INTEGER,
-	product_variant VARCHAR,
-	product_variant_id INTEGER,
-	product_cost NUMERIC, 
-	product_stock INTEGER,
+	PRO_variant VARCHAR,
+	PRO_variant_id INTEGER,
+	PRO_cost NUMERIC, 
+	PRO_stock INTEGER,
 	available BOOLEAN, 
-	color VARCHAR, 
+	color VARCHAR,
 	creation_date DATE
 )
 LANGUAGE plpgsql AS
@@ -945,152 +835,107 @@ $func$
 BEGIN
 	RETURN QUERY
 	SELECT 
-	p.name AS product,
-	p.id AS product_code,
-	b.name AS brand,
-	b.id AS brand_code,
-	sc.name AS subcategory,
-	sc.id AS subcategory_code,
-	cat.name AS category,
-	cat.id as category_code,
-	v.name AS product_variant, 
-	v.id AS product_variant_id,
-	v.cost AS product_cost,
-	v.stock as product_stock,
-	v.isavailable AS availabe, 
-	c.color AS color, 
-	date(v.created_at) AS creation_date 
-	FROM variants AS v
-	JOIN products AS p ON v.product_id = p.id
-	JOIN (
-		SELECT s.variant_id as variant,s.name AS color from specifications AS s WHERE s.color = TRUE
-	) AS c ON v.id = c.variant
-	JOIN brands AS b ON p.brand_id = b.id
-	JOIN subcategorys AS sc ON p.subcategory_id = sc.id
-	JOIN categorys AS cat ON sc.category_id = cat.id
-	WHERE p.state = TRUE AND b.id = brandId_in;
+		p.name AS product, 
+		p.id AS PRO_code, 
+		pb.name AS brand, 
+		pb.id AS brand_code, 
+		ps.name AS subcategory, 
+		ps.id AS subcategory_code, 
+		pc.name AS category, 
+		pc.id AS category_code, 
+		pv.name AS PRO_variant, 
+		pv.id AS PRO_variant_id, 
+		pv.cost AS PRO_cost, 
+		pv.stock AS PRO_stock, 
+		pv.is_available AS available, 
+		c.color AS color, 
+		date(pv.created_at) AS creation_date
+	FROM PRO_variants pv
+	JOIN products p ON pv.PRO_id = p.id
+	JOIN ( 
+		SELECT vsv.PRO_variant_id AS variant, sv.value AS color 
+		FROM PRO_variant_specification_values vsv 
+		INNER JOIN PRO_specification_values sv ON vsv.PRO_specification_value_id = sv.id
+		INNER JOIN PRO_specifications s ON sv.PRO_specification_id = s.id
+		INNER JOIN specificaction_constants sc ON s.specification_constant_id = sc.id
+		WHERE sc.name = 'COLOR') AS c ON pv.id = c.variant
+	JOIN PRO_brands pb ON p.PRO_brand_id = pb.id
+	JOIN PRO_subcategorys ps ON p.PRO_subcategory_id = ps.id
+	JOIN PRO_categorys pc ON ps.PRO_category_id = pc.id
+	WHERE p.state = TRUE AND ps.id = subcategory_id_in;
 END
 $func$;
 
-CREATE OR REPLACE FUNCTION getColorsProductsBySubcategory(subcategoryId_in INTEGER)
+CREATE OR REPLACE FUNCTION get_colors_byBrand(brand_id_in INTEGER)
 RETURNS TABLE(
 	product VARCHAR, 
-	product_code INTEGER,
+	PRO_code INTEGER,
 	brand VARCHAR,
 	brand_code INTEGER,
 	subcategory VARCHAR,
 	subcategory_code INTEGER,
 	category VARCHAR,
 	category_code INTEGER,
-	product_variant VARCHAR,
-	product_variant_id INTEGER,
-	product_cost NUMERIC, 
-	product_stock INTEGER, 
+	PRO_variant VARCHAR,
+	PRO_variant_id INTEGER,
+	PRO_cost NUMERIC, 
+	PRO_stock INTEGER,
 	available BOOLEAN, 
-	color VARCHAR, 
+	color VARCHAR,
 	creation_date DATE
 )
 LANGUAGE plpgsql AS
 $func$
 BEGIN
 	RETURN QUERY
-	SELECT
-	p.name AS product,
-	p.id AS product_code,
-	b.name AS brand,
-	b.id AS brand_code,
-	sc.name AS subcategory,
-	sc.id AS subcategory_code,
-	cat.name AS category,
-	cat.id as category_code,
-	v.name AS product_variant, 
-	v.id AS product_variant_id,
-	v.cost AS product_cost, 
-	v.stock as product_stock,
-	v.isavailable AS availabe, 
-	c.color AS color, 
-	date(v.created_at) AS creation_date 
-	FROM variants AS v
-	JOIN products AS p ON v.product_id = p.id
-	JOIN (
-		SELECT s.variant_id as variant,s.name AS color from specifications AS s WHERE s.color = TRUE
-	) AS c ON v.id = c.variant
-	JOIN brands AS b ON p.brand_id = b.id
-	JOIN subcategorys AS sc ON p.subcategory_id = sc.id
-	JOIN categorys AS cat ON sc.category_id = cat.id
-	WHERE p.state = TRUE AND sc.id = subcategoryId_in;
+	SELECT 
+		p.name AS product, 
+		p.id AS PRO_code, 
+		pb.name AS brand, 
+		pb.id AS brand_code, 
+		ps.name AS subcategory, 
+		ps.id AS subcategory_code, 
+		pc.name AS category, 
+		pc.id AS category_code, 
+		pv.name AS PRO_variant, 
+		pv.id AS PRO_variant_id, 
+		pv.cost AS PRO_cost, 
+		pv.stock AS PRO_stock, 
+		pv.is_available AS available, 
+		c.color AS color, 
+		date(pv.created_at) AS creation_date
+	FROM PRO_variants pv
+	JOIN products p ON pv.PRO_id = p.id
+	JOIN ( 
+		SELECT vsv.PRO_variant_id AS variant, sv.value AS color 
+		FROM PRO_variant_specification_values vsv 
+		INNER JOIN PRO_specification_values sv ON vsv.PRO_specification_value_id = sv.id
+		INNER JOIN PRO_specifications s ON sv.PRO_specification_id = s.id
+		INNER JOIN specificaction_constants sc ON s.specification_constant_id = sc.id
+		WHERE sc.name = 'COLOR') AS c ON pv.id = c.variant
+	JOIN PRO_brands pb ON p.PRO_brand_id = pb.id
+	JOIN PRO_subcategorys ps ON p.PRO_subcategory_id = ps.id
+	JOIN PRO_categorys pc ON ps.PRO_category_id = pc.id
+	WHERE p.state = TRUE AND pb.id = brand_id_in;
 END
 $func$;
 
-
-CREATE OR REPLACE FUNCTION getColorsDataByProduct(productId_in INTEGER)
+CREATE OR REPLACE FUNCTION get_colors_byProduct(PRO_id_in INTEGER)
 RETURNS TABLE(
 	product VARCHAR, 
-	product_code INTEGER,
+	PRO_code INTEGER,
 	brand VARCHAR,
 	brand_code INTEGER,
 	subcategory VARCHAR,
 	subcategory_code INTEGER,
 	category VARCHAR,
 	category_code INTEGER,
-	product_variant VARCHAR,
-	product_variant_id INTEGER,
-	product_cost NUMERIC, 
-	product_stock INTEGER,
+	PRO_variant VARCHAR,
+	PRO_variant_id INTEGER,
+	PRO_cost NUMERIC, 
+	PRO_stock INTEGER,
 	available BOOLEAN, 
-	color VARCHAR, 
-	creation_date DATE)
-LANGUAGE plpgsql AS
-$func$
-BEGIN
-	RETURN QUERY
-	SELECT 
-	p.name AS product,
-	p.id AS product_code,
-	b.name AS brand,
-	b.id AS brand_code,
-	sc.name AS subcategory,
-	sc.id AS subcategory_code,
-	cat.name AS category,
-	cat.id as category_code,
-	v.name AS product_variant, 
-	v.id AS product_variant_id,
-	v.cost AS product_cost, 
-	v.stock as product_stock,
-	v.isavailable AS availabe, 
-	c.color AS color, 
-	date(v.created_at) AS creation_date 
-	FROM variants AS v
-	JOIN products AS p ON v.product_id = p.id
-	JOIN (
-		SELECT s.variant_id as variant,s.name AS color from specifications AS s WHERE s.color = TRUE
-	) AS c ON v.id = c.variant
-	JOIN brands AS b ON p.brand_id = b.id
-	JOIN subcategorys AS sc ON p.subcategory_id = sc.id
-	JOIN categorys AS cat ON sc.category_id = cat.id
-	WHERE product_id = productId_in AND p.state = TRUE
-	ORDER BY v.id;
-END
-$func$;
-
-
-/*
---------SEARCHS DESCRIPTIONS -----------
-*/
-
-
-CREATE OR REPLACE FUNCTION getDescriptionsProductsByBrand(brandId_in INTEGER)
-RETURNS TABLE(
-	product VARCHAR, 
-	product_code INTEGER,
-	brand VARCHAR,
-	brand_code INTEGER,
-	subcategory VARCHAR,
-	subcategory_code INTEGER,
-	product_variant VARCHAR,
-	product_variant_id INTEGER,
-	name VARCHAR,
-	information VARCHAR,
+	color VARCHAR,
 	creation_date DATE
 )
 LANGUAGE plpgsql AS
@@ -1098,136 +943,56 @@ $func$
 BEGIN
 	RETURN QUERY
 	SELECT 
-	p.name AS product,
-	p.id AS product_code,
-	b.name AS brand,
-	b.id AS brand_code,
-	sc.name AS subcategory,
-	sc.id AS subcategory_code,
-	v.name AS product_variant, 
-	v.id AS product_variant_id,
-	s.name AS name, 
-	s.information AS information,
-	date(v.created_at) AS creation_date 
-	FROM variants AS v
-	JOIN products AS p ON v.product_id = p.id
-	JOIN (
-		SELECT s.variant_id as variant,s.name AS name, s.information AS information from specifications AS s WHERE s.text = TRUE
-	) AS s ON v.id = s.variant
-	JOIN brands AS b ON p.brand_id = b.id
-	JOIN subcategorys AS sc ON p.subcategory_id = sc.id
-	JOIN categorys AS cat ON sc.category_id = cat.id
-	WHERE p.state = TRUE AND b.id = brandId_in;
+		p.name AS product, 
+		p.id AS PRO_code, 
+		pb.name AS brand, 
+		pb.id AS brand_code, 
+		ps.name AS subcategory, 
+		ps.id AS subcategory_code, 
+		pc.name AS category, 
+		pc.id AS category_code, 
+		pv.name AS PRO_variant, 
+		pv.id AS PRO_variant_id, 
+		pv.cost AS PRO_cost, 
+		pv.stock AS PRO_stock, 
+		pv.is_available AS available, 
+		c.color AS color, 
+		date(pv.created_at) AS creation_date
+	FROM PRO_variants pv
+	JOIN products p ON pv.PRO_id = p.id
+	JOIN ( 
+		SELECT vsv.PRO_variant_id AS variant, sv.value AS color 
+		FROM PRO_variant_specification_values vsv 
+		INNER JOIN PRO_specification_values sv ON vsv.PRO_specification_value_id = sv.id
+		INNER JOIN PRO_specifications s ON sv.PRO_specification_id = s.id
+		INNER JOIN specificaction_constants sc ON s.specification_constant_id = sc.id
+		WHERE sc.name = 'COLOR') AS c ON pv.id = c.variant
+	JOIN PRO_brands pb ON p.PRO_brand_id = pb.id
+	JOIN PRO_subcategorys ps ON p.PRO_subcategory_id = ps.id
+	JOIN PRO_categorys pc ON ps.PRO_category_id = pc.id
+	WHERE p.state = TRUE AND pv.PRO_id = PRO_id_in;
 END
 $func$;
 
-CREATE OR REPLACE FUNCTION getDescriptionsProductsBySubcategory(subcategoryId_in INTEGER)
+/* GET SIZES BY */
+
+
+CREATE OR REPLACE FUNCTION get_sizes_bySubcategory(subcategory_id_in INTEGER)
 RETURNS TABLE(
 	product VARCHAR, 
-	product_code INTEGER,
-	brand VARCHAR,
-	brand_code INTEGER,
-	subcategory VARCHAR,
-	subcategory_code INTEGER,
-	product_variant VARCHAR,
-	product_variant_id INTEGER,
-	name VARCHAR,
-	information VARCHAR,
-	creation_date DATE
-)
-LANGUAGE plpgsql AS
-$func$
-BEGIN
-	RETURN QUERY
-	SELECT 
-	p.name AS product,
-	p.id AS product_code,
-	b.name AS brand,
-	b.id AS brand_code,
-	sc.name AS subcategory,
-	sc.id AS subcategory_code,
-	v.name AS product_variant, 
-	v.id AS product_variant_id,
-	s.name AS name, 
-	s.information AS information,
-	date(v.created_at) AS creation_date 
-	FROM variants AS v
-	JOIN products AS p ON v.product_id = p.id
-	JOIN (
-		SELECT s.variant_id as variant,s.name AS name, s.information AS information from specifications AS s WHERE s.text = TRUE
-	) AS s ON v.id = s.variant
-	JOIN brands AS b ON p.brand_id = b.id
-	JOIN subcategorys AS sc ON p.subcategory_id = sc.id
-	JOIN categorys AS cat ON sc.category_id = cat.id
-	WHERE p.state = TRUE AND sc.id = subcategoryId_in;
-END
-$func$;
-
-CREATE OR REPLACE FUNCTION getDescriptionsDataByProduct(productId_in INTEGER)
-RETURNS TABLE(
-	product VARCHAR, 
-	product_code INTEGER,
-	brand VARCHAR,
-	brand_code INTEGER,
-	subcategory VARCHAR,
-	subcategory_code INTEGER,
-	product_variant VARCHAR,
-	product_variant_id INTEGER,
-	name VARCHAR,
-	information VARCHAR,
-	creation_date DATE
-)
-LANGUAGE plpgsql AS
-$func$
-BEGIN
-	RETURN QUERY
-	SELECT 
-	p.name AS product,
-	p.id AS product_code,
-	b.name AS brand,
-	b.id AS brand_code,
-	sc.name AS subcategory,
-	sc.id AS subcategory_code,
-	v.name AS product_variant, 
-	v.id AS product_variant_id,
-	s.name AS name, 
-	s.information AS information,
-	date(v.created_at) AS creation_date 
-	FROM variants AS v
-	JOIN products AS p ON v.product_id = p.id
-	JOIN (
-		SELECT s.variant_id as variant,s.name AS name, s.information AS information from specifications AS s WHERE s.text = TRUE
-	) AS s ON v.id = s.variant
-	JOIN brands AS b ON p.brand_id = b.id
-	JOIN subcategorys AS sc ON p.subcategory_id = sc.id
-	WHERE product_id = productId_in AND p.state = TRUE
-	ORDER BY v.id;
-END
-$func$;
-
-
-/*
---------SEARCHS VARIANTS DESCRIPTIONS -----------
-*/
-
-
-CREATE OR REPLACE FUNCTION getVariantsDescriptionsProductsByBrand(brandId_in INTEGER)
-RETURNS TABLE(
-	product VARCHAR, 
-	product_code INTEGER,
+	PRO_code INTEGER,
 	brand VARCHAR,
 	brand_code INTEGER,
 	subcategory VARCHAR,
 	subcategory_code INTEGER,
 	category VARCHAR,
 	category_code INTEGER,
-	product_variant VARCHAR,
-	product_variant_id INTEGER,
-	product_cost NUMERIC, 
-	product_stock INTEGER,
+	PRO_variant VARCHAR,
+	PRO_variant_id INTEGER,
+	PRO_cost NUMERIC, 
+	PRO_stock INTEGER,
 	available BOOLEAN, 
-	name VARCHAR,
-	information VARCHAR,
+	size VARCHAR,
 	creation_date DATE
 )
 LANGUAGE plpgsql AS
@@ -1235,260 +1000,449 @@ $func$
 BEGIN
 	RETURN QUERY
 	SELECT 
-	p.name AS product,
-	p.id AS product_code,
-	b.name AS brand,
-	b.id AS brand_code,
-	sc.name AS subcategory,
-	sc.id AS subcategory_code,
-	cat.name AS category,
-	cat.id as category_code,
-	v.name AS product_variant, 
-	v.id AS product_variant_id,
-	v.cost AS product_cost,
-	v.stock as product_stock,
-	v.isavailable AS availabe, 
-	s.name AS name, 
-	s.information AS information,
-	date(v.created_at) AS creation_date 
-	FROM variants AS v
-	JOIN products AS p ON v.product_id = p.id
-	JOIN (
-		SELECT s.variant_id as variant,s.name AS name, s.information AS information from specifications AS s WHERE s.text = TRUE
-	) AS s ON v.id = s.variant
-	JOIN brands AS b ON p.brand_id = b.id
-	JOIN subcategorys AS sc ON p.subcategory_id = sc.id
-	JOIN categorys AS cat ON sc.category_id = cat.id
-	WHERE p.state = TRUE AND b.id = brandId_in;
+		p.name AS product, 
+		p.id AS PRO_code, 
+		pb.name AS brand, 
+		pb.id AS brand_code, 
+		ps.name AS subcategory, 
+		ps.id AS subcategory_code, 
+		pc.name AS category, 
+		pc.id AS category_code, 
+		pv.name AS PRO_variant, 
+		pv.id AS PRO_variant_id, 
+		pv.cost AS PRO_cost, 
+		pv.stock AS PRO_stock, 
+		pv.is_available AS available, 
+		s.size AS size, 
+		date(pv.created_at) AS creation_date
+	FROM PRO_variants pv
+	JOIN products p ON pv.PRO_id = p.id
+	JOIN ( 
+		SELECT vsv.PRO_variant_id AS variant, sv.value AS size 
+		FROM PRO_variant_specification_values vsv 
+		INNER JOIN PRO_specification_values sv ON vsv.PRO_specification_value_id = sv.id
+		INNER JOIN PRO_specifications s ON sv.PRO_specification_id = s.id
+		INNER JOIN specificaction_constants sc ON s.specification_constant_id = sc.id
+		WHERE sc.name = 'SIZE') AS s ON pv.id = s.variant
+	JOIN PRO_brands pb ON p.PRO_brand_id = pb.id
+	JOIN PRO_subcategorys ps ON p.PRO_subcategory_id = ps.id
+	JOIN PRO_categorys pc ON ps.PRO_category_id = pc.id
+	WHERE p.state = TRUE AND ps.id = subcategory_id_in;
 END
 $func$;
 
-CREATE OR REPLACE FUNCTION getVariantsDescriptionsProductsBySubcategory(subcategoryId_in INTEGER)
+CREATE OR REPLACE FUNCTION get_sizes_byBrand(brand_id_in INTEGER)
 RETURNS TABLE(
 	product VARCHAR, 
-	product_code INTEGER,
+	PRO_code INTEGER,
 	brand VARCHAR,
 	brand_code INTEGER,
 	subcategory VARCHAR,
 	subcategory_code INTEGER,
 	category VARCHAR,
 	category_code INTEGER,
-	product_variant VARCHAR,
-	product_variant_id INTEGER,
-	product_cost NUMERIC, 
-	product_stock INTEGER, 
+	PRO_variant VARCHAR,
+	PRO_variant_id INTEGER,
+	PRO_cost NUMERIC, 
+	PRO_stock INTEGER,
 	available BOOLEAN, 
-	name VARCHAR,
-	information VARCHAR,
+	size VARCHAR,
 	creation_date DATE
 )
 LANGUAGE plpgsql AS
 $func$
 BEGIN
 	RETURN QUERY
-	SELECT
-	p.name AS product,
-	p.id AS product_code,
-	b.name AS brand,
-	b.id AS brand_code,
-	sc.name AS subcategory,
-	sc.id AS subcategory_code,
-	cat.name AS category,
-	cat.id as category_code,
-	v.name AS product_variant, 
-	v.id AS product_variant_id,
-	v.cost AS product_cost, 
-	v.stock as product_stock,
-	v.isavailable AS availabe, 
-	s.name AS name, 
-	s.information AS information,
-	date(v.created_at) AS creation_date 
-	FROM variants AS v
-	JOIN products AS p ON v.product_id = p.id
-	JOIN (
-		SELECT s.variant_id as variant,s.name AS name, s.information AS information from specifications AS s WHERE s.text = TRUE
-	) AS s ON v.id = s.variant
-	JOIN brands AS b ON p.brand_id = b.id
-	JOIN subcategorys AS sc ON p.subcategory_id = sc.id
-	JOIN categorys AS cat ON sc.category_id = cat.id
-	WHERE p.state = TRUE AND sc.id = subcategoryId_in;
+	SELECT 
+		p.name AS product, 
+		p.id AS PRO_code, 
+		pb.name AS brand, 
+		pb.id AS brand_code, 
+		ps.name AS subcategory, 
+		ps.id AS subcategory_code, 
+		pc.name AS category, 
+		pc.id AS category_code, 
+		pv.name AS PRO_variant, 
+		pv.id AS PRO_variant_id, 
+		pv.cost AS PRO_cost, 
+		pv.stock AS PRO_stock, 
+		pv.is_available AS available, 
+		s.size AS size, 
+		date(pv.created_at) AS creation_date
+	FROM PRO_variants pv
+	JOIN products p ON pv.PRO_id = p.id
+	JOIN ( 
+		SELECT vsv.PRO_variant_id AS variant, sv.value AS size 
+		FROM PRO_variant_specification_values vsv 
+		INNER JOIN PRO_specification_values sv ON vsv.PRO_specification_value_id = sv.id
+		INNER JOIN PRO_specifications s ON sv.PRO_specification_id = s.id
+		INNER JOIN specificaction_constants sc ON s.specification_constant_id = sc.id
+		WHERE sc.name = 'SIZE') AS s ON pv.id = s.variant
+	JOIN PRO_brands pb ON p.PRO_brand_id = pb.id
+	JOIN PRO_subcategorys ps ON p.PRO_subcategory_id = ps.id
+	JOIN PRO_categorys pc ON ps.PRO_category_id = pc.id
+	WHERE p.state = TRUE AND pb.id = brand_id_in;
 END
 $func$;
 
-
-CREATE OR REPLACE FUNCTION getVariantsDescriptionsDataByProduct(productId_in INTEGER)
+CREATE OR REPLACE FUNCTION get_sizes_byProduct(PRO_id_in INTEGER)
 RETURNS TABLE(
 	product VARCHAR, 
-	product_code INTEGER,
+	PRO_code INTEGER,
 	brand VARCHAR,
 	brand_code INTEGER,
 	subcategory VARCHAR,
 	subcategory_code INTEGER,
-	product_variant VARCHAR,
-	product_variant_id INTEGER,
-	product_cost NUMERIC, 
-	product_stock INTEGER,
+	category VARCHAR,
+	category_code INTEGER,
+	PRO_variant VARCHAR,
+	PRO_variant_id INTEGER,
+	PRO_cost NUMERIC, 
+	PRO_stock INTEGER,
 	available BOOLEAN, 
-	name VARCHAR,
-	information VARCHAR,
-	creation_date DATE)
+	size VARCHAR,
+	creation_date DATE
+)
 LANGUAGE plpgsql AS
 $func$
 BEGIN
 	RETURN QUERY
 	SELECT 
-	p.name AS product,
-	p.id AS product_code,
-	b.name AS brand,
-	b.id AS brand_code,
-	sc.name AS subcategory,
-	sc.id AS subcategory_code,
-	v.name AS product_variant, 
-	v.id AS product_variant_id,
-	v.cost AS product_cost, 
-	v.stock as product_stock,
-	v.isavailable AS availabe, 
-	s.name AS name, 
-	s.information AS information,
-	date(v.created_at) AS creation_date 
-	FROM variants AS v
-	JOIN products AS p ON v.product_id = p.id
-	JOIN (
-		SELECT s.variant_id as variant,s.name AS name, s.information AS information from specifications AS s WHERE s.text = TRUE
-	) AS s ON v.id = s.variant
-	JOIN brands AS b ON p.brand_id = b.id
-	JOIN subcategorys AS sc ON p.subcategory_id = sc.id
-	WHERE product_id = productId_in AND p.state = TRUE
-	ORDER BY v.id;
+		p.name AS product, 
+		p.id AS PRO_code, 
+		pb.name AS brand, 
+		pb.id AS brand_code, 
+		ps.name AS subcategory, 
+		ps.id AS subcategory_code, 
+		pc.name AS category, 
+		pc.id AS category_code, 
+		pv.name AS PRO_variant, 
+		pv.id AS PRO_variant_id, 
+		pv.cost AS PRO_cost, 
+		pv.stock AS PRO_stock, 
+		pv.is_available AS available, 
+		s.size AS size, 
+		date(pv.created_at) AS creation_date
+	FROM PRO_variants pv
+	JOIN products p ON pv.PRO_id = p.id
+	JOIN ( 
+		SELECT vsv.PRO_variant_id AS variant, sv.value AS size 
+		FROM PRO_variant_specification_values vsv 
+		INNER JOIN PRO_specification_values sv ON vsv.PRO_specification_value_id = sv.id
+		INNER JOIN PRO_specifications s ON sv.PRO_specification_id = s.id
+		INNER JOIN specificaction_constants sc ON s.specification_constant_id = sc.id
+		WHERE sc.name = 'SIZE') AS s ON pv.id = s.variant
+	JOIN PRO_brands pb ON p.PRO_brand_id = pb.id
+	JOIN PRO_subcategorys ps ON p.PRO_subcategory_id = ps.id
+	JOIN PRO_categorys pc ON ps.PRO_category_id = pc.id
+	WHERE p.state = TRUE AND pv.PRO_id = PRO_id_in;
 END
 $func$;
 
 
-/*
-
--- ADDING SOME PRODUCTS(2) DATA..
-
-SELECT addcategory('tecnologia');
-
-SELECT addsubcategory('consolas',3);
-
-SELECT addbrand('Nintendo');
-SELECT addbrand('Sony');
-
-SELECT addproduct('Consola PS5 Standard', 'PROD00010',3,6);
-SELECT addproduct('Consola Nintendo Switch Oled Edición Especial Pokemon Scarlet and Violet', 'PROD00011',3,5);
-
-SELECT addVariant('Consola PS5 Standard', 100, 2900.00, 5);
-SELECT addVariant('Consola Nintendo Switch Oled Edición Especial Pokemon Scarlet and Viole', 100, 1499.00, 6);
-
-SELECT addSpecification(FALSE, FALSE, TRUE, 'País de origen', 'China', 11);
-SELECT addSpecification(FALSE, FALSE, TRUE, 'Conexión a Internet', 'Wifi/LAN', 11);
-
-SELECT addSpecification(FALSE, FALSE, TRUE, 'País de origen', 'China', 12);
-SELECT addSpecification(FALSE, FALSE, TRUE, 'Capacidad de almacenamiento', '64GB', 12);
-
-*/
-
-/*
--------------------- USERS --------------------
-*/
-
-CREATE OR REPLACE FUNCTION addUserType(name_in VARCHAR)
-RETURNS INTEGER AS 
-$func$
-DECLARE
-	ut_new_id INTEGER;
-BEGIN
-	INSERT INTO usertypes (name) VALUES (name_in)
-	RETURNING id INTO ut_new_id;
-	RETURN ut_new_id;
-END;
-$func$
-LANGUAGE plpgsql;
-
-SELECT addUserType('admin');
-SELECT addUserType('client');
-
--- CREATION OF USERS (ADMINS AND CLIENTS)
-
-CREATE OR REPLACE FUNCTION addUserAdmin(firstname_in VARCHAR, lastname_in VARCHAR, username_in VARCHAR, password_in VARCHAR, email_in VARCHAR)
-RETURNS INTEGER AS 
-$func$
-DECLARE
-	u_new_id INTEGER;
-BEGIN
-	INSERT INTO users (firstname, lastname, username, password, email, state, created_at, modified_at,type_id) VALUES (firstname_in, lastname_in, username_in, password_in, email_in, TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1)
-	RETURNING id INTO u_new_id;
-	RETURN u_new_id;
-END;
-$func$
-LANGUAGE plpgsql;
-
-CREATE OR REPLACE FUNCTION addUserClient(firstname_in VARCHAR, lastname_in VARCHAR, username_in VARCHAR, password_in VARCHAR, email_in VARCHAR)
-RETURNS INTEGER AS 
-$func$
-DECLARE
-	u_new_id INTEGER;
-BEGIN
-	INSERT INTO users (firstname, lastname, username, password, email, state, created_at, modified_at,type_id) VALUES (firstname_in, lastname_in, username_in, password_in, email_in, TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 2)
-	RETURNING id INTO u_new_id;
-	RETURN u_new_id;
-END;
-$func$
-LANGUAGE plpgsql;
-
--- USER CREATION AND AUTHENTICATION
-
-CREATE OR REPLACE FUNCTION signupUser (firstname_in VARCHAR, lastname_in VARCHAR, username_in VARCHAR, password_in VARCHAR, email_in VARCHAR, typeId_in INTEGER)
-RETURNS INTEGER AS 
-$func$
-DECLARE
-	u_new_id INTEGER;
-BEGIN
-	INSERT INTO users (firstname, lastname, username, password, email, state, created_at, modified_at, type_id) VALUES (firstname_in, lastname_in, username_in, password_in, email_in, TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, typeId_in)
-	RETURNING id INTO u_new_id;
-	RETURN u_new_id;
-END;
-$func$
-LANGUAGE plpgsql;
+/* GET SPECIFICATIONS BY */
 
 
-CREATE OR REPLACE FUNCTION signinUser (username_in VARCHAR)
-	RETURNS TABLE(id INTEGER, firstname VARCHAR, lastname VARCHAR, username VARCHAR, password VARCHAR, email VARCHAR, state BOOLEAN, type VARCHAR)
+CREATE OR REPLACE FUNCTION get_specifications_bySubcategory(subcategory_id_in INTEGER)
+RETURNS TABLE(
+	product VARCHAR, 
+	PRO_code INTEGER,
+	brand VARCHAR,
+	brand_code INTEGER,
+	subcategory VARCHAR,
+	subcategory_code INTEGER,
+	category VARCHAR,
+	category_code INTEGER,
+	PRO_variant VARCHAR,
+	PRO_variant_id INTEGER,
+	specification VARCHAR,
+	value VARCHAR,
+	creation_date DATE
+)
 LANGUAGE plpgsql AS
 $func$
 BEGIN
 	RETURN QUERY
-	SELECT u.id AS id, u.firstname AS firstname, u.lastname AS lastname, u.username AS username, u.password AS password, u.email AS email, u.state AS state, ut.name AS type 
-	FROM users as u 
-	INNER JOIN usertypes as ut on u.type_id = ut.id
-	WHERE u.username = username_in;
-	-- SI NO EXISTE EL USUARIO EN LA DATA, ENVIO UNA EXCEPCION CONTROLADA DE CODIGO 'P0001'
-    IF NOT FOUND THEN
-		RAISE EXCEPTION 'USER NOT FOUND';
-    END IF;
+	SELECT 
+		p.name AS product, 
+		p.id AS PRO_code, 
+		pb.name AS brand, 
+		pb.id AS brand_code, 
+		ps.name AS subcategory, 
+		ps.id AS subcategory_code, 
+		pc.name AS category, 
+		pc.id AS category_code, 
+		pv.name AS PRO_variant, 
+		pv.id AS PRO_variant_id, 
+		sc.name AS specification, 
+		sv.value AS value, 
+		date(pv.created_at) AS creation_date
+	FROM PRO_variants pv
+	JOIN products p ON pv.PRO_id = p.id
+	JOIN PRO_variant_specification_values vsv ON pv.id = vsv.PRO_variant_id
+	JOIN PRO_specification_values sv ON vsv.PRO_specification_value_id = sv.id
+	JOIN PRO_specifications s ON sv.PRO_specification_id = s.id
+	JOIN specificaction_constants sc ON s.specification_constant_id = sc.id
+	JOIN PRO_brands pb ON p.PRO_brand_id = pb.id
+	JOIN PRO_subcategorys ps ON p.PRO_subcategory_id = ps.id
+	JOIN PRO_categorys pc ON ps.PRO_category_id = pc.id
+	WHERE p.state = TRUE AND ps.id = subcategory_id_in;
 END
 $func$;
 
-/*
--------------------- SALES --------------------
-*/
-
-CREATE OR REPLACE FUNCTION addSaleState(name_in VARCHAR)
-RETURNS INTEGER AS 
+CREATE OR REPLACE FUNCTION get_specifications_byBrand(brand_id_in INTEGER)
+RETURNS TABLE(
+	product VARCHAR, 
+	PRO_code INTEGER,
+	brand VARCHAR,
+	brand_code INTEGER,
+	subcategory VARCHAR,
+	subcategory_code INTEGER,
+	category VARCHAR,
+	category_code INTEGER,
+	PRO_variant VARCHAR,
+	PRO_variant_id INTEGER,
+	specification VARCHAR,
+	value VARCHAR,
+	creation_date DATE
+)
+LANGUAGE plpgsql AS
 $func$
-DECLARE
-	ss_new_id INTEGER;
 BEGIN
-	INSERT INTO statesales (name) VALUES (name_in)
-	RETURNING id INTO ss_new_id;
-	RETURN ss_new_id;
-END;
+	RETURN QUERY
+	SELECT 
+		p.name AS product, 
+		p.id AS PRO_code, 
+		pb.name AS brand, 
+		pb.id AS brand_code, 
+		ps.name AS subcategory, 
+		ps.id AS subcategory_code, 
+		pc.name AS category, 
+		pc.id AS category_code, 
+		pv.name AS PRO_variant, 
+		pv.id AS PRO_variant_id, 
+		sc.name AS specification, 
+		sv.value AS value, 
+		date(pv.created_at) AS creation_date
+	FROM PRO_variants pv
+	JOIN products p ON pv.PRO_id = p.id
+	JOIN PRO_variant_specification_values vsv ON pv.id = vsv.PRO_variant_id
+	JOIN PRO_specification_values sv ON vsv.PRO_specification_value_id = sv.id
+	JOIN PRO_specifications s ON sv.PRO_specification_id = s.id
+	JOIN specificaction_constants sc ON s.specification_constant_id = sc.id
+	JOIN PRO_brands pb ON p.PRO_brand_id = pb.id
+	JOIN PRO_subcategorys ps ON p.PRO_subcategory_id = ps.id
+	JOIN PRO_categorys pc ON ps.PRO_category_id = pc.id
+	WHERE p.state = TRUE AND pb.id = brand_id_in;
+END
+$func$;
+
+CREATE OR REPLACE FUNCTION get_specifications_byProduct(PRO_id_in INTEGER)
+RETURNS TABLE(
+	product VARCHAR, 
+	PRO_code INTEGER,
+	brand VARCHAR,
+	brand_code INTEGER,
+	subcategory VARCHAR,
+	subcategory_code INTEGER,
+	category VARCHAR,
+	category_code INTEGER,
+	PRO_variant VARCHAR,
+	PRO_variant_id INTEGER,
+	specification VARCHAR,
+	value VARCHAR,
+	creation_date DATE
+)
+LANGUAGE plpgsql AS
 $func$
-LANGUAGE plpgsql;
+BEGIN
+	RETURN QUERY
+	SELECT 
+		p.name AS product, 
+		p.id AS PRO_code, 
+		pb.name AS brand, 
+		pb.id AS brand_code, 
+		ps.name AS subcategory, 
+		ps.id AS subcategory_code, 
+		pc.name AS category, 
+		pc.id AS category_code, 
+		pv.name AS PRO_variant, 
+		pv.id AS PRO_variant_id, 
+		sc.name AS specification, 
+		sv.value AS value, 
+		date(pv.created_at) AS creation_date
+	FROM PRO_variants pv
+	JOIN products p ON pv.PRO_id = p.id
+	JOIN PRO_variant_specification_values vsv ON pv.id = vsv.PRO_variant_id
+	JOIN PRO_specification_values sv ON vsv.PRO_specification_value_id = sv.id
+	JOIN PRO_specifications s ON sv.PRO_specification_id = s.id
+	JOIN specificaction_constants sc ON s.specification_constant_id = sc.id
+	JOIN PRO_brands pb ON p.PRO_brand_id = pb.id
+	JOIN PRO_subcategorys ps ON p.PRO_subcategory_id = ps.id
+	JOIN PRO_categorys pc ON ps.PRO_category_id = pc.id
+	WHERE p.state = TRUE AND pv.PRO_id = PRO_id_in;
+END
+$func$;
 
-SELECT addSaleState('pendiente');
-SELECT addSaleState('pagada');
-SELECT addSaleState('cancelada');
 
-	
+/* GET VARIANTS DETAILS BY */
+
+
+CREATE OR REPLACE FUNCTION get_variants_details_bySubcategory(subcategory_id_in INTEGER)
+RETURNS TABLE(
+	product VARCHAR, 
+	PRO_code INTEGER,
+	brand VARCHAR,
+	brand_code INTEGER,
+	subcategory VARCHAR,
+	subcategory_code INTEGER,
+	category VARCHAR,
+	category_code INTEGER,
+	PRO_variant VARCHAR,
+	PRO_variant_id INTEGER,
+	PRO_cost NUMERIC, 
+	PRO_stock INTEGER,
+	available BOOLEAN,
+	specification VARCHAR,
+	value VARCHAR,
+	creation_date DATE
+)
+LANGUAGE plpgsql AS
+$func$
+BEGIN
+	RETURN QUERY
+	SELECT 
+		p.name AS product, 
+		p.id AS PRO_code, 
+		pb.name AS brand, 
+		pb.id AS brand_code, 
+		ps.name AS subcategory, 
+		ps.id AS subcategory_code, 
+		pc.name AS category, 
+		pc.id AS category_code, 
+		pv.name AS PRO_variant, 
+		pv.id AS PRO_variant_id, 
+		pv.cost AS PRO_cost, 
+		pv.stock AS PRO_stock, 
+		pv.is_available AS available, 
+		sc.name AS specification, 
+		sv.value AS value, 
+		date(pv.created_at) AS creation_date
+	FROM PRO_variants pv
+	JOIN products p ON pv.PRO_id = p.id
+	JOIN PRO_variant_specification_values vsv ON pv.id = vsv.PRO_variant_id
+	JOIN PRO_specification_values sv ON vsv.PRO_specification_value_id = sv.id
+	JOIN PRO_specifications s ON sv.PRO_specification_id = s.id
+	JOIN specificaction_constants sc ON s.specification_constant_id = sc.id
+	JOIN PRO_brands pb ON p.PRO_brand_id = pb.id
+	JOIN PRO_subcategorys ps ON p.PRO_subcategory_id = ps.id
+	JOIN PRO_categorys pc ON ps.PRO_category_id = pc.id
+	WHERE p.state = TRUE AND ps.id = subcategory_id_in;
+END
+$func$;
+
+CREATE OR REPLACE FUNCTION get_variants_details_byBrand(brand_id_in INTEGER)
+RETURNS TABLE(
+	product VARCHAR, 
+	PRO_code INTEGER,
+	brand VARCHAR,
+	brand_code INTEGER,
+	subcategory VARCHAR,
+	subcategory_code INTEGER,
+	category VARCHAR,
+	category_code INTEGER,
+	PRO_variant VARCHAR,
+	PRO_variant_id INTEGER,
+	PRO_cost NUMERIC, 
+	PRO_stock INTEGER,
+	available BOOLEAN,
+	specification VARCHAR,
+	value VARCHAR,
+	creation_date DATE
+)
+LANGUAGE plpgsql AS
+$func$
+BEGIN
+	RETURN QUERY
+	SELECT 
+		p.name AS product, 
+		p.id AS PRO_code, 
+		pb.name AS brand, 
+		pb.id AS brand_code, 
+		ps.name AS subcategory, 
+		ps.id AS subcategory_code, 
+		pc.name AS category, 
+		pc.id AS category_code, 
+		pv.name AS PRO_variant, 
+		pv.id AS PRO_variant_id, 
+		pv.cost AS PRO_cost, 
+		pv.stock AS PRO_stock, 
+		pv.is_available AS available, 
+		sc.name AS specification, 
+		sv.value AS value, 
+		date(pv.created_at) AS creation_date
+	FROM PRO_variants pv
+	JOIN products p ON pv.PRO_id = p.id
+	JOIN PRO_variant_specification_values vsv ON pv.id = vsv.PRO_variant_id
+	JOIN PRO_specification_values sv ON vsv.PRO_specification_value_id = sv.id
+	JOIN PRO_specifications s ON sv.PRO_specification_id = s.id
+	JOIN specificaction_constants sc ON s.specification_constant_id = sc.id
+	JOIN PRO_brands pb ON p.PRO_brand_id = pb.id
+	JOIN PRO_subcategorys ps ON p.PRO_subcategory_id = ps.id
+	JOIN PRO_categorys pc ON ps.PRO_category_id = pc.id
+	WHERE p.state = TRUE AND pb.id = brand_id_in;
+END
+$func$;
+
+CREATE OR REPLACE FUNCTION get_variants_details_byProduct(PRO_id_in INTEGER)
+RETURNS TABLE(
+	product VARCHAR, 
+	PRO_code INTEGER,
+	brand VARCHAR,
+	brand_code INTEGER,
+	subcategory VARCHAR,
+	subcategory_code INTEGER,
+	category VARCHAR,
+	category_code INTEGER,
+	PRO_variant VARCHAR,
+	PRO_variant_id INTEGER,
+	PRO_cost NUMERIC, 
+	PRO_stock INTEGER,
+	available BOOLEAN,
+	specification VARCHAR,
+	value VARCHAR,
+	creation_date DATE
+)
+LANGUAGE plpgsql AS
+$func$
+BEGIN
+	RETURN QUERY
+	SELECT 
+		p.name AS product, 
+		p.id AS PRO_code, 
+		pb.name AS brand, 
+		pb.id AS brand_code, 
+		ps.name AS subcategory, 
+		ps.id AS subcategory_code, 
+		pc.name AS category, 
+		pc.id AS category_code, 
+		pv.name AS PRO_variant, 
+		pv.id AS PRO_variant_id, 
+		pv.cost AS PRO_cost, 
+		pv.stock AS PRO_stock, 
+		pv.is_available AS available, 
+		sc.name AS specification, 
+		sv.value AS value, 
+		date(pv.created_at) AS creation_date
+	FROM PRO_variants pv
+	JOIN products p ON pv.PRO_id = p.id
+	JOIN PRO_variant_specification_values vsv ON pv.id = vsv.PRO_variant_id
+	JOIN PRO_specification_values sv ON vsv.PRO_specification_value_id = sv.id
+	JOIN PRO_specifications s ON sv.PRO_specification_id = s.id
+	JOIN specificaction_constants sc ON s.specification_constant_id = sc.id
+	JOIN PRO_brands pb ON p.PRO_brand_id = pb.id
+	JOIN PRO_subcategorys ps ON p.PRO_subcategory_id = ps.id
+	JOIN PRO_categorys pc ON ps.PRO_category_id = pc.id
+	WHERE p.state = TRUE AND pv.PRO_id = PRO_id_in;
+END
+$func$;
