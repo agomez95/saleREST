@@ -1,7 +1,7 @@
 
 const express = require('express');
 const router = express.Router();
-const subcategoryController = require('../controllers/subcategory.controller');
+const subcategoryController = require('../controllers/products/subcategory.controller');
 
 router
     .get('/', subcategoryController.getSubcategorysController)

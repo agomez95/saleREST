@@ -1,4 +1,4 @@
-const brandService = require('../services/brand.service');
+const brandService = require('../services/products/brand.service');
 
 const addBrandController = async (req, res, next) => {
     try {

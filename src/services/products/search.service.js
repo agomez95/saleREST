@@ -1,12 +1,12 @@
-const pgConnection = require('../common/pgConnection');
+const pgConnection = require('../../common/pgConnection');
 
-const { CustomError } = require('../utils/moduleError');
-const moduleErrorHandler = require('../utils/moduleError');
+const { CustomError } = require('../../utils/moduleError');
+const moduleErrorHandler = require('../../utils/moduleError');
 
-const { resolveSearchBrandQuery, resolveSearchSubcategoryQuery, resolveSearchProductQuery } = require('../utils/searchs/specifications');
-const { listProductsOneQuery, listProductsTwoQuerys } = require('../utils/searchs/products')
+const { resolveSearchBrandQuery, resolveSearchSubcategoryQuery, resolveSearchProductQuery } = require('../../utils/searchs/specifications');
+const { listProductsOneQuery, listProductsTwoQuerys } = require('../../utils/searchs/products')
 
-const searchQuery = require('../utils/querys/search.query');
+const searchQuery = require('../../utils/querys/search.query');
 
 const getProductsByBrandService = async (data) => {
     const pgDB = new pgConnection();

@@ -1,8 +1,8 @@
-const pgConnection = require('../common/pgConnection');
+const pgConnection = require('../../common/pgConnection');
 
-const moduleErrorHandler = require('../utils/moduleError');
+const moduleErrorHandler = require('../../utils/moduleError');
 
-const variantQuery = require('../utils/querys/variant.query');
+const variantQuery = require('../../utils/querys/variant.query');
 
 /*** AQUI SI AGREGAR SERVICIO PARA SPECIFICATION VALUE */
 const addVariantService = async (data) => {

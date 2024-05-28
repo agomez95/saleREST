@@ -1,4 +1,4 @@
-const specificationService = require('../services/specification.service');
+const specificationService = require('../services/products/specification.service');
 
 const addSpecificationController = async (req, res, next) => {
     try {

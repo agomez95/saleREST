@@ -1,8 +1,8 @@
-const pgConnection = require('../common/pgConnection');
+const pgConnection = require('../../common/pgConnection');
 
-const moduleErrorHandler = require('../utils/moduleError');
+const moduleErrorHandler = require('../../utils/moduleError');
 
-const specificationQuery = require('../utils/querys/specification.query');
+const specificationQuery = require('../../utils/querys/specification.query');
 
 
 /*** AQUI SI AGREGAR SERVICIO PARA SPECIFICATION VALUE */

@@ -1,8 +1,8 @@
-const pgConnection = require('../common/pgConnection');
+const pgConnection = require('../../common/pgConnection');
 
-const moduleErrorHandler = require('../utils/moduleError');
+const moduleErrorHandler = require('../../utils/moduleError');
 
-const brandQuery = require('../utils/querys/brand.query');
+const brandQuery = require('../../utils/querys/brand.query');
 
 const addBrandService = async (data) => {
     const pgDB = new pgConnection();

@@ -1,10 +1,10 @@
-const pgConnection = require('../common/pgConnection');
+const pgConnection = require('../../common/pgConnection');
 
-const moduleErrorHandler = require('../utils/moduleError');
+const moduleErrorHandler = require('../../utils/moduleError');
 
-const categoryQuery = require('../utils/querys/category.query');
+const subcategoryQuery = require('../../utils/querys/subcategory.query');
 
-const getCategorysService = async () => {
+const getSubcategorysService = async () => {
     const pgDB = new pgConnection();
 
     let result;
@@ -12,29 +12,29 @@ const getCategorysService = async () => {
     try {
         await pgDB.connect();
 
-        result = await pgDB.query(categoryQuery.get_PRO_categorys).catch((error) => { throw error; });
-
+        result = await pgDB.query(subcategoryQuery.get_PRO_subcategorys).catch((error) => { throw error; });
+        
         const count = result.length;
 
         const response = {
             status: 200,
-            service: 'getCategorysService',
+            service: 'getSubcategorysService',
             count: count,
             data: result
         };
 
         return { response: response };
-    } catch(err) {
+    } catch(error) {
         moduleErrorHandler.handleError(error);
     } finally {
         pgDB.close();
     }
 };
 
-const addCategoryService = async (data) => {
+const addSubcategoryService = async (data) => {
     const pgDB = new pgConnection();
 
-    const { name } = data;
+    const { name, category_id } = data;
 
     let result;
 
@@ -44,7 +44,7 @@ const addCategoryService = async (data) => {
         await pgDB.query('BEGIN');
 
         try {
-            result = await pgDB.selectFunction(categoryQuery.add_PRO_category, { name: name });
+            result = await pgDB.selectFunction(subcategoryQuery.add_PRO_subcategory, { name: name, category_id: category_id });
         } catch (error) {
             await pgDB.query('ROLLBACK');
             throw error;
@@ -54,7 +54,7 @@ const addCategoryService = async (data) => {
 
         const response = {
             status: 200,
-            service: 'addCategoryService',
+            service: 'addSubcategoryService',
             result: result,
         };
 
@@ -66,7 +66,7 @@ const addCategoryService = async (data) => {
     }
 };
 
-const editCategoryService = async (params, body) => {
+const editNameSubcategoryService = async (params, body) => {
     const pgDB = new pgConnection();
 
     const id = params.id;
@@ -81,7 +81,7 @@ const editCategoryService = async (params, body) => {
         await pgDB.query('BEGIN');
 
         try {
-            result = await pgDB.selectFunction(categoryQuery.edit_PRO_category, { id: Number(id), name: name });
+            result = await pgDB.selectFunction(subcategoryQuery.edit_PRO_subcategory, { id: Number(id), name: name });
         } catch (error) {
             await pgDB.query('ROLLBACK');
             throw error;
@@ -93,7 +93,7 @@ const editCategoryService = async (params, body) => {
 
         const response = {
             status: 200,
-            service: 'editCategoryService',
+            service: 'editNameSubcategoryService',
             count: count,
             result: result
         };
@@ -106,10 +106,13 @@ const editCategoryService = async (params, body) => {
     }
 };
 
-const activateCategoryService = async (data) => {
+/*** AQUI CREAR UNA FUNCION NUEVA PARA LA EDICION DE CATEGORIAS DE UNA SUB */
+const editCategorySubcategoryService = async (params, body) => {
     const pgDB = new pgConnection();
 
-    const id = data.id;
+    const id = params.id;
+
+    const { category_id } = body;
 
     let result;
 
@@ -119,7 +122,7 @@ const activateCategoryService = async (data) => {
         await pgDB.query('BEGIN');
 
         try {
-            result = await pgDB.selectFunction(categoryQuery.activate_PRO_category, { id: Number(id) });
+            result = await pgDB.selectFunction(subcategoryQuery.ed, { id: Number(id), category_id: category_id });
         } catch (error) {
             await pgDB.query('ROLLBACK');
             throw error;
@@ -131,7 +134,7 @@ const activateCategoryService = async (data) => {
 
         const response = {
             status: 200,
-            service: 'activateCategoryService',
+            service: 'editCategorySubcategoryService',
             count: count,
             result: result
         };
@@ -144,7 +147,7 @@ const activateCategoryService = async (data) => {
     }
 };
 
-const deactivateCategoryService = async (data) => {
+const activateSubcategoryService = async (data) => {
     const pgDB = new pgConnection();
 
     const id = data.id;
@@ -157,7 +160,7 @@ const deactivateCategoryService = async (data) => {
         await pgDB.query('BEGIN');
 
         try {
-            result = await pgDB.selectFunction(categoryQuery.deactivate_PRO_category, { id: Number(id) });
+            result = await pgDB.selectFunction(subcategoryQuery.activate_PRO_subcategory, { id: Number(id) });
         } catch (error) {
             await pgDB.query('ROLLBACK');
             throw error;
@@ -169,7 +172,7 @@ const deactivateCategoryService = async (data) => {
 
         const response = {
             status: 200,
-            service: 'deactivateCategoryService',
+            service: 'activateSubcategoryService',
             count: count,
             result: result
         };
@@ -182,7 +185,7 @@ const deactivateCategoryService = async (data) => {
     }
 };
 
-const deleteCategoryService = async (data) => {
+const deactivateSubcategoryService = async (data) => {
     const pgDB = new pgConnection();
 
     const id = data.id;
@@ -195,7 +198,7 @@ const deleteCategoryService = async (data) => {
         await pgDB.query('BEGIN');
 
         try {
-            result = await pgDB.selectFunction(categoryQuery.deactivate_PRO_category, { id: Number(id) });
+            result = await pgDB.selectFunction(subcategoryQuery.deactivate_PRO_subcategory, { id: Number(id) });
         } catch (error) {
             await pgDB.query('ROLLBACK');
             throw error;
@@ -207,7 +210,45 @@ const deleteCategoryService = async (data) => {
 
         const response = {
             status: 200,
-            service: 'deleteCategoryService',
+            service: 'deactivateSubcategoryService',
+            count: count,
+            result: result
+        };
+
+        return { response: response }
+    } catch (error) {
+        moduleErrorHandler.handleError(error);
+    } finally {
+        pgDB.close();
+    }
+};
+
+const deleteSubcategoryService = async (data) => {
+    const pgDB = new pgConnection();
+
+    const id = data.id;
+
+    let result;
+
+    try {
+        await pgDB.connect();
+
+        await pgDB.query('BEGIN');
+
+        try {
+            result = await pgDB.selectFunction(subcategoryQuery.delete_PRO_subcategory, { id: Number(id) });
+        } catch (error) {
+            await pgDB.query('ROLLBACK');
+            throw error;
+        }
+
+        const count = result.length;
+
+        await pgDB.query('COMMIT');
+
+        const response = {
+            status: 200,
+            service: 'deleteSubcategoryService',
             count: count,
             result: result
         };
@@ -221,10 +262,11 @@ const deleteCategoryService = async (data) => {
 };
 
 module.exports = {
-    getCategorysService,
-    addCategoryService,
-    editCategoryService,
-    activateCategoryService,
-    deactivateCategoryService,
-    deleteCategoryService
-}
+    getSubcategorysService,
+    addSubcategoryService,
+    editNameSubcategoryService,
+    editCategorySubcategoryService,
+    activateSubcategoryService,
+    deactivateSubcategoryService,
+    deleteSubcategoryService
+};
