@@ -2,113 +2,74 @@
 
 const searchQuery = require('../querys/search.query');
 
-const resolveSearchBrandQuery = (data) => {
-    const option = data[0].specification_type;
-
-    let firstQuery = '';
-    let secondQuery = '';
-
-    switch(option) {
-        case 0:
-            return false;
-            break;
-        case 1:
-            // this kind of specifications BY BRAND is ONLY FOR COLOR
-            firstQuery = searchQuery.get_colors_byBrand;
-            secondQuery = searchQuery.get_specifications_byBrand;
-            return { firstQuery, secondQuery};
-            break;
-        case 2:
-            // this kind of specifications BY BRAND is ONLY FOR SIZE
-            firstQuery = searchQuery.get_sizes_byBrand;
-            secondQuery = searchQuery.get_specifications_byBrand;
-            return { firstQuery, secondQuery};
-            break;
-        case 3:
-            // this kind of specifications BY BRAND is FOR COLOR AN SIZE
-            firstQuery = searchQuery.get_sizes_colors_byBrand;
-            secondQuery = searchQuery.get_specifications_byBrand;
-            return { firstQuery, secondQuery};
-            break;
-        case 4:
-            // this kind is for only TEXT TYPE
-            firstQuery = searchQuery.get_variants_details_byBrand;
-            return { firstQuery };
-            break;
+// the 1 is for only color, 2 is for only sizes, 3 is the both and 4 is only for text type
+const queryMap = {
+    brand: {
+        1: {
+            firstQuery: searchQuery.get_colors_byBrand,
+            secondQuery: searchQuery.get_specifications_byBrand
+        },
+        2: {
+            firstQuery: searchQuery.get_sizes_byBrand,
+            secondQuery: searchQuery.get_specifications_byBrand
+        },
+        3: {
+            firstQuery: searchQuery.get_sizes_colors_byBrand,
+            secondQuery: searchQuery.get_specifications_byBrand
+        },
+        4: {
+            firstQuery: searchQuery.get_variants_details_byBrand
+        }
+    },
+    subcategory: {
+        1: {
+            firstQuery: searchQuery.get_colors_bySubcategory,
+            secondQuery: searchQuery.get_specifications_bySubcategory
+        },
+        2: {
+            firstQuery: searchQuery.get_sizes_bySubcategory,
+            secondQuery: searchQuery.get_specifications_bySubcategory
+        },
+        3: {
+            firstQuery: searchQuery.get_sizes_colors_bySubcategory,
+            secondQuery: searchQuery.get_specifications_bySubcategory
+        },
+        4: {
+            firstQuery: searchQuery.get_variants_details_bySubcategory
+        }
+    },
+    product: {
+        1: {
+            firstQuery: searchQuery.get_colors_byProduct,
+            secondQuery: searchQuery.get_specifications_byProduct
+        },
+        2: {
+            firstQuery: searchQuery.get_sizes_byProduct,
+            secondQuery: searchQuery.get_specifications_byProduct
+        },
+        3: {
+            firstQuery: searchQuery.get_sizes_colors_byProduct,
+            secondQuery: searchQuery.get_specifications_byProduct
+        },
+        4: {
+            firstQuery: searchQuery.get_variants_details_byProduct
+        }
     }
 };
 
-const resolveSearchSubcategoryQuery = (data) => {
+const resolveSearchQuery = (type, data) => {
     const option = data[0].specification_type;
 
-    let firstQuery = '';
-    let secondQuery = '';
+    if(option === 0) return false;
 
-    switch(option) {
-        case 0:
-            return false;
-            break;
-        case 1:
-            // this kind of specifications BY SUBCATEGORY is ONLY FOR COLOR
-            firstQuery = searchQuery.get_colors_bySubcategory;
-            secondQuery = searchQuery.get_specifications_bySubcategory;
-            return { firstQuery, secondQuery};
-            break;
-        case 2:
-            // this kind of specifications BY SUBCATEGORY is ONLY FOR SIZE
-            firstQuery = searchQuery.get_colors_bySubcategory;
-            secondQuery = searchQuery.get_specifications_bySubcategory;
-            return { firstQuery, secondQuery};
-            break;
-        case 3:
-            // this kind of specifications BY SUBCATEGORY is FOR COLOR AN SIZE
-            firstQuery = searchQuery.get_sizes_colors_bySubcategory;
-            secondQuery = searchQuery.get_specifications_bySubcategory;
-            return { firstQuery, secondQuery};
-            break;
-        case 4:
-            // this kind is for only TEXT TYPE
-            firstQuery = searchQuery.get_variants_details_bySubcategory;
-            return { firstQuery };
-            break;
-    }
+    const queries = queryMap[type][option];
+
+    return queries ? queries : false;
 };
 
-const resolveSearchProductQuery = (data) => {
-    const option = data[0].specification_type;
-
-    let firstQuery = '';
-    let secondQuery = '';
-
-    switch(option) {
-        case 0:
-            return false;
-            break;
-        case 1:
-            // this kind of specifications BY PRODUCT is ONLY FOR COLOR
-            firstQuery = searchQuery.get_colors_byProduct;
-            secondQuery = searchQuery.get_specifications_byProduct;
-            return { firstQuery, secondQuery};
-            break;
-        case 2:
-            // this kind of specifications BY PRODUCT is ONLY FOR SIZE
-            firstQuery = searchQuery.get_sizes_byProduct;
-            secondQuery = searchQuery.get_specifications_byProduct;
-            return { firstQuery, secondQuery};
-            break;
-        case 3:
-            // this kind of specifications BY PRODUCT is FOR COLOR AN SIZE
-            firstQuery = searchQuery.get_sizes_colors_byProduct;
-            secondQuery = searchQuery.get_specifications_byProduct;
-            return { firstQuery, secondQuery};
-            break;
-        case 4:
-            // this kind is for only TEXT TYPE
-            firstQuery = searchQuery.get_variants_details_byProduct;
-            return { firstQuery };
-            break;
-    }
-};
+const resolveSearchBrandQuery = (data) => resolveSearchQuery('brand', data);
+const resolveSearchSubcategoryQuery = (data) => resolveSearchQuery('subcategory', data);
+const resolveSearchProductQuery = (data) => resolveSearchQuery('product', data);
 
 module.exports = {
     resolveSearchBrandQuery,
