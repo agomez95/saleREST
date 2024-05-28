@@ -1,4 +1,4 @@
-const variantService = require('../services/products/variant.service');
+const variantService = require('../../services/products/variant.service');
 
 const addVariantController = async (req, res, next) => {
     try {

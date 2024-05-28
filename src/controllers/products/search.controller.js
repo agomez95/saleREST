@@ -1,4 +1,4 @@
-const searchService = require('../services/products/search.service');
+const searchService = require('../../services/products/search.service');
 
 const getProductsByBrandController = async (req, res, next) => {
     try {

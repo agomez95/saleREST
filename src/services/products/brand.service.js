@@ -26,7 +26,7 @@ const addBrandService = async (data) => {
         await pgDB.query('COMMIT');
 
         const response = {
-            status: 200,
+            status: 201,
             service: 'addBrandService',
             result: result,
         };
