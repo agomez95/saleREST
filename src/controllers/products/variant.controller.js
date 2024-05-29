@@ -4,7 +4,7 @@ const addVariantController = async (req, res, next) => {
     try {
         const response = await variantService.addVariantService(req.body);
 
-        res.status(response.response.status).json({
+        res.status(response.status).json({
             ...response
         });
     } catch (err) {

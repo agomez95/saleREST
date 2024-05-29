@@ -4,7 +4,7 @@ const getCategorysController = async (req, res, next) => {
     try {
         const response = await categoryService.getCategorysService();
 
-        res.status(response.response.status).json({
+        res.status(response.status).json({
             ...response
         });
     } catch (err) {
@@ -16,7 +16,7 @@ const addCategoryController = async (req, res, next) => {
     try {
         const response = await categoryService.addCategoryService(req.body);
 
-        res.status(response.response.status).json({
+        res.status(response.status).json({
             ...response
         });
     } catch (err) {
@@ -28,7 +28,7 @@ const editCategoryController = async (req, res, next) => {
     try {
         const response = await categoryService.editCategoryService(req.params, req.body);
         
-        res.status(response.response.status).json({
+        res.status(response.status).json({
             ...response
         });
     } catch(err) {
@@ -40,7 +40,7 @@ const activateCategoryController = async (req, res, next) => {
     try {
         const response = await categoryService.activateCategoryService(req.params);
         
-        res.status(response.response.status).json({
+        res.status(response.status).json({
             ...response
         });
     } catch(err) {
@@ -52,7 +52,7 @@ const deactivateCategoryController = async (req, res, next) => {
     try {
         const response = await categoryService.deactivateCategoryService(req.params);
         
-        res.status(response.response.status).json({
+        res.status(response.status).json({
             ...response
         });
     } catch(err) {
@@ -64,7 +64,7 @@ const deleteCategoryController = async (req, res, next) => {
     try {
         const response = await categoryService.deleteCategoryService(req.params);
         
-        res.status(response.response.status).json({
+        res.status(response.status).json({
             ...response
         });
     } catch(err) {

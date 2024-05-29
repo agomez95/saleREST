@@ -31,7 +31,7 @@ const addBrandService = async (data) => {
             result: result,
         };
 
-        return { response: response }
+        return response;
     } catch (error) {
         moduleErrorHandler.handleError(error);
     } finally {

@@ -32,7 +32,7 @@ const addVariantService = async (data) => {
             result: result,
         };
 
-        return { response: response }
+        return response;
     } catch (err) {
         moduleErrorHandler.handleError(error);
     } finally {

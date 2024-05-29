@@ -23,7 +23,7 @@ const getCategorysService = async () => {
             data: result
         };
 
-        return { response: response };
+        return response;;
     } catch(err) {
         moduleErrorHandler.handleError(error);
     } finally {
@@ -58,7 +58,7 @@ const addCategoryService = async (data) => {
             result: result,
         };
 
-        return { response: response }
+        return response;
     } catch (error) {
         moduleErrorHandler.handleError(error);
     } finally {
@@ -98,7 +98,7 @@ const editCategoryService = async (params, body) => {
             result: result
         };
 
-        return { response: response }
+        return response;
     } catch (error) {
         moduleErrorHandler.handleError(error);
     } finally {
@@ -136,7 +136,7 @@ const activateCategoryService = async (data) => {
             result: result
         };
 
-        return { response: response }
+        return response;
     } catch (error) {
         moduleErrorHandler.handleError(error);
     } finally {
@@ -174,7 +174,7 @@ const deactivateCategoryService = async (data) => {
             result: result
         };
 
-        return { response: response }
+        return response;
     } catch (error) {
         moduleErrorHandler.handleError(error);
     } finally {
@@ -212,7 +212,7 @@ const deleteCategoryService = async (data) => {
             result: result
         };
 
-        return { response: response }
+        return response;
     } catch (error) {
         moduleErrorHandler.handleError(error);
     } finally {

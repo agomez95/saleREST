@@ -51,7 +51,7 @@ const getProductsByBrandService = async (data) => {
             data: products
         };
 
-        return { response: response }
+        return response;
     } catch (err) {
         moduleErrorHandler.handleError(err);
     } finally {
@@ -103,7 +103,7 @@ const getProductsBySubcategoryService = async (data) => {
             result: products
         };
 
-        return { response: response }
+        return response;
     } catch (err) {
         moduleErrorHandler.handleError(err);
     } finally {
@@ -155,7 +155,7 @@ const getDataByProductService = async (data) => {
             result: products
         };
 
-        return { response: response }
+        return response;
     } catch (err) {
         moduleErrorHandler.handleError(err);
     } finally {

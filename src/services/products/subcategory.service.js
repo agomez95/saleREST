@@ -23,7 +23,7 @@ const getSubcategorysService = async () => {
             data: result
         };
 
-        return { response: response };
+        return response;;
     } catch(error) {
         moduleErrorHandler.handleError(error);
     } finally {
@@ -58,7 +58,7 @@ const addSubcategoryService = async (data) => {
             result: result,
         };
 
-        return { response: response }
+        return response;
     } catch (error) {
         moduleErrorHandler.handleError(error);
     } finally {
@@ -98,7 +98,7 @@ const editNameSubcategoryService = async (params, body) => {
             result: result
         };
 
-        return { response: response }
+        return response;
     } catch (error) {
         moduleErrorHandler.handleError(error);
     } finally {
@@ -139,7 +139,7 @@ const editCategorySubcategoryService = async (params, body) => {
             result: result
         };
 
-        return { response: response }
+        return response;
     } catch (error) {
         moduleErrorHandler.handleError(error);
     } finally {
@@ -177,7 +177,7 @@ const activateSubcategoryService = async (data) => {
             result: result
         };
 
-        return { response: response }
+        return response;
     } catch (error) {
         moduleErrorHandler.handleError(error);
     } finally {
@@ -215,7 +215,7 @@ const deactivateSubcategoryService = async (data) => {
             result: result
         };
 
-        return { response: response }
+        return response;
     } catch (error) {
         moduleErrorHandler.handleError(error);
     } finally {
@@ -253,7 +253,7 @@ const deleteSubcategoryService = async (data) => {
             result: result
         };
 
-        return { response: response }
+        return response;
     } catch (error) {
         moduleErrorHandler.handleError(error);
     } finally {
