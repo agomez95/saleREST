@@ -1,12 +1,9 @@
-const photoService = require('../../services/products/photos.service');
+const photoService = require('../../services/products/photo.service');
 
-const uploadPhotoController = async (req, res) => {
+const uploadPhotoController = async (req, res, next) => {
     try {
-        const response = await photoService.uploadPhotoService(req.file);
-
-        res.status(response.response.status).json({
-            ...response
-        });
+        const response = await photoService.uploadPhotoService(req, res);
+        res.status(response.status).json(response);
     } catch (err) {
         next(err);
     }
@@ -16,7 +13,7 @@ const getPhotosByProductController = async (req, res) => {
     try {
         const response = await photoService.getPhotosByProductService();
 
-        res.status(response.response.status).json({
+        res.status(response.status).json({
             ...response
         });
     } catch (err) {
