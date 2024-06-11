@@ -1,8 +1,10 @@
-const pgConnection = require('../../common/pgConnection');
+const pgConnection = require('../../db/connection.db');
 
-const moduleErrorHandler = require('../../utils/moduleError');
+const moduleErrorHandler = require('../../common/moduleError');
 
-const categoryQuery = require('../../utils/querys/category.query');
+const { HTTP_RESPONSES } = require('../../common/constans');
+
+const { category } = require('../../db/querys.db');
 
 const getCategorysService = async () => {
     const pgDB = new pgConnection();
@@ -12,18 +14,18 @@ const getCategorysService = async () => {
     try {
         await pgDB.connect();
 
-        result = await pgDB.query(categoryQuery.get_PRO_categorys).catch((error) => { throw error; });
+        result = await pgDB.query(category.get_PRO_categorys).catch((error) => { throw error; });
 
         const count = result.length;
 
         const response = {
-            status: 200,
+            status: HTTP_RESPONSES.ACCEPTED,
             service: 'getCategorysService',
             count: count,
             data: result
         };
 
-        return response;;
+        return response;
     } catch(err) {
         moduleErrorHandler.handleError(error);
     } finally {
@@ -44,7 +46,7 @@ const addCategoryService = async (data) => {
         await pgDB.query('BEGIN');
 
         try {
-            result = await pgDB.selectFunction(categoryQuery.add_PRO_category, { name: name });
+            result = await pgDB.selectFunction(category.add_PRO_category, { name: name });
         } catch (error) {
             await pgDB.query('ROLLBACK');
             throw error;
@@ -53,7 +55,7 @@ const addCategoryService = async (data) => {
         await pgDB.query('COMMIT');
 
         const response = {
-            status: 201,
+            status: HTTP_RESPONSES.CREATED,
             service: 'addCategoryService',
             result: result,
         };
@@ -81,7 +83,7 @@ const editCategoryService = async (params, body) => {
         await pgDB.query('BEGIN');
 
         try {
-            result = await pgDB.selectFunction(categoryQuery.edit_PRO_category, { id: Number(id), name: name });
+            result = await pgDB.selectFunction(category.edit_PRO_category, { id: Number(id), name: name });
         } catch (error) {
             await pgDB.query('ROLLBACK');
             throw error;
@@ -92,7 +94,7 @@ const editCategoryService = async (params, body) => {
         await pgDB.query('COMMIT');
 
         const response = {
-            status: 200,
+            status: HTTP_RESPONSES.ACCEPTED,
             service: 'editCategoryService',
             count: count,
             result: result
@@ -119,7 +121,7 @@ const activateCategoryService = async (data) => {
         await pgDB.query('BEGIN');
 
         try {
-            result = await pgDB.selectFunction(categoryQuery.activate_PRO_category, { id: Number(id) });
+            result = await pgDB.selectFunction(category.activate_PRO_category, { id: Number(id) });
         } catch (error) {
             await pgDB.query('ROLLBACK');
             throw error;
@@ -130,7 +132,7 @@ const activateCategoryService = async (data) => {
         await pgDB.query('COMMIT');
 
         const response = {
-            status: 200,
+            status: HTTP_RESPONSES.ACCEPTED,
             service: 'activateCategoryService',
             count: count,
             result: result
@@ -157,7 +159,7 @@ const deactivateCategoryService = async (data) => {
         await pgDB.query('BEGIN');
 
         try {
-            result = await pgDB.selectFunction(categoryQuery.deactivate_PRO_category, { id: Number(id) });
+            result = await pgDB.selectFunction(category.deactivate_PRO_category, { id: Number(id) });
         } catch (error) {
             await pgDB.query('ROLLBACK');
             throw error;
@@ -168,7 +170,7 @@ const deactivateCategoryService = async (data) => {
         await pgDB.query('COMMIT');
 
         const response = {
-            status: 200,
+            status: HTTP_RESPONSES.ACCEPTED,
             service: 'deactivateCategoryService',
             count: count,
             result: result
@@ -195,7 +197,7 @@ const deleteCategoryService = async (data) => {
         await pgDB.query('BEGIN');
 
         try {
-            result = await pgDB.selectFunction(categoryQuery.deactivate_PRO_category, { id: Number(id) });
+            result = await pgDB.selectFunction(category.deactivate_PRO_category, { id: Number(id) });
         } catch (error) {
             await pgDB.query('ROLLBACK');
             throw error;
@@ -206,7 +208,7 @@ const deleteCategoryService = async (data) => {
         await pgDB.query('COMMIT');
 
         const response = {
-            status: 200,
+            status: HTTP_RESPONSES.ACCEPTED,
             service: 'deleteCategoryService',
             count: count,
             result: result

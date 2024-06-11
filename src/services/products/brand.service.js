@@ -1,8 +1,10 @@
-const pgConnection = require('../../common/pgConnection');
+const pgConnection = require('../../db/connection.db');
 
-const moduleErrorHandler = require('../../utils/moduleError');
+const moduleErrorHandler = require('../../common/moduleError');
 
-const brandQuery = require('../../utils/querys/brand.query');
+const { HTTP_RESPONSES } = require('../../common/constans');
+
+const { brand } = require('../../db/querys.db');
 
 const addBrandService = async (data) => {
     const pgDB = new pgConnection();
@@ -17,7 +19,7 @@ const addBrandService = async (data) => {
         await pgDB.query('BEGIN');
 
         try {
-            result = await pgDB.selectFunction(brandQuery.add_PRO_brand, { name: name });
+            result = await pgDB.selectFunction(brand.add_PRO_brand, { name: name });
         } catch (error) {
             await pgDB.query('ROLLBACK');
             throw error;
@@ -26,7 +28,7 @@ const addBrandService = async (data) => {
         await pgDB.query('COMMIT');
 
         const response = {
-            status: 201,
+            status: HTTP_RESPONSES.CREATED,
             service: 'addBrandService',
             result: result,
         };

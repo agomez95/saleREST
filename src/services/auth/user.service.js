@@ -1,14 +1,15 @@
 const jwt = require('jsonwebtoken');
 
-const pgConnection = require('../common/pgConnection');
+const pgConnection = require('../../db/connection.db');
 
-const { UnauthorizedError} = require('../utils/httpError');
-const moduleErrorHandler = require('../utils/moduleError');
+const { UnauthorizedError} = require('../../errors/httpError');
+const moduleErrorHandler = require('../../common/moduleError');
 
-const { encryptPassword, comparePassword } = require('../utils/users/cryptPassword');
-const { makeToken } = require('../utils/users/makeToken');
+const { encryptPassword, comparePassword, makeToken } = require('../../common/utils');
 
-const userQuery = require('../utils/querys/user.query');
+const { HTTP_RESPONSES } = require('../../common/constans');
+
+const { user } = require('../../db/querys.db');
 
 const addUserClientService = async (data) => {
     const pgDB = new pgConnection();
@@ -25,7 +26,7 @@ const addUserClientService = async (data) => {
         try {
             let username = firstname.toLowerCase().charAt(0) + lastname.toLowerCase().split(' ')[0] + lastname.toLowerCase().split(' ')[1].charAt(0)
 
-            const user = {
+            const newUser = {
                 firstname: firstname,
                 lastname: lastname,
                 username: username,
@@ -33,7 +34,7 @@ const addUserClientService = async (data) => {
                 email: email
             };
     
-            result = await pgDB.selectFunction(userQuery.addUserClient, user);
+            result = await pgDB.selectFunction(user.addUserClient, newUser);
         } catch (error) {
             await pgDB.query('ROLLBACK');
             throw error;
@@ -42,9 +43,8 @@ const addUserClientService = async (data) => {
         await pgDB.query('COMMIT');
 
         const response = {
-            status: 200,
-            service: 'signUpService',
-            message: message,
+            status: HTTP_RESPONSES.CREATED,
+            service: 'addUserClientService',
             user_id: result[0]
         };
 
@@ -71,7 +71,7 @@ const addUserAdminService = async (data) => {
         try {
             let username = firstname.toLowerCase().charAt(0) + lastname.toLowerCase().split(' ')[0] + lastname.toLowerCase().split(' ')[1].charAt(0)
 
-            const user = {
+            const newUser = {
                 firstname: firstname,
                 lastname: lastname,
                 username: username,
@@ -79,7 +79,7 @@ const addUserAdminService = async (data) => {
                 email: email
             };
     
-            result = await pgDB.selectFunction(userQuery.addUserAdmin, user);
+            result = await pgDB.selectFunction(user.addUserAdmin, newUser);
         } catch (error) {
             await pgDB.query('ROLLBACK');
             throw error;
@@ -88,7 +88,7 @@ const addUserAdminService = async (data) => {
         await pgDB.query('COMMIT');
 
         const response = {
-            status: 200,
+            status: HTTP_RESPONSES.CREATED,
             service: 'addUserAdminService',
             user_id: result[0]
         };
@@ -116,7 +116,7 @@ const signUpService = async (data) => {
         try {
             let username = firstname.toLowerCase().charAt(0) + lastname.toLowerCase().split(' ')[0] + lastname.toLowerCase().split(' ')[1].charAt(0)
 
-            const user = {
+            const newUser = {
                 firstname: firstname,
                 lastname: lastname,
                 username: username,
@@ -125,7 +125,7 @@ const signUpService = async (data) => {
                 type: type
             };
     
-            result = await pgDB.selectFunction(userQuery.signupUser, user);    
+            result = await pgDB.selectFunction(user.signupUser, newUser);    
         } catch (error) {
             await pgDB.query('ROLLBACK');
             throw error;
@@ -134,7 +134,7 @@ const signUpService = async (data) => {
         await pgDB.query('COMMIT');
 
         const response = {
-            status: 200,
+            status: HTTP_RESPONSES.CREATED,
             service: 'signUpService',
             user_id: result[0]
         };
@@ -157,18 +157,18 @@ const signInService = async (data) => {
     try {
         await pgDB.connect();
 
-        result = await pgDB.query(userQuery.signinUser, [ username ]).catch((error) => { throw error; });
+        result = await pgDB.query(user.signinUser, [ username ]).catch((error) => { throw error; });
 
         // COMPARE PASSWORD
         const matchPassword = await comparePassword(password, result[0]['password']);
         
-        if(!matchPassword) throw new UnauthorizedError(409, `ERROR: PASSWORD DOESN'T MATCH`, '08006');
+        if(!matchPassword) throw new UnauthorizedError(HTTP_RESPONSES.UNAUTHORIZED, `ERROR: PASSWORD DOESN'T MATCH`, '08006');
 
         // TOKEN
         const token = makeToken(result[0]);
 
         const response = {
-            status: 200,
+            status: HTTP_RESPONSES.ACCEPTED,
             service: 'signInService',
             token: token
         };

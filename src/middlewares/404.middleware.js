@@ -1,8 +1,8 @@
-const { NotFoundError } = require('../utils/httpError');
+const { NotFoundError } = require('../errors/httpError');
+const { HTTP_RESPONSES } = require('../common/constans');
 
 const notFoundRouteMiddleware = (req, res, next) => {
-
-    const error = new NotFoundError(404, 'RUTA NO ENCONTRADA', '404');
+    const error = new NotFoundError(HTTP_RESPONSES.NOT_FOUND, 'RUTA NO ENCONTRADA', '404');
     next(error);
 };
 

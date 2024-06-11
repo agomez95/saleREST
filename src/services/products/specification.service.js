@@ -1,9 +1,10 @@
-const pgConnection = require('../../common/pgConnection');
+const pgConnection = require('../../db/connection.db');
 
-const moduleErrorHandler = require('../../utils/moduleError');
+const moduleErrorHandler = require('../../common/moduleError');
 
-const specificationQuery = require('../../utils/querys/specification.query');
+const { HTTP_RESPONSES } = require('../../common/constans');
 
+const { specification } = require('../../db/querys.db');
 
 /*** AQUI SI AGREGAR SERVICIO PARA SPECIFICATION VALUE */
 const addSpecificationService = async (data) => {
@@ -19,7 +20,7 @@ const addSpecificationService = async (data) => {
         await pgDB.query('BEGIN');
 
         try {
-            result = await pgDB.selectFunction(specificationQuery.add, { color: color, size: size, text: text, name: name, information: information, variantId: variantId });    
+            result = await pgDB.selectFunction(specification.add, { color: color, size: size, text: text, name: name, information: information, variantId: variantId });    
         } catch (error) {
             throw error;
         }
@@ -27,7 +28,7 @@ const addSpecificationService = async (data) => {
         await pgDB.query('COMMIT');
 
         const response = {
-            status: 201,
+            status: HTTP_RESPONSES.CREATED,
             service: 'addSpecificationService',
             message: 'SUCCES',
             result: result,

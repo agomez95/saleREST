@@ -1,5 +1,5 @@
-const { HttpError } = require('../utils/httpError');
-
+const { HttpError } = require('../errors/httpError');
+const { HTTP_RESPONSES } = require('../common/constans');
 /**
  * 
  * @param {error} err 
@@ -27,10 +27,11 @@ const errorHandlerMiddleware = (err, req, res, next) => {
         console.error(err.type);
         console.error('STATUS:', err.status);
         console.error('CÓDIGO DE ERROR:', err.code);
+        console.error(err.message);
     
-        res.status(500).json({
+        res.status(HTTP_RESPONSES.INTERNAL_SERVER_ERROR).json({
             err_code: 1,
-            status: 500,
+            status: HTTP_RESPONSES.INTERNAL_SERVER_ERROR,
             err_msg: 'ERROR, SEE LOGS',
         });
     }

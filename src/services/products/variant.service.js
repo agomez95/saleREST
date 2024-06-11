@@ -1,8 +1,10 @@
-const pgConnection = require('../../common/pgConnection');
+const pgConnection = require('../../db/connection.db');
 
-const moduleErrorHandler = require('../../utils/moduleError');
+const moduleErrorHandler = require('../../common/moduleError');
 
-const variantQuery = require('../../utils/querys/variant.query');
+const { HTTP_RESPONSES } = require('../../common/constans');
+
+const { variant } = require('../../db/querys.db');
 
 /*** AQUI SI AGREGAR SERVICIO PARA SPECIFICATION VALUE */
 const addVariantService = async (data) => {
@@ -18,7 +20,7 @@ const addVariantService = async (data) => {
         await pgDB.query('BEGIN');
 
         try {
-            result = await pgDB.selectFunction(variantQuery.add_PRO_variant, { name: name, stock: stock, cost: cost, productId: productId });    
+            result = await pgDB.selectFunction(variant.add_PRO_variant, { name: name, stock: stock, cost: cost, productId: productId });    
         } catch (error) {
             await pgDB.query('ROLLBACK');
             throw error;
@@ -27,7 +29,7 @@ const addVariantService = async (data) => {
         await pgDB.query('COMMIT');
 
         const response = {
-            status: 201,
+            status: HTTP_RESPONSES.CREATED,
             service: 'addVariantService',
             result: result,
         };

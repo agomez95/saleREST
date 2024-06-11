@@ -1,12 +1,13 @@
-const pgConnection = require('../../common/pgConnection');
+const pgConnection = require('../../db/connection.db');
 
-const { CustomError } = require('../../utils/moduleError');
-const moduleErrorHandler = require('../../utils/moduleError');
+const moduleErrorHandler = require('../../common/moduleError');
 
-const { resolveSearchBrandQuery, resolveSearchSubcategoryQuery, resolveSearchProductQuery } = require('../../utils/searchs/specifications');
-const { listProductsOneQuery, listProductsTwoQuerys } = require('../../utils/searchs/products')
+const { resolveSearchBrandQuery, resolveSearchSubcategoryQuery, resolveSearchProductQuery } = require('../../validations/specifications');
+const { listProductsOneQuery, listProductsTwoQuerys } = require('../../validations/products')
 
-const searchQuery = require('../../utils/querys/search.query');
+const { HTTP_RESPONSES } = require('../../common/constans');
+
+const { search } = require('../../db/querys.db');
 
 const getProductsByBrandService = async (data) => {
     const pgDB = new pgConnection();
@@ -20,7 +21,7 @@ const getProductsByBrandService = async (data) => {
         
         await pgDB.connect();
         // TYPE OF SPECS GET IT: First we get the type of specifications from db from the brand
-        SPECS = await pgDB.selectFunction(searchQuery.search_spectifications_brand, { id: Number(id) }).catch((error) => { moduleErrorHandler.handleError(error); });
+        SPECS = await pgDB.selectFunction(search.search_spectifications_brand, { id: Number(id) }).catch((error) => { moduleErrorHandler.handleError(error); });
         
         // this 'no content' is for specify that BRAND doesn't have any SPECS
         if (SPECS.length === 0) return { response: { status: 204 } }; 
@@ -45,7 +46,7 @@ const getProductsByBrandService = async (data) => {
         }
 
         const response = {
-            status: 200,
+            status: HTTP_RESPONSES.ACCEPTED,
             service: 'getProductsByBrandService',
             count: products.length,
             data: products
@@ -72,7 +73,7 @@ const getProductsBySubcategoryService = async (data) => {
         await pgDB.connect();
         
         // TYPE OF SPECS GET IT: First we get the type of specifications from db from the SUBCATEGORY
-        SPECS = await pgDB.selectFunction(searchQuery.search_spectifications_subcategory, { id: Number(id) }).catch((error) => { moduleErrorHandler.handleError(error); });
+        SPECS = await pgDB.selectFunction(search.search_spectifications_subcategory, { id: Number(id) }).catch((error) => { moduleErrorHandler.handleError(error); });
 
         // this 'no content' is for specify that SUBCATEGORY doesn't have any SPECS
         if (SPECS.length === 0) return { response: { status: 204 } }; 
@@ -97,7 +98,7 @@ const getProductsBySubcategoryService = async (data) => {
         }
 
         const response = {
-            status: 200,
+            status: HTTP_RESPONSES.ACCEPTED,
             service: 'getProductsBySubcategoryService',
             count: products.length,
             result: products
@@ -124,7 +125,7 @@ const getDataByProductService = async (data) => {
         await pgDB.connect();
 
         // TYPE OF SPECS GET IT: First we get the type of specifications from db from the PRODUCTS
-        SPECS = await pgDB.selectFunction(searchQuery.search_spectifications_product, { id: Number(id) }).catch((error) => { moduleErrorHandler.handleError(error); });
+        SPECS = await pgDB.selectFunction(search.search_spectifications_product, { id: Number(id) }).catch((error) => { moduleErrorHandler.handleError(error); });
         
         // this 'no content' is for specify that SUBCATEGORY doesn't have any SPECS
         if (SPECS.length === 0) return { response: { status: 204 } }; 
@@ -149,7 +150,7 @@ const getDataByProductService = async (data) => {
         }
 
         const response = {
-            status: 200,
+            status: HTTP_RESPONSES.ACCEPTED,
             service: 'getDataByProductService',
             count: products.length,
             result: products
