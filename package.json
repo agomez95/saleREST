@@ -5,6 +5,7 @@
   "main": "server.js",
   "scripts": {
     "docker": "docker-compose up -d",
+    "dir": "(mkdir public/files/photos && mkdir public/files/temp)",
     "local": "(bash scripts/env.sh && nodemon src/server.js)"
   },
   "author": "adrian",
