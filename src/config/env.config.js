@@ -1,6 +1,6 @@
 'use strict';
 
-const { CustomError } = require('../utils/moduleError');
+const { CustomError } = require('../common/moduleError');
 
 let param = null;
 

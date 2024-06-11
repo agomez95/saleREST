@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const config = require('./config/main.config');
+const config = require('./config/env.config');
 const cors = require('cors');
 
 const errorHandlerMiddleware = require('./middlewares/error.middleware');
@@ -14,6 +14,7 @@ const productRouter = require('./routes/product.route');
 const variantRouter =  require('./routes/variant.route');
 const specificationRouter = require('./routes/specification.route');
 const searchRouter = require('./routes/search.route');
+const photoRouter = require('./routes/photo.route');
 
 const serverStart = () => {
     try {        
@@ -29,6 +30,7 @@ const serverStart = () => {
         app.use("/sales/api/variant/",variantRouter);
         app.use("/sales/api/specification/",specificationRouter);
         app.use("/sales/api/search/",searchRouter);
+        app.use("/sales/api/photo/", photoRouter);
 
         // Manejador de rutas no encontradas
         app.use(notFoundRouteMiddleware);
