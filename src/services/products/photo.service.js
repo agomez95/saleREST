@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const sharp = require('sharp');
 
 const pgConnection = require('../../db/connection.db');
 
@@ -30,8 +31,20 @@ const uploadPhotoService = async (req, res) => {
         //     throw new BadRequestError(400, 'Invalid pro_variant_id');
         // }
 
-        // Mover el archivo de la carpeta temporal a la carpeta final
+        // Ruta del archivo temporal en el servidor
         const tempFilePath = req.file.path;
+
+        // Atributos de la imagen
+        const { width, height } = await sharp(tempFilePath).metadata();
+        const type = req.file.mimetype.split('/')[1];
+        const size = parseFloat((req.file.size / (1024 * 1024)).toFixed(2));
+
+        // console.log('Width dimension (px):', width);
+        // console.log('Height dimension (px):', height);
+        // console.log('Image type:', type);
+        // console.log('Image size (mb):', size);
+
+        // Mover el archivo de la carpeta temporal a la carpeta final
         const uploadFolder = '../../../public/files/photos';
         const destinationFolder = path.join(__dirname, uploadFolder);
         const finalFilePath = path.join(destinationFolder, path.basename(tempFilePath));

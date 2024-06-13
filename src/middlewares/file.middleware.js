@@ -38,7 +38,7 @@ module.exports = (req, res, next) => {
 
         if (!req.file) {
             console.error('------------------DETAILS BELOW-------------------');
-            console.error('STATUS:', HTTP_RESPONSES.INTERNAL_SERVER_ERROR);
+            console.error('STATUS:', HTTP_RESPONSES.BAD_REQUEST);
             console.error(`ERROR: FILE IS REQUIRED`)
 
             return res.status(HTTP_RESPONSES.BAD_REQUEST).json({
