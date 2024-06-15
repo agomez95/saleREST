@@ -48,5 +48,7 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 
 And that its all, the installation takes a lot of time and needs some investigation. I hope that information helps everyone to function the photo module for this project.
 
+More information about this package: [Sharp Installation Guide](https://sharp.pixelplumbing.com/install)
+
 ## License:
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.

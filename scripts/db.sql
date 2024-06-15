@@ -110,6 +110,38 @@ ALTER TABLE PRO_variant_specification_values ADD CONSTRAINT fk_products_variant_
 ALTER TABLE PRO_variant_specification_values ADD CONSTRAINT fk_products_variant_specification_values_specification_values FOREIGN KEY (PRO_specification_value_id) REFERENCES PRO_specification_values (id);
 
 
+CREATE TABLE PRO_photo_attributes(
+	id SERIAL NOT NULL PRIMARY KEY,
+	size FLOAT NOT NULL,
+	height INTEGER NOT NULL,
+	width INTEGER NOT NULL,
+    type VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE PRO_photo_storage(
+	id SERIAL NOT NULL PRIMARY KEY,
+	route VARCHAR(700) NOT NULL
+);
+
+CREATE TABLE PRO_photos(
+	id SERIAL NOT NULL PRIMARY KEY,
+	name VARCHAR(500) NOT NULL,
+    PRO_photo_attribute_id INTEGER NOT NULL,
+    PRO_photo_storage_id INTEGER NOT NULL
+);
+
+ALTER TABLE PRO_photos ADD CONSTRAINT fk_PRO_photos_PRO_photo_attributes FOREIGN KEY (PRO_photo_attribute_id) REFERENCES PRO_photo_attributes (id);
+ALTER TABLE PRO_photos ADD CONSTRAINT fk_PRO_photos_PRO_photo_storage FOREIGN KEY (PRO_photo_storage_id) REFERENCES PRO_photo_storage (id);
+
+CREATE TABLE PRO_photo_configuration(
+	PRO_variant_id INTEGER NOT NULL,
+	PRO_photo_id INTEGER NOT NULL
+);
+
+ALTER TABLE PRO_photo_configuration ADD CONSTRAINT fk_PRO_photo_configuration_products FOREIGN KEY (PRO_variant_id) REFERENCES PRO_variants (id);
+ALTER TABLE PRO_photo_configuration ADD CONSTRAINT fk_PRO_photo_configuration_PRO_images FOREIGN KEY (PRO_photo_id) REFERENCES PRO_photos (id);
+
+
 
 /* FUNCTIONS */
 
@@ -1446,3 +1478,75 @@ BEGIN
 	WHERE p.state = TRUE AND pv.PRO_id = PRO_id_in;
 END
 $func$;
+
+/*************************** FOTO ********************************/
+
+/* GET VARIANTS BY */
+
+CREATE OR REPLACE FUNCTION variant_exists(variant_id_in INT) RETURNS BOOLEAN AS $$
+BEGIN
+    RETURN EXISTS (SELECT 1 FROM pro_variants WHERE id = variant_id_in);
+END;
+$$ LANGUAGE plpgsql;
+
+-- SELECT variant_exists(1); retorna true o false
+
+/* GET COUNT PHOTOS BY VARIANT ID */
+
+CREATE OR REPLACE FUNCTION count_variant_photo(variant_id_in INT)
+RETURNS INTEGER AS
+$$
+DECLARE
+	photos_count INTEGER;
+BEGIN
+    SELECT COUNT(*) INTO photos_count FROM pro_photo_configuration WHERE pro_variant_id = variant_id_in;
+	RETURN photos_count;
+END;
+$$ LANGUAGE plpgsql;
+
+-- SELECT count_variant_photo(1); retorna 1, 2, etc.
+
+/* ADD PHOTO VARIANT*/
+
+CREATE OR REPLACE FUNCTION add_photo_variant(
+    p_size_in FLOAT,
+    p_height_in INTEGER,
+    p_width_in INTEGER,
+    p_type_in VARCHAR(50),
+    p_route_in VARCHAR(700),
+    p_name_in VARCHAR(500),
+    p_pro_variant_id_in INTEGER
+)
+RETURNS INTEGER AS 
+$func$
+DECLARE
+    v_photo_attribute_id INTEGER;
+    v_photo_storage_id INTEGER;
+    v_photo_id INTEGER;
+	v_photo_configuration_id INTEGER;
+BEGIN
+	INSERT INTO PRO_photo_attributes(size, height, width, type)
+	VALUES (p_size_in, p_height_in, p_width_in, p_type_in)
+	RETURNING id INTO v_photo_attribute_id;
+
+	INSERT INTO PRO_photo_storage(route)
+	VALUES (p_route_in)
+	RETURNING id INTO v_photo_storage_id;
+	
+	INSERT INTO PRO_photos(name, PRO_photo_attribute_id, PRO_photo_storage_id)
+	VALUES (p_name_in, v_photo_attribute_id, v_photo_storage_id)
+	RETURNING id INTO v_photo_id;
+	
+    BEGIN
+        INSERT INTO PRO_photo_configuration (PRO_variant_id, PRO_photo_id)
+        VALUES (p_pro_variant_id_in, v_photo_id);
+        
+        v_photo_configuration_id := 1;
+    EXCEPTION WHEN OTHERS THEN
+        v_photo_configuration_id := 0;
+    END;
+
+	RETURN v_photo_configuration_id;
+END;
+$func$
+LANGUAGE plpgsql;

@@ -76,6 +76,9 @@ const add_PRO_variant = 'add_PRO_variant';
 // POST one
 const add_PRO_variant_specification_value = 'add_PRO_variant_specification_value';
 
+// GET true or false
+const variant_exist = 'SELECT variant_exists($1)';
+
 /************************* SPECIFICATIONS ****************************/
 // POST one
 const add_PRO_specification = 'add_PRO_specification';
@@ -84,10 +87,12 @@ const add_PRO_specification = 'add_PRO_specification';
 const add_PRO_specification_value = 'add_PRO_specification_value';
 
 /************************* PHOTOS ****************************/
+// GET true or false
+const count_variant_photo = 'SELECT count_variant_photo($1)';
+const add_photo_variant = 'add_photo_variant';
 
 /************************* SEARCH ****************************/
 // find type of product
-
 const search_spectifications_subcategory = '* FROM search_spectifications_subcategory';
 const search_spectifications_brand = '* FROM search_spectifications_brand';
 const search_spectifications_product = '* FROM search_spectifications_product';
@@ -168,14 +173,16 @@ module.exports = {
     },
     variant: {
         add_PRO_variant,
-        add_PRO_variant_specification_value
+        add_PRO_variant_specification_value,
+        variant_exist
     },
     specification: {
         add_PRO_specification,
         add_PRO_specification_value
     },
     photo: {
-
+        count_variant_photo,
+        add_photo_variant
     },
     search: {
         search_spectifications_subcategory,
