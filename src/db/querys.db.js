@@ -88,7 +88,7 @@ const add_PRO_specification_value = 'add_PRO_specification_value';
 
 /************************* PHOTOS ****************************/
 // GET true or false
-const count_variant_photo = 'SELECT count_variant_photo($1)';
+const get_numeration_photo = 'SELECT get_numeration_photo($1)';
 const add_photo_variant = 'add_photo_variant';
 
 /************************* SEARCH ****************************/
@@ -181,7 +181,7 @@ module.exports = {
         add_PRO_specification_value
     },
     photo: {
-        count_variant_photo,
+        get_numeration_photo,
         add_photo_variant
     },
     search: {

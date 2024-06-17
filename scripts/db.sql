@@ -1491,20 +1491,33 @@ $$ LANGUAGE plpgsql;
 
 -- SELECT variant_exists(1); retorna true o false
 
-/* GET COUNT PHOTOS BY VARIANT ID */
+/* GET NUMERATION BY VARIANT ID */
 
-CREATE OR REPLACE FUNCTION count_variant_photo(variant_id_in INT)
-RETURNS INTEGER AS
-$$
+CREATE OR REPLACE FUNCTION get_numeration_photo(variant_id_in INT)
+RETURNS INT AS
+$func$
 DECLARE
-	photos_count INTEGER;
+    next_number INT;
+    photos_count INTEGER;
 BEGIN
-    SELECT COUNT(*) INTO photos_count FROM pro_photo_configuration WHERE pro_variant_id = variant_id_in;
-	RETURN photos_count;
-END;
-$$ LANGUAGE plpgsql;
 
--- SELECT count_variant_photo(1); retorna 1, 2, etc.
+    SELECT COUNT(*) INTO photos_count FROM pro_photo_configuration WHERE pro_variant_id = variant_id_in;
+    
+    IF photos_count > 0 THEN
+        SELECT COALESCE(MAX(SUBSTRING(name FROM '[0-9]+$')::INT), 0) + 1
+        INTO next_number
+        FROM PRO_photos
+        WHERE name LIKE variant_id_in || '_%';
+    ELSE
+        next_number := 0;
+    END IF;
+
+    RETURN next_number;
+END;
+$func$
+LANGUAGE plpgsql;
+
+-- SELECT get_numeration_photo(1); retorna 0 SI no hay fotos con esa variant y retorna X numero SI existen variantes configuradas
 
 /* ADD PHOTO VARIANT*/
 

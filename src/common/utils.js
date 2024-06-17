@@ -24,3 +24,9 @@ module.exports.makeToken = (user) => {
 
     return jwt.sign(userToken, config.ACCESS_SECRET, { expiresIn: '1h' });
 };
+
+module.exports.makeNumeration = (number) => {
+    if (number === 0) return String(number + 1).padStart(2, '0'); // Asegurar que el número tenga dos dígitos
+
+    return String(number).padStart(2, '0');
+};

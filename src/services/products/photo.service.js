@@ -12,6 +12,8 @@ const { HTTP_RESPONSES } = require('../../common/constans');
 
 const { photo, variant } = require('../../db/querys.db');
 
+const { makeNumeration } = require('../../common/utils');
+
 const photoSchema = require('../../schemas/photo.schema');
 
 const validate = require('../../validations/formData');
@@ -35,10 +37,10 @@ const uploadPhotoService = async (req, res) => {
         if (!exist[0].variant_exists) throw new BadRequestError(400, 'INVALID VARIANT ID');
 
         // Obtener el número de fotos ya existentes de la variante
-        const count = await pgDB.query(photo.count_variant_photo, [pro_variant_id]);
-
+        const count = await pgDB.query(photo.get_numeration_photo, [pro_variant_id]);
+        
         // Generar el nombre del archivo
-        const photoNumber = String(count[0].count_variant_photo + 1).padStart(2, '0'); // Asegurar que el número tenga dos dígitos
+        const photoNumber = makeNumeration(count[0].get_numeration_photo);
         const photoName = `${pro_variant_id}_${photoNumber}`;
 
         // Ruta del archivo temporal en el servidor
