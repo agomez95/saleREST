@@ -93,6 +93,11 @@ const getPhotosByProductService = () => {
 
 };
 
+/* AQUI SE ELIMINA LA FOTO PERO SE RECEPCIONARA EL ID DE LA FOTO PRIMERO PARA ELIMINAR EL PHOTO-CONFIGURATION Y POSTERIOR LA FOTO*/
+const deletePhotoService = () => {
+
+};
+
 module.exports = {
     uploadPhotoService,
     getPhotosByProductService

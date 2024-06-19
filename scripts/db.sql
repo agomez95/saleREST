@@ -514,6 +514,47 @@ $func$
 LANGUAGE plpgsql;
 
 
+/* DELETE SPECIFICATION VALUES BY VARIANT */
+
+
+CREATE OR REPLACE FUNCTION delete_PRO_variant_specification_value(id_in INTEGER)
+RETURNS INTEGER AS
+$func$
+DECLARE
+	vsp_delete_count INTEGER;	
+BEGIN
+    DELETE FROM PRO_variant_specification_values 
+    WHERE PRO_variant_id = id_in;
+    
+    -- GET DIAGNOSTICS: Obtener el número de filas afectadas
+    GET DIAGNOSTICS vsp_delete_count = ROW_COUNT;
+
+    RETURN vsp_delete_count;
+END;
+$func$
+LANGUAGE plpgsql;
+
+-- SELECT delete_PRO_variant_specification_value(2);
+
+
+/* DELETE VARIANT */
+
+
+CREATE OR REPLACE FUNCTION delete_PRO_variant(id_in INTEGER)
+RETURNS INTEGER AS
+$func$
+DECLARE
+	v_delete_count INTEGER;	
+BEGIN
+	DELETE FROM PRO_variants where id = id_in
+	RETURNING * INTO v_delete_count;
+	RETURN v_delete_count;
+END;
+$func$
+LANGUAGE plpgsql;
+
+
+
 /* INFORMATION */
 
 
@@ -1563,3 +1604,66 @@ BEGIN
 END;
 $func$
 LANGUAGE plpgsql;
+
+
+/* DELETE TRIGGER BY VARIANT*/
+
+CREATE OR REPLACE FUNCTION FN_DEL_PHOTO_ON_VARIANT()
+RETURNS TRIGGER AS
+$func$
+DECLARE
+    photo_ids INTEGER[];
+    attribute_ids INTEGER[];
+    storage_ids INTEGER[];
+BEGIN
+    -- Obtener los IDs de las fotos asociadas a la variante eliminada
+    SELECT ARRAY(SELECT PRO_photo_id FROM PRO_photo_configuration WHERE PRO_variant_id = OLD.id) INTO photo_ids;
+    
+    -- Obtener los IDs de los atributos y rutas de almacenamiento antes de eliminar las fotos
+    SELECT ARRAY(SELECT PRO_photo_attribute_id FROM PRO_photos WHERE id = ANY(photo_ids)) INTO attribute_ids;
+    SELECT ARRAY(SELECT PRO_photo_storage_id FROM PRO_photos WHERE id = ANY(photo_ids)) INTO storage_ids;
+   
+    -- Eliminar configuraciones de fotos asociadas
+    DELETE FROM PRO_photo_configuration WHERE PRO_variant_id = OLD.id;
+
+    -- Eliminar fotos
+    DELETE FROM PRO_photos WHERE id = ANY(photo_ids);
+    
+    -- Eliminar atributos de fotos asociadas
+    DELETE FROM PRO_photo_attributes WHERE id = ANY(attribute_ids);
+
+    -- Eliminar rutas de almacenamiento de fotos asociadas
+    DELETE FROM PRO_photo_storage WHERE id = ANY(storage_ids);
+
+    RETURN OLD;
+END;
+$func$
+LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER TR_DEL_PHOTO_ON_VARIANT
+BEFORE DELETE ON PRO_variants
+FOR EACH ROW
+EXECUTE FUNCTION FN_DEL_PHOTO_ON_VARIANT();
+
+
+/* DELETE TRIGGER BY PHOTO*/
+
+CREATE OR REPLACE FUNCTION FN_DEL_DATA_ON_PHOTO()
+RETURNS TRIGGER AS
+$func$
+BEGIN
+    -- Eliminar atributos de fotos asociadas
+    DELETE FROM PRO_photo_attributes WHERE id = OLD.PRO_photo_attribute_id;
+
+    -- Eliminar rutas de almacenamiento de fotos asociadas
+    DELETE FROM PRO_photo_storage WHERE id = OLD.PRO_photo_storage_id;
+
+    RETURN OLD;
+END;
+$func$
+LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER TR_DEL_DATA_ON_PHOTO
+AFTER DELETE ON PRO_photos
+FOR EACH ROW
+EXECUTE FUNCTION FN_DEL_DATA_ON_PHOTO();

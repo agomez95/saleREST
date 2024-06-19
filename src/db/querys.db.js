@@ -69,12 +69,18 @@ const deactivate_PRO_subcategory = 'deactivate_PRO_subcategory';
 // POST one
 const add_product = 'add_product';
 
-/************************* VARIANTS ****************************/
+/************************* VARIANTS && VARIANT SPECIFICATION VALUES ****************************/
 // POST one
 const add_PRO_variant = 'add_PRO_variant';
 
 // POST one
 const add_PRO_variant_specification_value = 'add_PRO_variant_specification_value';
+
+// DELETE many
+const delete_PRO_variant_specification_value = 'delete_PRO_variant_specification_value';
+
+// DELETE one
+const delete_PRO_variant = 'delete_PRO_variant';
 
 // GET true or false
 const variant_exist = 'SELECT variant_exists($1)';
@@ -174,6 +180,8 @@ module.exports = {
     variant: {
         add_PRO_variant,
         add_PRO_variant_specification_value,
+        delete_PRO_variant_specification_value,
+        delete_PRO_variant,
         variant_exist
     },
     specification: {
