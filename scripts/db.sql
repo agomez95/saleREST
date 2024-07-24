@@ -1,7 +1,7 @@
 CREATE DATABASE sales;
 \c sales
 
-/* TABLES */
+/* TABLES: PRODUCTS */
 
 CREATE TABLE PRO_categorys(
     id SERIAL NOT NULL PRIMARY KEY,
@@ -33,7 +33,8 @@ CREATE TABLE PRO_brands(
 CREATE TABLE products(
     id SERIAL NOT NULL PRIMARY KEY,
     name VARCHAR(250) NOT NULL,
-    code VARCHAR(250) NOT NULL,
+    description VARCHAR(250) NOT NULL,
+	long_description TEXT NOT NULL,
     state BOOLEAN NOT NULL,
     created_at TIMESTAMP,
     modified_at TIMESTAMP,
@@ -141,13 +142,75 @@ CREATE TABLE PRO_photo_configuration(
 ALTER TABLE PRO_photo_configuration ADD CONSTRAINT fk_PRO_photo_configuration_products FOREIGN KEY (PRO_variant_id) REFERENCES PRO_variants (id);
 ALTER TABLE PRO_photo_configuration ADD CONSTRAINT fk_PRO_photo_configuration_PRO_images FOREIGN KEY (PRO_photo_id) REFERENCES PRO_photos (id);
 
+/* TABLES: CUSTOMERS & ADDRESS*/
 
+CREATE TABLE CST_customers(
+	id SERIAL NOT NULL PRIMARY KEY,
+    firstname VARCHAR(250) NOT NULL,
+    lastname VARCHAR(250) NOT NULL,
+	email VARCHAR(250) NOT NULL UNIQUE,
+	password VARCHAR(250) NOT NULL,
+	state BOOLEAN NOT NULL,
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	modified_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE ADR_country(
+	id SERIAL NOT NULL PRIMARY KEY,
+	name VARCHAR(250) NOT NULL UNIQUE
+);
+
+CREATE TABLE ADR_addresses(
+	id SERIAL NOT NULL PRIMARY KEY,
+	number VARCHAR(250) NOT NULL,
+	street VARCHAR(250) NOT NULL,
+	address_line_1 VARCHAR(250),
+	address_line_2 VARCHAR(250),
+	city VARCHAR(250) NOT NULL,
+	region VARCHAR(250) NOT NULL,
+	postal_code VARCHAR(250) NOT NULL,
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	modified_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	ADR_country_id INTEGER NOT NULL
+);
+
+ALTER TABLE ADR_addresses ADD CONSTRAINT fk_address_country FOREIGN KEY (ADR_country_id) REFERENCES ADR_country (id);
+
+CREATE TABLE CST_customer_address(
+	CST_customer_id INTEGER NOT NULL,
+	ADR_address_id INTEGER NOT NULL,
+	is_default BOOLEAN NOT NULL
+	-- PRIMARY KEY (CST_customer_id, ADR_address_id)
+);
+
+ALTER TABLE CST_customer_address ADD CONSTRAINT fk_CST_customer_address_customers FOREIGN KEY (CST_customer_id) REFERENCES CST_customers (id);
+ALTER TABLE CST_customer_address ADD CONSTRAINT fk_CST_customer_address_addresses FOREIGN KEY (ADR_address_id) REFERENCES ADR_addresses (id);
+
+/* TABLES: PAYMENT */
+
+CREATE TABLE PMT_methods(
+	id SERIAL NOT NULL PRIMARY KEY,
+	name VARCHAR(250) NOT NULL UNIQUE
+);
+
+CREATE TABLE CST_payment_method(
+	id SERIAL NOT NULL PRIMARY KEY,
+	provider VARCHAR(250) NOT NULL,
+	account VARCHAR(250) NOT NULL,
+	expiry VARCHAR NOT NULL,
+	is_default BOOLEAN NOT NULL,
+	PMT_method_id INTEGER NOT NULL,
+	CST_customer_id INTEGER NOT NULL
+);
+
+ALTER TABLE CST_payment_method ADD CONSTRAINT CST_payment_method_payments FOREIGN KEY (PMT_method_id) REFERENCES CST_customers (id);
+ALTER TABLE CST_payment_method ADD CONSTRAINT CST_payment_method_customers FOREIGN KEY (CST_customer_id) REFERENCES PMT_methods (id);
 
 /* FUNCTIONS */
 
 /* PRODUCT CATEGORYS */
 
-CREATE OR REPLACE FUNCTION get_PRO_categorys()
+CREATE OR REPLACE FUNCTION FN_GET_CATEOGRYS()
 RETURNS TABLE(id INTEGER, name VARCHAR, state BOOLEAN, created_at DATE)
 LANGUAGE plpgsql AS
 $func$
@@ -157,7 +220,7 @@ BEGIN
 END
 $func$;
 
-CREATE OR REPLACE FUNCTION get_PRO_category(id_in INTEGER)
+CREATE OR REPLACE FUNCTION FN_GET_CATEGORY(id_in INTEGER)
 RETURNS TABLE(id INTEGER, name VARCHAR, state BOOLEAN, created_at DATE)
 LANGUAGE plpgsql AS
 $func$
@@ -167,7 +230,7 @@ BEGIN
 END
 $func$;
 
-CREATE OR REPLACE FUNCTION add_PRO_category(name_in VARCHAR)
+CREATE OR REPLACE FUNCTION FN_ADD_CATEGORY(name_in VARCHAR)
 RETURNS INTEGER AS 
 $func$
 DECLARE
@@ -180,7 +243,7 @@ END;
 $func$
 LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION delete_PRO_category(id_in INTEGER)
+CREATE OR REPLACE FUNCTION FN_DEL_CATEGORY(id_in INTEGER)
 RETURNS INTEGER AS
 $func$
 DECLARE
@@ -193,7 +256,7 @@ END;
 $func$
 LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION activate_PRO_category(id_in INTEGER)
+CREATE OR REPLACE FUNCTION FN_ACT_CATEGORY(id_in INTEGER)
 RETURNS INTEGER AS
 $func$
 DECLARE
@@ -206,7 +269,7 @@ END;
 $func$
 LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION deactivate_PRO_category(id_in INTEGER)
+CREATE OR REPLACE FUNCTION FN_DEACT_CATEGORY(id_in INTEGER)
 RETURNS INTEGER AS
 $func$
 DECLARE
@@ -219,7 +282,7 @@ END;
 $func$
 LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION edit_PRO_category(id_in INTEGER, name_in VARCHAR)
+CREATE OR REPLACE FUNCTION FN_EDIT_CATEGORY(id_in INTEGER, name_in VARCHAR)
 RETURNS INTEGER AS
 $func$
 DECLARE
@@ -236,7 +299,7 @@ LANGUAGE plpgsql;
 /* PRODUCT SUBCATEGORYS */
 
 
-CREATE OR REPLACE FUNCTION get_PRO_subcategorys()
+CREATE OR REPLACE FUNCTION FN_GET_SUBCATEGORYS()
 RETURNS TABLE(id INTEGER, name VARCHAR, category VARCHAR, state BOOLEAN, created_at DATE)
 LANGUAGE plpgsql AS
 $func$
@@ -248,7 +311,7 @@ BEGIN
 END
 $func$;
 
-CREATE OR REPLACE FUNCTION get_PRO_subcategory(id_in INTEGER)
+CREATE OR REPLACE FUNCTION FN_GET_SUBCATEGORY(id_in INTEGER)
 RETURNS TABLE(id INTEGER, name VARCHAR, category VARCHAR, state BOOLEAN, created_at DATE)
 LANGUAGE plpgsql AS
 $func$
@@ -261,7 +324,7 @@ BEGIN
 END
 $func$;
 
-CREATE OR REPLACE FUNCTION add_PRO_subcategory(name_in VARCHAR, category_id_in INTEGER)
+CREATE OR REPLACE FUNCTION FN_ADD_SUBCATEGORY(name_in VARCHAR, category_id_in INTEGER)
 RETURNS INTEGER AS 
 $func$
 DECLARE
@@ -274,7 +337,7 @@ END;
 $func$
 LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION delete_PRO_subcategory(id_in INTEGER)
+CREATE OR REPLACE FUNCTION FN_DEL_SUBCATEGORY(id_in INTEGER)
 RETURNS INTEGER AS
 $func$
 DECLARE
@@ -287,7 +350,7 @@ END;
 $func$
 LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION activate_PRO_subcategory(id_in INTEGER)
+CREATE OR REPLACE FUNCTION FN_ACT_SUBCATEGORY(id_in INTEGER)
 RETURNS INTEGER AS
 $func$
 DECLARE
@@ -300,7 +363,7 @@ END;
 $func$
 LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION deactivate_PRO_subcategory(id_in INTEGER)
+CREATE OR REPLACE FUNCTION FN_DEACT_SUBCATEGORY(id_in INTEGER)
 RETURNS INTEGER AS
 $func$
 DECLARE
@@ -313,7 +376,7 @@ END;
 $func$
 LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION edit_name_PRO_subcategory(id_in INTEGER, name_in VARCHAR)
+CREATE OR REPLACE FUNCTION FN_EDIT_NA_SUBCATEGORY(id_in INTEGER, name_in VARCHAR)
 RETURNS INTEGER AS
 $func$
 DECLARE
@@ -326,7 +389,7 @@ END;
 $func$
 LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION edit_category_PRO_subcategory(id_in INTEGER, category_id_in INTEGER)
+CREATE OR REPLACE FUNCTION FN_EDIT_CAT_SUBCATEGORY(id_in INTEGER, category_id_in INTEGER)
 RETURNS INTEGER AS
 $func$
 DECLARE
@@ -343,7 +406,7 @@ LANGUAGE plpgsql;
 /* PRODUCT BRANDS */
 
 
-CREATE OR REPLACE FUNCTION get_PRO_brands()
+CREATE OR REPLACE FUNCTION FN_GET_BRANDS()
 RETURNS TABLE(id INTEGER, name VARCHAR, state BOOLEAN, created_at DATE)
 LANGUAGE plpgsql AS
 $func$
@@ -353,7 +416,7 @@ BEGIN
 END
 $func$;
 
-CREATE OR REPLACE FUNCTION get_PRO_brand(id_in INTEGER)
+CREATE OR REPLACE FUNCTION FN_GET_BRAND(id_in INTEGER)
 RETURNS TABLE(id INTEGER, name VARCHAR, state BOOLEAN, created_at DATE)
 LANGUAGE plpgsql AS
 $func$
@@ -363,7 +426,7 @@ BEGIN
 END
 $func$;
 
-CREATE OR REPLACE FUNCTION add_PRO_brand(name_in VARCHAR)
+CREATE OR REPLACE FUNCTION FN_ADD_BRAND(name_in VARCHAR)
 RETURNS INTEGER AS 
 $func$
 DECLARE
@@ -376,7 +439,7 @@ END;
 $func$
 LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION delete_PRO_brand(id_in INTEGER)
+CREATE OR REPLACE FUNCTION FN_DEL_BRAND(id_in INTEGER)
 RETURNS INTEGER AS
 $func$
 DECLARE
@@ -389,7 +452,7 @@ END;
 $func$
 LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION activate_PRO_brand(id_in INTEGER)
+CREATE OR REPLACE FUNCTION FN_ACT_BRAND(id_in INTEGER)
 RETURNS INTEGER AS
 $func$
 DECLARE
@@ -402,7 +465,7 @@ END;
 $func$
 LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION deactivate_PRO_brand(id_in INTEGER)
+CREATE OR REPLACE FUNCTION FN_DEACT_BRAND(id_in INTEGER)
 RETURNS INTEGER AS
 $func$
 DECLARE
@@ -415,7 +478,7 @@ END;
 $func$
 LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION edit_PRO_brand(id_in INTEGER, name_in VARCHAR)
+CREATE OR REPLACE FUNCTION FN_EDIT_BRAND(id_in INTEGER, name_in VARCHAR)
 RETURNS INTEGER AS
 $func$
 DECLARE
@@ -432,13 +495,13 @@ LANGUAGE plpgsql;
 /* PRODUCTS */
 
 
-CREATE OR REPLACE FUNCTION add_product(name_in VARCHAR, code_in VARCHAR, subcategory_id_in INTEGER, brand_id_in INTEGER)
+CREATE OR REPLACE FUNCTION FN_ADD_PRODUCT(name_in VARCHAR, description_in VARCHAR, long_description_in TEXT, subcategory_id_in INTEGER, brand_id_in INTEGER)
 RETURNS INTEGER AS 
 $func$
 DECLARE
 	p_new_id INTEGER;
 BEGIN
-	INSERT INTO products(name, code, state, created_at, modified_at, PRO_subcategory_id, PRO_brand_id) VALUES (name_in, code_in, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, subcategory_id_in, brand_id_in)
+	INSERT INTO products(name, description, long_description, state, created_at, modified_at, PRO_subcategory_id, PRO_brand_id) VALUES (name_in, description_in, long_description_in, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, subcategory_id_in, brand_id_in)
 	RETURNING id INTO p_new_id;
 	RETURN p_new_id;
 END;
@@ -449,7 +512,7 @@ LANGUAGE plpgsql;
 /* PRODUCT SPECIFICATIONS */
 
 
-CREATE OR REPLACE FUNCTION add_PRO_specification(specification_constant_id_in INTEGER, subcategory_id_in INTEGER)
+CREATE OR REPLACE FUNCTION FN_ADD_SPEC(specification_constant_id_in INTEGER, subcategory_id_in INTEGER)
 RETURNS INTEGER AS 
 $func$
 DECLARE
@@ -466,7 +529,7 @@ LANGUAGE plpgsql;
 /* PRODUCT SPECIFICATION VALUES */
 
 
-CREATE OR REPLACE FUNCTION add_PRO_specification_value(value_in VARCHAR, specification_id_in INTEGER)
+CREATE OR REPLACE FUNCTION FN_ADD_SPEC_VAL(value_in VARCHAR, specification_id_in INTEGER)
 RETURNS INTEGER AS 
 $func$
 DECLARE
@@ -483,7 +546,7 @@ LANGUAGE plpgsql;
 /* PRODUCT VARIANTS */
 
 
-CREATE OR REPLACE FUNCTION add_PRO_variant(name_in VARCHAR, stock_in INTEGER, cost_in NUMERIC, PRO_id_in INTEGER)
+CREATE OR REPLACE FUNCTION FN_ADD_VARIANT(name_in VARCHAR, stock_in INTEGER, cost_in NUMERIC, PRO_id_in INTEGER)
 RETURNS INTEGER AS 
 $func$
 DECLARE
@@ -500,7 +563,7 @@ LANGUAGE plpgsql;
 /* PRODUCT VARIANT SPECIFICATION VALUES */
 
 
-CREATE OR REPLACE FUNCTION add_PRO_variant_specification_value(variant_id_in INTEGER, specification_value_id_in INTEGER)
+CREATE OR REPLACE FUNCTION FN_ADD_VARIANT_SPEC_VAL(variant_id_in INTEGER, specification_value_id_in INTEGER)
 RETURNS INTEGER AS 
 $func$
 DECLARE
@@ -517,7 +580,7 @@ LANGUAGE plpgsql;
 /* DELETE SPECIFICATION VALUES BY VARIANT */
 
 
-CREATE OR REPLACE FUNCTION delete_PRO_variant_specification_value(id_in INTEGER)
+CREATE OR REPLACE FUNCTION FN_DEL_VARIANT_SPEC_VAL(id_in INTEGER)
 RETURNS INTEGER AS
 $func$
 DECLARE
@@ -540,7 +603,7 @@ LANGUAGE plpgsql;
 /* DELETE VARIANT */
 
 
-CREATE OR REPLACE FUNCTION delete_PRO_variant(id_in INTEGER)
+CREATE OR REPLACE FUNCTION FN_DEL_VARIANT(id_in INTEGER)
 RETURNS INTEGER AS
 $func$
 DECLARE
@@ -613,7 +676,7 @@ LANGUAGE plpgsql;
 
 /* SEARCHES */
 
-CREATE OR REPLACE FUNCTION search_spectifications_subcategory(subcategory_id_in INTEGER)
+CREATE OR REPLACE FUNCTION FN_SEARCH_SPECS_SUBCAT(subcategory_id_in INTEGER)
 RETURNS TABLE(specification_type INTEGER)
 LANGUAGE plpgsql AS
 $func$
@@ -638,7 +701,7 @@ BEGIN
 END
 $func$;
 
-CREATE OR REPLACE FUNCTION search_spectifications_brand(brand_id_in INTEGER)
+CREATE OR REPLACE FUNCTION FN_SEARCH_SPECS_BRAND(brand_id_in INTEGER)
 RETURNS TABLE(specification_type INTEGER)
 LANGUAGE plpgsql AS
 $func$
@@ -663,7 +726,7 @@ BEGIN
 END
 $func$;
 
-CREATE OR REPLACE FUNCTION search_spectifications_product(PRO_id_in INTEGER)
+CREATE OR REPLACE FUNCTION FN_SEARCH_SPECS_PRODUCT(PRO_id_in INTEGER)
 RETURNS TABLE(specification_type INTEGER)
 LANGUAGE plpgsql AS
 $func$
@@ -692,7 +755,7 @@ $func$;
 /* GET SIZES-COLORS BY */
 
 
-CREATE OR REPLACE FUNCTION get_sizes_colors_bySubcategory(subcategory_id_in INTEGER)
+CREATE OR REPLACE FUNCTION FN_GET_SIZ_COL_SUBCAT(subcategory_id_in INTEGER)
 RETURNS TABLE(
 	product VARCHAR, 
 	PRO_code INTEGER,
@@ -755,7 +818,7 @@ BEGIN
 END
 $func$;
 
-CREATE OR REPLACE FUNCTION get_sizes_colors_byBrand(brand_id_in INTEGER)
+CREATE OR REPLACE FUNCTION FN_GET_SIZ_COL_BRAND(brand_id_in INTEGER)
 RETURNS TABLE(
 	product VARCHAR, 
 	PRO_code INTEGER,
@@ -818,7 +881,7 @@ BEGIN
 END
 $func$;
 
-CREATE OR REPLACE FUNCTION get_sizes_colors_byProduct(PRO_id_in INTEGER)
+CREATE OR REPLACE FUNCTION FN_GET_SIZ_COL_PRODUCT(PRO_id_in INTEGER)
 RETURNS TABLE(
 	product VARCHAR, 
 	PRO_code INTEGER,
@@ -885,7 +948,7 @@ $func$;
 /* GET COLORS BY */
 
 
-CREATE OR REPLACE FUNCTION get_colors_bySubcategory(subcategory_id_in INTEGER)
+CREATE OR REPLACE FUNCTION FN_GET_COL_SUBCAT(subcategory_id_in INTEGER)
 RETURNS TABLE(
 	product VARCHAR, 
 	PRO_code INTEGER,
@@ -939,7 +1002,7 @@ BEGIN
 END
 $func$;
 
-CREATE OR REPLACE FUNCTION get_colors_byBrand(brand_id_in INTEGER)
+CREATE OR REPLACE FUNCTION FN_GET_COL_BRAND(brand_id_in INTEGER)
 RETURNS TABLE(
 	product VARCHAR, 
 	PRO_code INTEGER,
@@ -993,7 +1056,7 @@ BEGIN
 END
 $func$;
 
-CREATE OR REPLACE FUNCTION get_colors_byProduct(PRO_id_in INTEGER)
+CREATE OR REPLACE FUNCTION FN_GET_COL_PRODUCT(PRO_id_in INTEGER)
 RETURNS TABLE(
 	product VARCHAR, 
 	PRO_code INTEGER,
@@ -1049,8 +1112,7 @@ $func$;
 
 /* GET SIZES BY */
 
-
-CREATE OR REPLACE FUNCTION get_sizes_bySubcategory(subcategory_id_in INTEGER)
+CREATE OR REPLACE FUNCTION FN_GET_SIZ_SUBCAT(subcategory_id_in INTEGER)
 RETURNS TABLE(
 	product VARCHAR, 
 	PRO_code INTEGER,
@@ -1104,7 +1166,7 @@ BEGIN
 END
 $func$;
 
-CREATE OR REPLACE FUNCTION get_sizes_byBrand(brand_id_in INTEGER)
+CREATE OR REPLACE FUNCTION FN_GET_SIZ_BRAND(brand_id_in INTEGER)
 RETURNS TABLE(
 	product VARCHAR, 
 	PRO_code INTEGER,
@@ -1158,7 +1220,7 @@ BEGIN
 END
 $func$;
 
-CREATE OR REPLACE FUNCTION get_sizes_byProduct(PRO_id_in INTEGER)
+CREATE OR REPLACE FUNCTION FN_GET_SIZ_PRODUCT(PRO_id_in INTEGER)
 RETURNS TABLE(
 	product VARCHAR, 
 	PRO_code INTEGER,
@@ -1216,7 +1278,7 @@ $func$;
 /* GET SPECIFICATIONS BY */
 
 
-CREATE OR REPLACE FUNCTION get_specifications_bySubcategory(subcategory_id_in INTEGER)
+CREATE OR REPLACE FUNCTION FN_GET_SPEC_SUBCAT(subcategory_id_in INTEGER)
 RETURNS TABLE(
 	product VARCHAR, 
 	PRO_code INTEGER,
@@ -1263,7 +1325,7 @@ BEGIN
 END
 $func$;
 
-CREATE OR REPLACE FUNCTION get_specifications_byBrand(brand_id_in INTEGER)
+CREATE OR REPLACE FUNCTION FN_GET_SPEC_BRAND(brand_id_in INTEGER)
 RETURNS TABLE(
 	product VARCHAR, 
 	PRO_code INTEGER,
@@ -1310,7 +1372,7 @@ BEGIN
 END
 $func$;
 
-CREATE OR REPLACE FUNCTION get_specifications_byProduct(PRO_id_in INTEGER)
+CREATE OR REPLACE FUNCTION FN_GET_SPEC_PRODUCT(PRO_id_in INTEGER)
 RETURNS TABLE(
 	product VARCHAR, 
 	PRO_code INTEGER,
@@ -1361,7 +1423,7 @@ $func$;
 /* GET VARIANTS DETAILS BY */
 
 
-CREATE OR REPLACE FUNCTION get_variants_details_bySubcategory(subcategory_id_in INTEGER)
+CREATE OR REPLACE FUNCTION FN_GET_VARIANTS_DETAILS_SUBCAT(subcategory_id_in INTEGER)
 RETURNS TABLE(
 	product VARCHAR, 
 	PRO_code INTEGER,
@@ -1414,7 +1476,7 @@ BEGIN
 END
 $func$;
 
-CREATE OR REPLACE FUNCTION get_variants_details_byBrand(brand_id_in INTEGER)
+CREATE OR REPLACE FUNCTION FN_GET_VARIANTS_DETAILS_BRAND(brand_id_in INTEGER)
 RETURNS TABLE(
 	product VARCHAR, 
 	PRO_code INTEGER,
@@ -1467,7 +1529,7 @@ BEGIN
 END
 $func$;
 
-CREATE OR REPLACE FUNCTION get_variants_details_byProduct(PRO_id_in INTEGER)
+CREATE OR REPLACE FUNCTION FN_GET_VARIANTS_DETAILS_PRODUCT(PRO_id_in INTEGER)
 RETURNS TABLE(
 	product VARCHAR, 
 	PRO_code INTEGER,
@@ -1524,7 +1586,7 @@ $func$;
 
 /* GET VARIANTS BY */
 
-CREATE OR REPLACE FUNCTION variant_exists(variant_id_in INT) RETURNS BOOLEAN AS $$
+CREATE OR REPLACE FUNCTION FN_VARIANT_EXIST(variant_id_in INT) RETURNS BOOLEAN AS $$
 BEGIN
     RETURN EXISTS (SELECT 1 FROM pro_variants WHERE id = variant_id_in);
 END;
@@ -1534,7 +1596,7 @@ $$ LANGUAGE plpgsql;
 
 /* GET NUMERATION BY VARIANT ID */
 
-CREATE OR REPLACE FUNCTION get_numeration_photo(variant_id_in INT)
+CREATE OR REPLACE FUNCTION FN_GET_NUMERATION_PHOTO(variant_id_in INT)
 RETURNS INT AS
 $func$
 DECLARE
@@ -1562,7 +1624,7 @@ LANGUAGE plpgsql;
 
 /* ADD PHOTO VARIANT*/
 
-CREATE OR REPLACE FUNCTION add_photo_variant(
+CREATE OR REPLACE FUNCTION FN_ADD_PHOTO_VAR(
     p_size_in FLOAT,
     p_height_in INTEGER,
     p_width_in INTEGER,

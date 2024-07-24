@@ -1,137 +1,135 @@
 
 /************************* BRANDS ****************************/
 // GET all
-const get_PRO_brands = 'SELECT * FROM get_PRO_brands();';
+const FN_GET_BRANDS = 'SELECT * FROM FN_GET_BRANDS();';
 
 // POST one
-const add_PRO_brand = 'add_PRO_brand';
+const FN_ADD_BRAND = 'FN_ADD_BRAND';
 
 // PUT one
-const edit_PRO_brand = 'edit_PRO_brand';
+const FN_EDIT_BRAND = 'FN_EDIT_BRAND';
 
 // GET one
-const get_PRO_brand = 'get_PRO_brand';
+const FN_GET_BRAND = 'FN_GET_BRAND';
 
 // PUT one
-const delete_PRO_brand = 'delete_PRO_brand';
+const FN_DEL_BRAND = 'FN_DEL_BRAND';
 
 // PUT one
-const activate_PRO_brand = 'activate_PRO_brand';
+const FN_ACT_BRAND = 'FN_ACT_BRAND';
 
 // PUT one
-const deactivate_PRO_brand = 'deactivate_PRO_brand';
+const FN_DEACT_BRAND = 'FN_DEACT_BRAND';
 
 /************************* CATEGORY ****************************/
 // GET all
-const get_PRO_categorys = 'SELECT * FROM get_PRO_categorys();';
+const FN_GET_CATEOGRYS = 'SELECT * FROM FN_GET_CATEOGRYS();';
 
 // POST one
-const add_PRO_category = 'add_PRO_category';
+const FN_ADD_CATEGORY = 'FN_ADD_CATEGORY';
 
 // PUT one
-const edit_PRO_category = 'edit_PRO_category';
+const FN_EDIT_CATEGORY = 'FN_EDIT_CATEGORY';
 
 // GET one
-const get_PRO_category = 'get_PRO_category';
+const FN_GET_CATEGORY = 'FN_GET_CATEGORY';
 
 // PUT one
-const delete_PRO_category = 'delete_PRO_category';
+const FN_DEL_CATEGORY = 'FN_DEL_CATEGORY';
 
 // PUT one
-const activate_PRO_category = 'activate_PRO_category';
+const FN_ACT_CATEGORY = 'FN_ACT_CATEGORY';
 
 // PUT one
-const deactivate_PRO_category = 'deactivate_PRO_category';
+const FN_DEACT_CATEGORY = 'FN_DEACT_CATEGORY';
 
 /************************* SUBCATEGORYS ****************************/
 // GET all
-const get_PRO_subcategorys = 'SELECT * FROM get_PRO_subcategorys();';
+const FN_GET_SUBCATEGORYS = 'SELECT * FROM FN_GET_SUBCATEGORYS();';
 
 // POST one
-const add_PRO_subcategory = 'add_PRO_subcategory';
+const FN_ADD_SUBCATEGORY = 'FN_ADD_SUBCATEGORY';
 
 // PUT one
-const edit_PRO_subcategory = 'edit_PRO_subcategory';
+const FN_EDIT_NA_SUBCATEGORY = 'FN_EDIT_NA_SUBCATEGORY';
+
+// PUT one
+const FN_EDIT_CAT_SUBCATEGORY = 'FN_EDIT_CAT_SUBCATEGORY';
 
 // GET one
-const get_PRO_subcategory = 'get_PRO_subcategory';
+const FN_GET_SUBCATEGORY = 'FN_GET_SUBCATEGORY';
 
 // PUT one
-const delete_PRO_subcategory = 'delete_PRO_subcategory';
+const FN_DEL_SUBCATEGORY = 'FN_DEL_SUBCATEGORY';
 
 // PUT one
-const activate_PRO_subcategory = 'activate_PRO_subcategory';
+const FN_ACT_SUBCATEGORY = 'FN_ACT_SUBCATEGORY';
 
 // PUT one
-const deactivate_PRO_subcategory = 'deactivate_PRO_subcategory';
+const FN_DEACT_SUBCATEGORY = 'FN_DEACT_SUBCATEGORY';
 
 /************************* PRODUCTS ****************************/
 // POST one
-const add_product = 'add_product';
+const FN_ADD_PRODUCT = 'FN_ADD_PRODUCT';
 
 /************************* VARIANTS && VARIANT SPECIFICATION VALUES ****************************/
 // POST one
-const add_PRO_variant = 'add_PRO_variant';
-
-// POST one
-const add_PRO_variant_specification_value = 'add_PRO_variant_specification_value';
-
-// DELETE many
-const delete_PRO_variant_specification_value = 'delete_PRO_variant_specification_value';
+const FN_ADD_VARIANT = 'FN_ADD_VARIANT';
 
 // DELETE one
-const delete_PRO_variant = 'delete_PRO_variant';
+const FN_DEL_VARIANT = 'FN_DEL_VARIANT';
+
+// POST one
+const FN_ADD_VARIANT_SPEC_VAL = 'FN_ADD_VARIANT_SPEC_VAL';
+
+// DELETE many
+const FN_DEL_VARIANT_SPEC_VAL = 'FN_DEL_VARIANT_SPEC_VAL';
 
 // GET true or false
-const variant_exist = 'SELECT variant_exists($1)';
+const FN_VARIANT_EXIST = 'SELECT FN_VARIANT_EXIST($1)';
 
 /************************* SPECIFICATIONS ****************************/
 // POST one
-const add_PRO_specification = 'add_PRO_specification';
+const FN_ADD_SPEC = 'FN_ADD_SPEC';
 
 // POST one
-const add_PRO_specification_value = 'add_PRO_specification_value';
+const FN_ADD_SPEC_VAL = 'FN_ADD_SPEC_VAL';
 
 /************************* PHOTOS ****************************/
 // GET true or false
-const get_numeration_photo = 'SELECT get_numeration_photo($1)';
-const add_photo_variant = 'add_photo_variant';
+const FN_GET_NUMERATION_PHOTO = 'SELECT FN_GET_NUMERATION_PHOTO($1)';
+const FN_ADD_PHOTO_VAR = 'FN_ADD_PHOTO_VAR';
 
 /************************* SEARCH ****************************/
-// find type of product
-const search_spectifications_subcategory = '* FROM search_spectifications_subcategory';
-const search_spectifications_brand = '* FROM search_spectifications_brand';
-const search_spectifications_product = '* FROM search_spectifications_product';
+// SEARCH type of product
+const FN_SEARCH_SPECS_SUBCAT = '* FROM FN_SEARCH_SPECS_SUBCAT';
+const FN_SEARCH_SPECS_BRAND = '* FROM FN_SEARCH_SPECS_BRAND';
+const FN_SEARCH_SPECS_PRODUCT = '* FROM FN_SEARCH_SPECS_PRODUCT';
 
-// search by colors and sizes
+// GET colors and sizes
+const FN_GET_SIZ_COL_SUBCAT = '* FROM FN_GET_SIZ_COL_SUBCAT';
+const FN_GET_SIZ_COL_BRAND = '* FROM FN_GET_SIZ_COL_BRAND';
+const FN_GET_SIZ_COL_PRODUCT = '* FROM FN_GET_SIZ_COL_PRODUCT';
 
-const get_sizes_colors_bySubcategory = '* FROM get_sizes_colors_bySubcategory';
-const get_sizes_colors_byBrand = '* FROM get_sizes_colors_byBrand';
-const get_sizes_colors_byProduct = '* FROM get_sizes_colors_byProduct';
+// GET sizes
+const FN_GET_SIZ_SUBCAT = '* FROM FN_GET_SIZ_SUBCAT';
+const FN_GET_SIZ_BRAND = '* FROM FN_GET_SIZ_BRAND';
+const FN_GET_SIZ_PRODUCT = '* FROM FN_GET_SIZ_PRODUCT';
 
-// search by sizes
+// GET colors
+const FN_GET_COL_SUBCAT = '* FROM FN_GET_COL_SUBCAT';
+const FN_GET_COL_BRAND = '* FROM FN_GET_COL_BRAND';
+const FN_GET_COL_PRODUCT = '* FROM FN_GET_COL_PRODUCT';
 
-const get_sizes_bySubcategory = '* FROM get_sizes_bySubcategory';
-const get_sizes_byBrand = '* FROM get_sizes_byBrand';
-const get_sizes_byProduct = '* FROM get_sizes_byProduct';
+// SEARCH specifications by (extra)
+const FN_GET_SPEC_SUBCAT = '* FROM FN_GET_SPEC_SUBCAT';
+const FN_GET_SPEC_BRAND = '* FROM FN_GET_SPEC_BRAND';
+const FN_GET_SPEC_PRODUCT = '* FROM FN_GET_SPEC_PRODUCT';
 
-// search by colors
-
-const get_colors_bySubcategory = '* FROM get_colors_bySubcategory';
-const get_colors_byBrand = '* FROM get_colors_byBrand';
-const get_colors_byProduct = '* FROM get_colors_byProduct';
-
-// search by descriptions (extra)
-
-const get_specifications_bySubcategory = '* FROM get_specifications_bySubcategory';
-const get_specifications_byBrand = '* FROM get_specifications_byBrand';
-const get_specifications_byProduct = '* FROM get_specifications_byProduct';
-
-// search variants descriptions (only text)
-
-const get_variants_details_bySubcategory = '* FROM get_variants_details_bySubcategory';
-const get_variants_details_byBrand = '* FROM get_variants_details_byBrand';
-const get_variants_details_byProduct = '* FROM get_variants_details_byProduct';
+// SEARCH variants details by (only text)
+const FN_GET_VARIANTS_DETAILS_SUBCAT = '* FROM FN_GET_VARIANTS_DETAILS_SUBCAT';
+const FN_GET_VARIANTS_DETAILS_BRAND = '* FROM FN_GET_VARIANTS_DETAILS_BRAND';
+const FN_GET_VARIANTS_DETAILS_PRODUCT = '* FROM FN_GET_VARIANTS_DETAILS_PRODUCT';
 
 /************************* USERS *****************************/
 // POST one
@@ -148,69 +146,70 @@ const signinUser = 'SELECT * FROM signinUser($1)';
 
 module.exports = {
     brand: {
-        get_PRO_brands,
-        add_PRO_brand,
-        edit_PRO_brand,
-        get_PRO_brand,
-        delete_PRO_brand,
-        activate_PRO_brand,
-        deactivate_PRO_brand
+        FN_GET_BRANDS,
+        FN_ADD_BRAND,
+        FN_EDIT_BRAND,
+        FN_GET_BRAND,
+        FN_DEL_BRAND,
+        FN_ACT_BRAND,
+        FN_DEACT_BRAND
     },
     category: {
-        get_PRO_categorys,
-        add_PRO_category,
-        edit_PRO_category,
-        get_PRO_category,
-        delete_PRO_category,
-        activate_PRO_category,
-        deactivate_PRO_category
+        FN_GET_CATEOGRYS,
+        FN_ADD_CATEGORY,
+        FN_EDIT_CATEGORY,
+        FN_GET_CATEGORY,
+        FN_DEL_CATEGORY,
+        FN_ACT_CATEGORY,
+        FN_DEACT_CATEGORY
     },
     subcategory: {
-        get_PRO_subcategorys,
-        add_PRO_subcategory,
-        edit_PRO_subcategory,
-        get_PRO_subcategory,
-        delete_PRO_subcategory,
-        activate_PRO_subcategory,
-        deactivate_PRO_subcategory
+        FN_GET_SUBCATEGORYS,
+        FN_ADD_SUBCATEGORY,
+        FN_EDIT_NA_SUBCATEGORY,
+        FN_EDIT_CAT_SUBCATEGORY,
+        FN_GET_SUBCATEGORY,
+        FN_DEL_SUBCATEGORY,
+        FN_ACT_SUBCATEGORY,
+        FN_DEACT_SUBCATEGORY
     },
     product: {
-        add_product
+        FN_ADD_PRODUCT
     },
     variant: {
-        add_PRO_variant,
-        add_PRO_variant_specification_value,
-        delete_PRO_variant_specification_value,
-        delete_PRO_variant,
-        variant_exist
+        FN_ADD_VARIANT,
+        FN_DEL_VARIANT,
+        FN_ADD_VARIANT_SPEC_VAL,
+        FN_DEL_VARIANT_SPEC_VAL,
+        FN_VARIANT_EXIST
     },
     specification: {
-        add_PRO_specification,
-        add_PRO_specification_value
+        FN_ADD_SPEC,
+        FN_ADD_SPEC_VAL
     },
     photo: {
-        get_numeration_photo,
-        add_photo_variant
+        FN_GET_NUMERATION_PHOTO,
+        FN_ADD_PHOTO_VAR
     },
     search: {
-        search_spectifications_subcategory,
-        search_spectifications_brand,
-        search_spectifications_product,
-        get_sizes_colors_bySubcategory,
-        get_sizes_colors_byBrand,
-        get_sizes_colors_byProduct,
-        get_sizes_bySubcategory,
-        get_sizes_byBrand,
-        get_sizes_byProduct,
-        get_colors_bySubcategory,
-        get_colors_byBrand,
-        get_colors_byProduct,
-        get_specifications_bySubcategory,
-        get_specifications_byBrand,
-        get_specifications_byProduct,
-        get_variants_details_bySubcategory,
-        get_variants_details_byBrand,
-        get_variants_details_byProduct
+        FN_SEARCH_SPECS_SUBCAT,
+        FN_SEARCH_SPECS_BRAND,
+        FN_SEARCH_SPECS_PRODUCT,
+        FN_GET_SIZ_COL_SUBCAT,
+        FN_GET_SIZ_COL_BRAND,
+        FN_GET_SIZ_COL_PRODUCT,
+        FN_GET_SIZ_SUBCAT,
+        FN_GET_SIZ_BRAND,
+        FN_GET_SIZ_PRODUCT,
+        FN_GET_COL_SUBCAT,
+        FN_GET_COL_BRAND,
+        FN_GET_COL_PRODUCT,
+        FN_GET_SPEC_SUBCAT,
+        FN_GET_SPEC_BRAND,
+        FN_GET_SPEC_PRODUCT,
+        FN_GET_VARIANTS_DETAILS_SUBCAT,
+        FN_GET_VARIANTS_DETAILS_BRAND,
+        FN_GET_VARIANTS_DETAILS_PRODUCT
     },
     user: {
         addUserAdmin,

@@ -6,31 +6,44 @@ const { HTTP_RESPONSES } = require('../../common/constans');
 
 const { specification } = require('../../db/querys.db');
 
-/*** AQUI SI AGREGAR SERVICIO PARA SPECIFICATION VALUE */
 const addSpecificationService = async (data) => {
     const pgDB = new pgConnection();
 
-    const { color, size, text, name, information, variantId } = data;
-
-    let result;
+    const { specficationConstantId, subcategoryId } = data;
 
     try {
         await pgDB.connect();
 
-        await pgDB.query('BEGIN');
-
-        try {
-            result = await pgDB.selectFunction(specification.add, { color: color, size: size, text: text, name: name, information: information, variantId: variantId });    
-        } catch (error) {
-            throw error;
-        }
-
-        await pgDB.query('COMMIT');
+        const result = await pgDB.selectFunction(specification.FN_ADD_SPEC, { specficationConstantId: specficationConstantId, subcategoryId: subcategoryId });    
 
         const response = {
             status: HTTP_RESPONSES.CREATED,
             service: 'addSpecificationService',
-            message: 'SUCCES',
+            result: result,
+        };
+
+        return response;
+    
+    } catch(error) {
+        moduleErrorHandler.handleError(error);
+    } finally {
+        pgDB.close();
+    }
+};
+
+const addSpecificationValueService = async (data) => {
+    const pgDB = new pgConnection();
+
+    const { value, specificationId } = data;
+
+    try {
+        await pgDB.connect();
+
+        const result = await pgDB.selectFunction(specification.FN_ADD_SPEC_VAL, { value: value, specificationId: specificationId });    
+
+        const response = {
+            status: HTTP_RESPONSES.CREATED,
+            service: 'addSpecificationService',
             result: result,
         };
 
@@ -43,5 +56,6 @@ const addSpecificationService = async (data) => {
 };
 
 module.exports = {
-    addSpecificationService
+    addSpecificationService,
+    addSpecificationValueService
 }

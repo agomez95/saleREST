@@ -2,7 +2,7 @@ const pgConnection = require('../../db/connection.db');
 
 const moduleErrorHandler = require('../../common/moduleError');
 
-const { HTTP_RESPONSES } = require('../../common/constans');
+const { HTTP_RESPONSES, ZERO_LENGHT } = require('../../common/constans');
 
 const { variant } = require('../../db/querys.db');
 const { InternalServerError } = require('../../errors/httpError');
@@ -12,21 +12,10 @@ const addVariantService = async (data) => {
 
     const { name, stock, cost, productId } = data;
 
-    let result;
-
     try {
         await pgDB.connect();
 
-        await pgDB.query('BEGIN');
-
-        try {
-            result = await pgDB.selectFunction(variant.add_PRO_variant, { name: name, stock: stock, cost: cost, productId: productId });    
-        } catch (error) {
-            await pgDB.query('ROLLBACK');
-            throw error;
-        }
-
-        await pgDB.query('COMMIT');
+        let result = await pgDB.selectFunction(variant.FN_ADD_VARIANT, { name: name, stock: stock, cost: cost, productId: productId });    
 
         const response = {
             status: HTTP_RESPONSES.CREATED,
@@ -47,21 +36,10 @@ const addVariantSpecificationValueService = async (data) => {
 
     const { variant_id, specification_id } = data;
 
-    let result;
-
     try {
         await pgDB.connect();
-
-        await pgDB.query('BEGIN');
-
-        try {
-            result = await pgDB.selectFunction(variant.add_PRO_variant_specification_value, { variant_id: Number(variant_id), specification_id: Number(specification_id) });    
-        } catch (error) {
-            await pgDB.query('ROLLBACK');
-            throw error;
-        }
-
-        await pgDB.query('COMMIT');
+        
+        const result = await pgDB.selectFunction(variant.FN_ADD_VARIANT_SPEC_VAL, { variant_id: Number(variant_id), specification_id: Number(specification_id) });
 
         const response = {
             status: HTTP_RESPONSES.CREATED,
@@ -82,31 +60,37 @@ const deleteVariantService = async (data) => {
 
     const id = data.id;
 
-    let result = 0;
+    // let result = 0;
 
     try {
         await pgDB.connect();
 
-        await pgDB.query('BEGIN');
+        // await pgDB.query('BEGIN');
 
-        try {
-            const resultVariantSpec = await pgDB.selectFunction(variant.delete_PRO_variant_specification_value, { id: Number(id) });
-            if(resultVariantSpec[0].delete_PRO_variant_specification_value <= 0) throw new InternalServerError(500, 'CAN NOT DELETE VARIANT SPECIFICATION VALUE');
+        // try {
+        //     const resultVariantSpec = await pgDB.selectFunction(variant.delete_PRO_variant_specification_value, { id: Number(id) });
+        //     if(resultVariantSpec[0].delete_PRO_variant_specification_value <= ZERO_LENGHT) throw new InternalServerError(500, 'CAN NOT DELETE VARIANT SPECIFICATION VALUE');
 
-            const resultVariant = await pgDB.selectFunction(variant.delete_PRO_variant, { id: Number(id) });
-            result = resultVariant[0].delete_pro_variant;
+        //     const resultVariant = await pgDB.selectFunction(variant.delete_PRO_variant, { id: Number(id) });
+        //     result = resultVariant[0].delete_pro_variant;
 
-        } catch (error) {
-            await pgDB.query('ROLLBACK');
-            throw error;
-        }
+        // } catch (error) {
+        //     await pgDB.query('ROLLBACK');
+        //     throw error;
+        // }
 
-        await pgDB.query('COMMIT');
+        // await pgDB.query('COMMIT');
+
+        const resultVS = await pgDB.selectFunction(variant.FN_DEL_VARIANT_SPEC_VAL, { id: Number(id) });
+
+        if(resultVS[0].delete_pro_variant <= ZERO_LENGHT) throw new InternalServerError(500, 'CAN NOT DELETE VARIANT');
+
+        const resultV = await pgDB.selectFunction(variant.FN_DEL_VARIANT, { id: Number(id) });
 
         const response = {
             status: HTTP_RESPONSES.ACCEPTED,
             service: 'deleteVariantService',
-            variant_deleted: result
+            variant_deleted: resultV[0].FN_DEL_VARIANT
         };
 
         return response;

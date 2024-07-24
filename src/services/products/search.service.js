@@ -5,7 +5,7 @@ const moduleErrorHandler = require('../../common/moduleError');
 const { resolveSearchBrandQuery, resolveSearchSubcategoryQuery, resolveSearchProductQuery } = require('../../validations/specifications');
 const { listProductsOneQuery, listProductsTwoQuerys } = require('../../validations/products')
 
-const { HTTP_RESPONSES } = require('../../common/constans');
+const { HTTP_RESPONSES, ZERO_LENGHT } = require('../../common/constans');
 
 const { search } = require('../../db/querys.db');
 
@@ -24,7 +24,7 @@ const getProductsByBrandService = async (data) => {
         SPECS = await pgDB.selectFunction(search.search_spectifications_brand, { id: Number(id) }).catch((error) => { moduleErrorHandler.handleError(error); });
         
         // this 'no content' is for specify that BRAND doesn't have any SPECS
-        if (SPECS.length === 0) return { response: { status: 204 } }; 
+        if (SPECS.length === ZERO_LENGHT) return { response: { status: HTTP_RESPONSES.NO_CONTENT } }; 
 
         // RECIVE QUERYS: this function give some querys by SPECS when we can get the 2 kind of searches of specifications
         const reciveQuery = resolveSearchBrandQuery(SPECS);
@@ -32,7 +32,7 @@ const getProductsByBrandService = async (data) => {
         let resultSpecs = [];
         
         // this 'no content' is for specify that QUERYS doesn't have any results
-        if (!reciveQuery) return { response: { status: 204 } };
+        if (!reciveQuery) return { response: { status: HTTP_RESPONSES.NO_CONTENT } };
         
         // EXECUTE QUERYS: its time for execute the QUERYS recived and GET the PRODUCTS
         resultProducts = await pgDB.selectFunction(reciveQuery.firstQuery, { id: Number(id) }).catch((error) => { moduleErrorHandler.handleError(error); });
@@ -76,7 +76,7 @@ const getProductsBySubcategoryService = async (data) => {
         SPECS = await pgDB.selectFunction(search.search_spectifications_subcategory, { id: Number(id) }).catch((error) => { moduleErrorHandler.handleError(error); });
 
         // this 'no content' is for specify that SUBCATEGORY doesn't have any SPECS
-        if (SPECS.length === 0) return { response: { status: 204 } }; 
+        if (SPECS.length === ZERO_LENGHT) return { response: { status: HTTP_RESPONSES.NO_CONTENT } }; 
 
         // RECIVE QUERYS: this function give some querys by SPECS when we can get the 2 kind of searches of specifications
         const reciveQuery = resolveSearchSubcategoryQuery(SPECS);
@@ -84,7 +84,7 @@ const getProductsBySubcategoryService = async (data) => {
         let resultSpecs = [];
 
         // this 'no content' is for specify that QUERYS doesn't have any results
-        if (!reciveQuery) return { response: { status: 204 } };
+        if (!reciveQuery) return { response: { status: HTTP_RESPONSES.NO_CONTENT } };
 
         // EXECUTE QUERYS: its time for execute the QUERYS recived and GET the PRODUCTS
         resultProducts = await pgDB.selectFunction(reciveQuery.firstQuery, { id: Number(id) }).catch((error) => { moduleErrorHandler.handleError(error); });
@@ -128,7 +128,7 @@ const getDataByProductService = async (data) => {
         SPECS = await pgDB.selectFunction(search.search_spectifications_product, { id: Number(id) }).catch((error) => { moduleErrorHandler.handleError(error); });
         
         // this 'no content' is for specify that SUBCATEGORY doesn't have any SPECS
-        if (SPECS.length === 0) return { response: { status: 204 } }; 
+        if (SPECS.length === ZERO_LENGHT) return { response: { status: HTTP_RESPONSES.NO_CONTENT } }; 
 
         // RECIVE QUERYS: this function give some querys by SPECS when we can get the 2 kind of searches of specifications
         const reciveQuery = resolveSearchProductQuery(SPECS);
@@ -136,7 +136,7 @@ const getDataByProductService = async (data) => {
         let resultSpecs = [];
 
         // this 'no content' is for specify that QUERYS doesn't have any results
-        if (!reciveQuery) return { response: { status: 204 } }; 
+        if (!reciveQuery) return { response: { status: HTTP_RESPONSES.NO_CONTENT } }; 
 
         // EXECUTE QUERYS: its time for execute the QUERYS recived and GET the PRODUCTS and SPECIFICATIONS
         resultProducts = await pgDB.selectFunction(reciveQuery.firstQuery, { id: Number(id) }).catch((error) => { moduleErrorHandler.handleError(error); });

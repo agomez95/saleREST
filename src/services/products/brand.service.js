@@ -11,21 +11,10 @@ const addBrandService = async (data) => {
 
     const { name } = data;
 
-    let result;
-
     try {
         await pgDB.connect();
 
-        await pgDB.query('BEGIN');
-
-        try {
-            result = await pgDB.selectFunction(brand.add_PRO_brand, { name: name });
-        } catch (error) {
-            await pgDB.query('ROLLBACK');
-            throw error;
-        }
-
-        await pgDB.query('COMMIT');
+        const result = await pgDB.selectFunction(brand.FN_ADD_BRAND, { name: name });
 
         const response = {
             status: HTTP_RESPONSES.CREATED,
