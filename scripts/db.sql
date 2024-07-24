@@ -157,8 +157,13 @@ CREATE TABLE CST_customers(
 
 CREATE TABLE ADR_country(
 	id SERIAL NOT NULL PRIMARY KEY,
-	name VARCHAR(250) NOT NULL UNIQUE
+	fullname VARCHAR(250) NOT NULL UNIQUE,
+	shortname VARCHAR(250) NOT NULL
 );
+
+INSERT INTO adr_country (name) VALUES ('Peru', 'pe'); 
+INSERT INTO adr_country (name) VALUES ('Spain', 'es'); 
+INSERT INTO adr_country (name) VALUES ('United States', 'us'); 
 
 CREATE TABLE ADR_addresses(
 	id SERIAL NOT NULL PRIMARY KEY,
@@ -167,7 +172,7 @@ CREATE TABLE ADR_addresses(
 	address_line_1 VARCHAR(250),
 	address_line_2 VARCHAR(250),
 	city VARCHAR(250) NOT NULL,
-	region VARCHAR(250) NOT NULL,
+	state_province VARCHAR(250) NOT NULL,
 	postal_code VARCHAR(250) NOT NULL,
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	modified_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -177,14 +182,14 @@ CREATE TABLE ADR_addresses(
 ALTER TABLE ADR_addresses ADD CONSTRAINT fk_address_country FOREIGN KEY (ADR_country_id) REFERENCES ADR_country (id);
 
 CREATE TABLE CST_customer_address(
-	CST_customer_id INTEGER NOT NULL,
-	ADR_address_id INTEGER NOT NULL,
-	is_default BOOLEAN NOT NULL
-	-- PRIMARY KEY (CST_customer_id, ADR_address_id)
+	CST_customer_id INTEGER REFERENCES CST_customers(id),
+	ADR_address_id INTEGER REFERENCES ADR_addresses(id),
+	is_default BOOLEAN NOT NULL,
+	PRIMARY KEY (CST_customer_id, ADR_address_id)
 );
 
-ALTER TABLE CST_customer_address ADD CONSTRAINT fk_CST_customer_address_customers FOREIGN KEY (CST_customer_id) REFERENCES CST_customers (id);
-ALTER TABLE CST_customer_address ADD CONSTRAINT fk_CST_customer_address_addresses FOREIGN KEY (ADR_address_id) REFERENCES ADR_addresses (id);
+-- ALTER TABLE CST_customer_address ADD CONSTRAINT fk_CST_customer_address_customers FOREIGN KEY (CST_customer_id) REFERENCES CST_customers (id);
+-- ALTER TABLE CST_customer_address ADD CONSTRAINT fk_CST_customer_address_addresses FOREIGN KEY (ADR_address_id) REFERENCES ADR_addresses (id);
 
 /* TABLES: PAYMENT */
 
