@@ -33,18 +33,24 @@ class Database {
         }
     };
 
-    async selectFunction(functionName, params) {
+    async selectFunction(functionName, params, get_one) {
         try {
             const propertys = Object.keys(params);
             const variables = [];
             const values = [];
+
+            let query;
             
             for(let property of propertys) {
                 variables.push(`$${variables.length + 1}`);
                 values.push(params[property]);
             }
 
-            const query = `SELECT ${functionName}(${variables});`;
+
+            query = `SELECT ${functionName}(${variables});`;
+
+            if(get_one) query = `SELECT * FROM ${functionName}(${variables});`;
+
             const result = await this.client.query(query, values);
             return result.rows;
         } catch (error) {

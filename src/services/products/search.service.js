@@ -21,7 +21,7 @@ const getProductsByBrandService = async (data) => {
         
         await pgDB.connect();
         // TYPE OF SPECS GET IT: First we get the type of specifications from db from the brand
-        SPECS = await pgDB.selectFunction(search.search_spectifications_brand, { id: Number(id) }).catch((error) => { moduleErrorHandler.handleError(error); });
+        SPECS = await pgDB.selectFunction(search.FN_SEARCH_SPECS_BRAND, { id: Number(id) }).catch((error) => { moduleErrorHandler.handleError(error); });
         
         // this 'no content' is for specify that BRAND doesn't have any SPECS
         if (SPECS.length === ZERO_LENGHT) return { response: { status: HTTP_RESPONSES.NO_CONTENT } }; 
@@ -49,7 +49,7 @@ const getProductsByBrandService = async (data) => {
             status: HTTP_RESPONSES.ACCEPTED,
             service: 'getProductsByBrandService',
             count: products.length,
-            data: products
+            result: products
         };
 
         return response;
@@ -73,7 +73,7 @@ const getProductsBySubcategoryService = async (data) => {
         await pgDB.connect();
         
         // TYPE OF SPECS GET IT: First we get the type of specifications from db from the SUBCATEGORY
-        SPECS = await pgDB.selectFunction(search.search_spectifications_subcategory, { id: Number(id) }).catch((error) => { moduleErrorHandler.handleError(error); });
+        SPECS = await pgDB.selectFunction(search.FN_SEARCH_SPECS_SUBCAT, { id: Number(id) }).catch((error) => { moduleErrorHandler.handleError(error); });
 
         // this 'no content' is for specify that SUBCATEGORY doesn't have any SPECS
         if (SPECS.length === ZERO_LENGHT) return { response: { status: HTTP_RESPONSES.NO_CONTENT } }; 
@@ -125,7 +125,7 @@ const getDataByProductService = async (data) => {
         await pgDB.connect();
 
         // TYPE OF SPECS GET IT: First we get the type of specifications from db from the PRODUCTS
-        SPECS = await pgDB.selectFunction(search.search_spectifications_product, { id: Number(id) }).catch((error) => { moduleErrorHandler.handleError(error); });
+        SPECS = await pgDB.selectFunction(search.FN_SEARCH_SPECS_PRODUCT, { id: Number(id) }).catch((error) => { moduleErrorHandler.handleError(error); });
         
         // this 'no content' is for specify that SUBCATEGORY doesn't have any SPECS
         if (SPECS.length === ZERO_LENGHT) return { response: { status: HTTP_RESPONSES.NO_CONTENT } }; 

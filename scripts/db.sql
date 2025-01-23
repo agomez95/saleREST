@@ -161,9 +161,9 @@ CREATE TABLE ADR_country(
 	shortname VARCHAR(250) NOT NULL
 );
 
-INSERT INTO adr_country (name) VALUES ('Peru', 'pe'); 
-INSERT INTO adr_country (name) VALUES ('Spain', 'es'); 
-INSERT INTO adr_country (name) VALUES ('United States', 'us'); 
+INSERT INTO ADR_country (fullname, shortname) VALUES ('Peru', 'pe'); 
+INSERT INTO ADR_country (fullname, shortname) VALUES ('Spain', 'es'); 
+INSERT INTO ADR_country (fullname, shortname) VALUES ('United States', 'us'); 
 
 CREATE TABLE ADR_addresses(
 	id SERIAL NOT NULL PRIMARY KEY,
@@ -215,7 +215,7 @@ ALTER TABLE CST_payment_method ADD CONSTRAINT CST_payment_method_customers FOREI
 
 /* PRODUCT CATEGORYS */
 
-CREATE OR REPLACE FUNCTION FN_GET_CATEOGRYS()
+CREATE OR REPLACE FUNCTION FN_GET_CATEGORIES()
 RETURNS TABLE(id INTEGER, name VARCHAR, state BOOLEAN, created_at DATE)
 LANGUAGE plpgsql AS
 $func$
@@ -304,7 +304,7 @@ LANGUAGE plpgsql;
 /* PRODUCT SUBCATEGORYS */
 
 
-CREATE OR REPLACE FUNCTION FN_GET_SUBCATEGORYS()
+CREATE OR REPLACE FUNCTION FN_GET_SUBCATEGORIES()
 RETURNS TABLE(id INTEGER, name VARCHAR, category VARCHAR, state BOOLEAN, created_at DATE)
 LANGUAGE plpgsql AS
 $func$
@@ -317,12 +317,12 @@ END
 $func$;
 
 CREATE OR REPLACE FUNCTION FN_GET_SUBCATEGORY(id_in INTEGER)
-RETURNS TABLE(id INTEGER, name VARCHAR, category VARCHAR, state BOOLEAN, created_at DATE)
+RETURNS TABLE(id INTEGER, name VARCHAR, category VARCHAR, category_id INTEGER, state BOOLEAN, created_at DATE)
 LANGUAGE plpgsql AS
 $func$
 BEGIN
 	RETURN QUERY
-	SELECT sc.id AS id, sc.name AS name, c.name AS category, sc.state AS state, date(sc.created_at) AS creation_date 
+	SELECT sc.id AS id, sc.name AS name, c.name AS category, sc.PRO_category_id AS category_id, sc.state AS state, date(sc.created_at) AS creation_date 
     FROM PRO_subcategorys AS sc
     INNER JOIN PRO_categorys AS c ON c.id = sc.PRO_category_id
     WHERE sc.id = id_in;
@@ -381,26 +381,13 @@ END;
 $func$
 LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION FN_EDIT_NA_SUBCATEGORY(id_in INTEGER, name_in VARCHAR)
+CREATE OR REPLACE FUNCTION FN_EDIT_SUBCATEGORY(id_in INTEGER, name_in VARCHAR, category_id_in INTEGER)
 RETURNS INTEGER AS
 $func$
 DECLARE
 	sc_edit_count INTEGER;	
 BEGIN
-	UPDATE PRO_subcategorys SET name = name_in, modified_at = CURRENT_TIMESTAMP WHERE id = id_in
-	RETURNING * INTO sc_edit_count;
-	RETURN sc_edit_count;
-END;
-$func$
-LANGUAGE plpgsql;
-
-CREATE OR REPLACE FUNCTION FN_EDIT_CAT_SUBCATEGORY(id_in INTEGER, category_id_in INTEGER)
-RETURNS INTEGER AS
-$func$
-DECLARE
-	sc_edit_count INTEGER;	
-BEGIN
-	UPDATE PRO_subcategorys SET category_id = category_id_in, modified_at = CURRENT_TIMESTAMP WHERE id = id_in
+	UPDATE PRO_subcategorys SET name = name_in, PRO_category_id = category_id_in, modified_at = CURRENT_TIMESTAMP WHERE id = id_in
 	RETURNING * INTO sc_edit_count;
 	RETURN sc_edit_count;
 END;
@@ -529,6 +516,58 @@ BEGIN
 END;
 $func$
 LANGUAGE plpgsql;
+
+/* SUBCATEGORIES WITH SPECS*/
+
+CREATE OR REPLACE FUNCTION FN_GET_SUBCAT_WITH_SPECS()
+RETURNS TABLE(
+	subcategory VARCHAR,
+	subcategory_id INTEGER,
+	specification_constant VARCHAR,
+	specification_constant_id INTEGER,
+	created_at DATE,
+	modified_at DATE
+)
+LANGUAGE plpgsql AS
+$func$
+BEGIN
+	RETURN QUERY
+	SELECT
+		psub.name AS subcategory, 
+		pspec.pro_subcategory_id AS subcategory_id, 
+		sconst.name AS specificaction_constant,
+		pspec.specification_constant_id AS specificaction_constant_id,
+		date(pspec.created_at) AS created_at,
+		date(pspec.modified_at) AS modified_at
+	FROM pro_specifications AS pspec
+	INNER JOIN pro_subcategorys AS psub ON pspec.pro_subcategory_id = psub.id
+	INNER JOIN specificaction_constants AS sconst ON pspec.specification_constant_id = sconst.id;
+END
+$func$;
+
+/* SUBCATEGORIES WITHOUT SPECS*/
+
+CREATE OR REPLACE FUNCTION FN_GET_SUBCAT_WITHOUT_SPECS()
+RETURNS TABLE(
+	subcategory_id INTEGER,
+	subcategory VARCHAR,
+	created_at DATE,
+	modified_at DATE
+)
+LANGUAGE plpgsql AS
+$func$
+BEGIN
+	RETURN QUERY
+	SELECT
+	    psub.id AS subcategory_id,
+	    psub.name AS subcategory,
+		date(psub.created_at) AS created_at,
+		date(psub.modified_at) AS modified_at
+	FROM pro_subcategorys AS psub
+	LEFT JOIN pro_specifications AS pspec ON pspec.pro_subcategory_id = psub.id
+	WHERE pspec.id IS NULL;
+END
+$func$;
 
 
 /* PRODUCT SPECIFICATION VALUES */
@@ -764,6 +803,8 @@ CREATE OR REPLACE FUNCTION FN_GET_SIZ_COL_SUBCAT(subcategory_id_in INTEGER)
 RETURNS TABLE(
 	product VARCHAR, 
 	PRO_code INTEGER,
+	PRO_description VARCHAR,
+	PRO_long_description VARCHAR,
 	brand VARCHAR,
 	brand_code INTEGER,
 	subcategory VARCHAR,
@@ -785,7 +826,9 @@ BEGIN
 	RETURN QUERY
 	SELECT 
 		p.name AS product, 
-		p.id AS PRO_code, 
+		p.id AS PRO_code,
+		p.description AS PRO_description,
+		p.long_description::VARCHAR AS PRO_long_description,
 		pb.name AS brand, 
 		pb.id AS brand_code, 
 		ps.name AS subcategory, 
@@ -827,6 +870,8 @@ CREATE OR REPLACE FUNCTION FN_GET_SIZ_COL_BRAND(brand_id_in INTEGER)
 RETURNS TABLE(
 	product VARCHAR, 
 	PRO_code INTEGER,
+	PRO_description VARCHAR,
+	PRO_long_description VARCHAR,
 	brand VARCHAR,
 	brand_code INTEGER,
 	subcategory VARCHAR,
@@ -848,7 +893,9 @@ BEGIN
 	RETURN QUERY
 	SELECT 
 		p.name AS product, 
-		p.id AS PRO_code, 
+		p.id AS PRO_code,
+		p.description AS PRO_description,
+		p.long_description::VARCHAR AS PRO_long_description,
 		pb.name AS brand, 
 		pb.id AS brand_code, 
 		ps.name AS subcategory, 
@@ -890,6 +937,8 @@ CREATE OR REPLACE FUNCTION FN_GET_SIZ_COL_PRODUCT(PRO_id_in INTEGER)
 RETURNS TABLE(
 	product VARCHAR, 
 	PRO_code INTEGER,
+	PRO_description VARCHAR,
+	PRO_long_description VARCHAR,
 	brand VARCHAR,
 	brand_code INTEGER,
 	subcategory VARCHAR,
@@ -910,7 +959,9 @@ BEGIN
 	RETURN QUERY
 	SELECT 
 		p.name AS product, 
-		p.id AS PRO_code, 
+		p.id AS PRO_code,
+		p.description AS PRO_description,
+		p.long_description::VARCHAR AS PRO_long_description,
 		pb.name AS brand, 
 		pb.id AS brand_code, 
 		ps.name AS subcategory, 
@@ -957,6 +1008,8 @@ CREATE OR REPLACE FUNCTION FN_GET_COL_SUBCAT(subcategory_id_in INTEGER)
 RETURNS TABLE(
 	product VARCHAR, 
 	PRO_code INTEGER,
+	PRO_description VARCHAR,
+	PRO_long_description VARCHAR,
 	brand VARCHAR,
 	brand_code INTEGER,
 	subcategory VARCHAR,
@@ -977,7 +1030,9 @@ BEGIN
 	RETURN QUERY
 	SELECT 
 		p.name AS product, 
-		p.id AS PRO_code, 
+		p.id AS PRO_code,
+		p.description AS PRO_description,
+		p.long_description::VARCHAR AS PRO_long_description,
 		pb.name AS brand, 
 		pb.id AS brand_code, 
 		ps.name AS subcategory, 
@@ -1011,6 +1066,8 @@ CREATE OR REPLACE FUNCTION FN_GET_COL_BRAND(brand_id_in INTEGER)
 RETURNS TABLE(
 	product VARCHAR, 
 	PRO_code INTEGER,
+	PRO_description VARCHAR,
+	PRO_long_description VARCHAR,
 	brand VARCHAR,
 	brand_code INTEGER,
 	subcategory VARCHAR,
@@ -1031,7 +1088,9 @@ BEGIN
 	RETURN QUERY
 	SELECT 
 		p.name AS product, 
-		p.id AS PRO_code, 
+		p.id AS PRO_code,
+		p.description AS PRO_description,
+		p.long_description::VARCHAR AS PRO_long_description,
 		pb.name AS brand, 
 		pb.id AS brand_code, 
 		ps.name AS subcategory, 
@@ -1065,6 +1124,8 @@ CREATE OR REPLACE FUNCTION FN_GET_COL_PRODUCT(PRO_id_in INTEGER)
 RETURNS TABLE(
 	product VARCHAR, 
 	PRO_code INTEGER,
+	PRO_description VARCHAR,
+	PRO_long_description VARCHAR,
 	brand VARCHAR,
 	brand_code INTEGER,
 	subcategory VARCHAR,
@@ -1085,7 +1146,9 @@ BEGIN
 	RETURN QUERY
 	SELECT 
 		p.name AS product, 
-		p.id AS PRO_code, 
+		p.id AS PRO_code,
+		p.description AS PRO_description,
+		p.long_description::VARCHAR AS PRO_long_description,
 		pb.name AS brand, 
 		pb.id AS brand_code, 
 		ps.name AS subcategory, 
@@ -1121,6 +1184,8 @@ CREATE OR REPLACE FUNCTION FN_GET_SIZ_SUBCAT(subcategory_id_in INTEGER)
 RETURNS TABLE(
 	product VARCHAR, 
 	PRO_code INTEGER,
+	PRO_description VARCHAR,
+	PRO_long_description VARCHAR,
 	brand VARCHAR,
 	brand_code INTEGER,
 	subcategory VARCHAR,
@@ -1141,7 +1206,9 @@ BEGIN
 	RETURN QUERY
 	SELECT 
 		p.name AS product, 
-		p.id AS PRO_code, 
+		p.id AS PRO_code,
+		p.description AS PRO_description,
+		p.long_description::VARCHAR AS PRO_long_description,
 		pb.name AS brand, 
 		pb.id AS brand_code, 
 		ps.name AS subcategory, 
@@ -1175,6 +1242,8 @@ CREATE OR REPLACE FUNCTION FN_GET_SIZ_BRAND(brand_id_in INTEGER)
 RETURNS TABLE(
 	product VARCHAR, 
 	PRO_code INTEGER,
+	PRO_description VARCHAR,
+	PRO_long_description VARCHAR,
 	brand VARCHAR,
 	brand_code INTEGER,
 	subcategory VARCHAR,
@@ -1195,7 +1264,9 @@ BEGIN
 	RETURN QUERY
 	SELECT 
 		p.name AS product, 
-		p.id AS PRO_code, 
+		p.id AS PRO_code,
+		p.description AS PRO_description,
+		p.long_description::VARCHAR AS PRO_long_description,
 		pb.name AS brand, 
 		pb.id AS brand_code, 
 		ps.name AS subcategory, 
@@ -1229,6 +1300,8 @@ CREATE OR REPLACE FUNCTION FN_GET_SIZ_PRODUCT(PRO_id_in INTEGER)
 RETURNS TABLE(
 	product VARCHAR, 
 	PRO_code INTEGER,
+	PRO_description VARCHAR,
+	PRO_long_description VARCHAR,
 	brand VARCHAR,
 	brand_code INTEGER,
 	subcategory VARCHAR,
@@ -1250,6 +1323,8 @@ BEGIN
 	SELECT 
 		p.name AS product, 
 		p.id AS PRO_code, 
+		p.description AS PRO_description,
+		p.long_description::VARCHAR AS PRO_long_description,
 		pb.name AS brand, 
 		pb.id AS brand_code, 
 		ps.name AS subcategory, 
@@ -1287,6 +1362,8 @@ CREATE OR REPLACE FUNCTION FN_GET_SPEC_SUBCAT(subcategory_id_in INTEGER)
 RETURNS TABLE(
 	product VARCHAR, 
 	PRO_code INTEGER,
+	PRO_description VARCHAR,
+	PRO_long_description VARCHAR,
 	brand VARCHAR,
 	brand_code INTEGER,
 	subcategory VARCHAR,
@@ -1305,7 +1382,9 @@ BEGIN
 	RETURN QUERY
 	SELECT 
 		p.name AS product, 
-		p.id AS PRO_code, 
+		p.id AS PRO_code,
+		p.description AS PRO_description,
+		p.long_description::VARCHAR AS PRO_long_description,
 		pb.name AS brand, 
 		pb.id AS brand_code, 
 		ps.name AS subcategory, 
@@ -1334,6 +1413,8 @@ CREATE OR REPLACE FUNCTION FN_GET_SPEC_BRAND(brand_id_in INTEGER)
 RETURNS TABLE(
 	product VARCHAR, 
 	PRO_code INTEGER,
+	PRO_description VARCHAR,
+	PRO_long_description VARCHAR,
 	brand VARCHAR,
 	brand_code INTEGER,
 	subcategory VARCHAR,
@@ -1352,7 +1433,9 @@ BEGIN
 	RETURN QUERY
 	SELECT 
 		p.name AS product, 
-		p.id AS PRO_code, 
+		p.id AS PRO_code,
+		p.description AS PRO_description,
+		p.long_description::VARCHAR AS PRO_long_description,
 		pb.name AS brand, 
 		pb.id AS brand_code, 
 		ps.name AS subcategory, 
@@ -1381,6 +1464,8 @@ CREATE OR REPLACE FUNCTION FN_GET_SPEC_PRODUCT(PRO_id_in INTEGER)
 RETURNS TABLE(
 	product VARCHAR, 
 	PRO_code INTEGER,
+	PRO_description VARCHAR,
+	PRO_long_description VARCHAR,
 	brand VARCHAR,
 	brand_code INTEGER,
 	subcategory VARCHAR,
@@ -1399,7 +1484,9 @@ BEGIN
 	RETURN QUERY
 	SELECT 
 		p.name AS product, 
-		p.id AS PRO_code, 
+		p.id AS PRO_code,
+		p.description AS PRO_description,
+		p.long_description::VARCHAR AS PRO_long_description,
 		pb.name AS brand, 
 		pb.id AS brand_code, 
 		ps.name AS subcategory, 
@@ -1432,6 +1519,8 @@ CREATE OR REPLACE FUNCTION FN_GET_VARIANTS_DETAILS_SUBCAT(subcategory_id_in INTE
 RETURNS TABLE(
 	product VARCHAR, 
 	PRO_code INTEGER,
+	PRO_description VARCHAR,
+	PRO_long_description VARCHAR,
 	brand VARCHAR,
 	brand_code INTEGER,
 	subcategory VARCHAR,
@@ -1453,7 +1542,9 @@ BEGIN
 	RETURN QUERY
 	SELECT 
 		p.name AS product, 
-		p.id AS PRO_code, 
+		p.id AS PRO_code,
+		p.description AS PRO_description,
+		p.long_description::VARCHAR AS PRO_long_description,
 		pb.name AS brand, 
 		pb.id AS brand_code, 
 		ps.name AS subcategory, 
@@ -1485,6 +1576,8 @@ CREATE OR REPLACE FUNCTION FN_GET_VARIANTS_DETAILS_BRAND(brand_id_in INTEGER)
 RETURNS TABLE(
 	product VARCHAR, 
 	PRO_code INTEGER,
+	PRO_description VARCHAR,
+	PRO_long_description VARCHAR,
 	brand VARCHAR,
 	brand_code INTEGER,
 	subcategory VARCHAR,
@@ -1506,7 +1599,9 @@ BEGIN
 	RETURN QUERY
 	SELECT 
 		p.name AS product, 
-		p.id AS PRO_code, 
+		p.id AS PRO_code,
+		p.description AS PRO_description,
+		p.long_description::VARCHAR AS PRO_long_description,
 		pb.name AS brand, 
 		pb.id AS brand_code, 
 		ps.name AS subcategory, 
@@ -1538,6 +1633,8 @@ CREATE OR REPLACE FUNCTION FN_GET_VARIANTS_DETAILS_PRODUCT(PRO_id_in INTEGER)
 RETURNS TABLE(
 	product VARCHAR, 
 	PRO_code INTEGER,
+	PRO_description VARCHAR,
+	PRO_long_description VARCHAR,
 	brand VARCHAR,
 	brand_code INTEGER,
 	subcategory VARCHAR,
@@ -1559,7 +1656,9 @@ BEGIN
 	RETURN QUERY
 	SELECT 
 		p.name AS product, 
-		p.id AS PRO_code, 
+		p.id AS PRO_code,
+		p.description AS PRO_description,
+		p.long_description::VARCHAR AS PRO_long_description,
 		pb.name AS brand, 
 		pb.id AS brand_code, 
 		ps.name AS subcategory, 

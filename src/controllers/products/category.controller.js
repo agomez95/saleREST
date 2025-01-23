@@ -1,8 +1,20 @@
 const categoryService = require('../../services/products/category.service');
 
-const getCategorysController = async (req, res, next) => {
+const getCategoriesController = async (req, res, next) => {
     try {
-        const response = await categoryService.getCategorysService();
+        const response = await categoryService.getCategoriesService();
+
+        res.status(response.status).json({
+            ...response
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
+const getCategoryController = async (req, res, next) => {
+    try {
+        const response = await categoryService.getCategoryService(req.params);
 
         res.status(response.status).json({
             ...response
@@ -73,7 +85,8 @@ const deleteCategoryController = async (req, res, next) => {
 };
 
 module.exports = {
-    getCategorysController,
+    getCategoriesController,
+    getCategoryController,
     addCategoryController,
     editCategoryController,
     activateCategoryController,

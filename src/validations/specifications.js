@@ -6,53 +6,53 @@ const { search } = require('../db/querys.db');
 const queryMap = {
     brand: {
         1: {
-            firstQuery: search.get_colors_byBrand,
-            secondQuery: search.get_specifications_byBrand
+            firstQuery: search.FN_GET_COL_BRAND,
+            secondQuery: search.FN_GET_SPEC_BRAND
         },
         2: {
-            firstQuery: search.get_sizes_byBrand,
-            secondQuery: search.get_specifications_byBrand
+            firstQuery: search.FN_GET_SIZ_BRAND,
+            secondQuery: search.FN_GET_SPEC_BRAND
         },
         3: {
-            firstQuery: search.get_sizes_colors_byBrand,
-            secondQuery: search.get_specifications_byBrand
+            firstQuery: search.FN_GET_SIZ_COL_BRAND,
+            secondQuery: search.FN_GET_SPEC_BRAND
         },
         4: {
-            firstQuery: search.get_variants_details_byBrand
+            firstQuery: search.FN_GET_VARIANTS_DETAILS_BRAND
         }
     },
     subcategory: {
         1: {
-            firstQuery: search.get_colors_bySubcategory,
-            secondQuery: search.get_specifications_bySubcategory
+            firstQuery: search.FN_GET_COL_SUBCAT,
+            secondQuery: search.FN_GET_SPEC_SUBCAT
         },
         2: {
-            firstQuery: search.get_sizes_bySubcategory,
-            secondQuery: search.get_specifications_bySubcategory
+            firstQuery: search.FN_GET_SIZ_SUBCAT,
+            secondQuery: search.FN_GET_SPEC_SUBCAT
         },
         3: {
-            firstQuery: search.get_sizes_colors_bySubcategory,
-            secondQuery: search.get_specifications_bySubcategory
+            firstQuery: search.FN_GET_SIZ_COL_SUBCAT,
+            secondQuery: search.FN_GET_SPEC_SUBCAT
         },
         4: {
-            firstQuery: search.get_variants_details_bySubcategory
+            firstQuery: search.FN_GET_VARIANTS_DETAILS_SUBCAT
         }
     },
     product: {
         1: {
-            firstQuery: search.get_colors_byProduct,
-            secondQuery: search.get_specifications_byProduct
+            firstQuery: search.FN_GET_COL_PRODUCT,
+            secondQuery: search.FN_GET_SPEC_PRODUCT
         },
         2: {
-            firstQuery: search.get_sizes_byProduct,
-            secondQuery: search.get_specifications_byProduct
+            firstQuery: search.FN_GET_SIZ_PRODUCT,
+            secondQuery: search.FN_GET_SPEC_PRODUCT
         },
         3: {
-            firstQuery: search.get_sizes_colors_byProduct,
-            secondQuery: search.get_specifications_byProduct
+            firstQuery: search.FN_GET_SIZ_COL_PRODUCT,
+            secondQuery: search.FN_GET_SPEC_PRODUCT
         },
         4: {
-            firstQuery: search.get_variants_details_byProduct
+            firstQuery: search.FN_GET_VARIANTS_DETAILS_PRODUCT
         }
     }
 };

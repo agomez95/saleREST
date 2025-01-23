@@ -4,7 +4,8 @@ const router = express.Router();
 const categoryController = require('../controllers/products/category.controller');
 
 router
-    .get('/', categoryController.getCategorysController)
+    .get('/', categoryController.getCategoriesController)
+    .get('/:id', categoryController.getCategoryController)
     .post('/', categoryController.addCategoryController)
     .patch('/:id', categoryController.editCategoryController)
     .patch('/activate/:id', categoryController.activateCategoryController)

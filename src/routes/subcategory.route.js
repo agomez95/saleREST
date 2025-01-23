@@ -4,10 +4,10 @@ const router = express.Router();
 const subcategoryController = require('../controllers/products/subcategory.controller');
 
 router
-    .get('/', subcategoryController.getSubcategorysController)
+    .get('/', subcategoryController.getSubcategoriesController)
+    .get('/:id', subcategoryController.getSubcategoryController)
     .post('/', subcategoryController.addSubcategoryController)
-    .patch('/name/:id', subcategoryController.editNameSubcategoryController)
-    .patch('/category/:id', subcategoryController.editCategorySubcategoryController)
+    .patch('/:id', subcategoryController.editSubcategoryController)
     .patch('/activate/:id', subcategoryController.activateSubcategoryController)
     .patch('/deactivate/:id', subcategoryController.deactivateSubcategoryController)
     .delete('/:id', subcategoryController.deleteSubcategoryController)

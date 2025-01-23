@@ -1,8 +1,8 @@
 const subcategoryService = require('../../services/products/subcategory.service');
 
-const getSubcategorysController = async (req, res, next) => {
+const getSubcategoriesController = async (req, res, next) => {
     try {
-        const response = await subcategoryService.getSubcategorysService();
+        const response = await subcategoryService.getSubcategoriesService();
 
         res.status(response.status).json({
             ...response
@@ -12,7 +12,19 @@ const getSubcategorysController = async (req, res, next) => {
     }
 };
 
-const addSubcategoryController = async (req, res, next) =>{
+const getSubcategoryController = async (req, res, next) => {
+    try {
+        const response = await subcategoryService.getSubcategoryService(req.params);
+
+        res.status(response.status).json({
+            ...response
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
+const addSubcategoryController = async (req, res, next) => {
     try {
         const response = await subcategoryService.addSubcategoryService(req.body);
 
@@ -24,9 +36,9 @@ const addSubcategoryController = async (req, res, next) =>{
     }
 };
 
-const editNameSubcategoryController = async (req, res, next) =>{
+const editSubcategoryController = async (req, res, next) => {
     try {
-        const response = await subcategoryService.editNameSubcategoryService(req.params, req.body);
+        const response = await subcategoryService.editSubcategoryService(req.params, req.body);
         
         res.status(response.status).json({
             ...response
@@ -36,19 +48,7 @@ const editNameSubcategoryController = async (req, res, next) =>{
     }
 };
 
-const editCategorySubcategoryController = async (req, res, next) =>{
-    try {
-        const response = await subcategoryService.editCategorySubcategoryService(req.params, req.body);
-        
-        res.status(response.status).json({
-            ...response
-        });
-    } catch(err) {
-        next(err);
-    }
-};
-
-const activateSubcategoryController = async (req, res, next) =>{
+const activateSubcategoryController = async (req, res, next) => {
     try {
         const response = await subcategoryService.activateSubcategoryService(req.params);
         
@@ -60,7 +60,7 @@ const activateSubcategoryController = async (req, res, next) =>{
     }
 };
 
-const deactivateSubcategoryController = async (req, res, next) =>{
+const deactivateSubcategoryController = async (req, res, next) => {
     try {
         const response = await subcategoryService.deactivateSubcategoryService(req.params);
         
@@ -72,7 +72,7 @@ const deactivateSubcategoryController = async (req, res, next) =>{
     }
 };
 
-const deleteSubcategoryController = async (req, res, next) =>{
+const deleteSubcategoryController = async (req, res, next) => {
     try {
         const response = await subcategoryService.deleteSubcategoryService(req.params);
         
@@ -85,10 +85,10 @@ const deleteSubcategoryController = async (req, res, next) =>{
 };
 
 module.exports = {
-    getSubcategorysController,
+    getSubcategoriesController,
+    getSubcategoryController,
     addSubcategoryController,
-    editNameSubcategoryController,
-    editCategorySubcategoryController,
+    editSubcategoryController,
     activateSubcategoryController,
     deactivateSubcategoryController,
     deleteSubcategoryController

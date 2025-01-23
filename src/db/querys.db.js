@@ -23,7 +23,7 @@ const FN_DEACT_BRAND = 'FN_DEACT_BRAND';
 
 /************************* CATEGORY ****************************/
 // GET all
-const FN_GET_CATEOGRYS = 'SELECT * FROM FN_GET_CATEOGRYS();';
+const FN_GET_CATEGORIES = 'SELECT * FROM FN_GET_CATEGORIES();';
 
 // POST one
 const FN_ADD_CATEGORY = 'FN_ADD_CATEGORY';
@@ -45,16 +45,13 @@ const FN_DEACT_CATEGORY = 'FN_DEACT_CATEGORY';
 
 /************************* SUBCATEGORYS ****************************/
 // GET all
-const FN_GET_SUBCATEGORYS = 'SELECT * FROM FN_GET_SUBCATEGORYS();';
+const FN_GET_SUBCATEGORIES = 'SELECT * FROM FN_GET_SUBCATEGORIES();';
 
 // POST one
 const FN_ADD_SUBCATEGORY = 'FN_ADD_SUBCATEGORY';
 
 // PUT one
-const FN_EDIT_NA_SUBCATEGORY = 'FN_EDIT_NA_SUBCATEGORY';
-
-// PUT one
-const FN_EDIT_CAT_SUBCATEGORY = 'FN_EDIT_CAT_SUBCATEGORY';
+const FN_EDIT_SUBCATEGORY = 'FN_EDIT_SUBCATEGORY';
 
 // GET one
 const FN_GET_SUBCATEGORY = 'FN_GET_SUBCATEGORY';
@@ -155,7 +152,7 @@ module.exports = {
         FN_DEACT_BRAND
     },
     category: {
-        FN_GET_CATEOGRYS,
+        FN_GET_CATEGORIES,
         FN_ADD_CATEGORY,
         FN_EDIT_CATEGORY,
         FN_GET_CATEGORY,
@@ -164,10 +161,9 @@ module.exports = {
         FN_DEACT_CATEGORY
     },
     subcategory: {
-        FN_GET_SUBCATEGORYS,
+        FN_GET_SUBCATEGORIES,
         FN_ADD_SUBCATEGORY,
-        FN_EDIT_NA_SUBCATEGORY,
-        FN_EDIT_CAT_SUBCATEGORY,
+        FN_EDIT_SUBCATEGORY,
         FN_GET_SUBCATEGORY,
         FN_DEL_SUBCATEGORY,
         FN_ACT_SUBCATEGORY,

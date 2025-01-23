@@ -4,6 +4,8 @@ class Product {
     constructor(row) {
         this.name = row.product;
         this.code = row.pro_code;
+        this.description = row.pro_description;
+        this.long_description = row.pro_long_description;
         this.brand = {
             id: Number(row.brand_code),
             name: row.brand
@@ -17,7 +19,7 @@ class Product {
             name: row.subcategory,
         };
         this.variants = [];
-        this.descriptions = [];
+        this.specifications = [];
     }
 
     addVariant(row, specType) {
@@ -25,9 +27,9 @@ class Product {
         this.variants.push(variant);
     }
 
-    addDescription(row) {
-        if (!this.descriptions.find(description => description.value === row.value) && row.specification === 'TEXT') {
-            this.descriptions.push({
+    addSpecification(row) {
+        if (!this.specifications.find(specification => specification.value === row.value) && row.specification === 'TEXT') {
+            this.specifications.push({
                 value: row.value
             });
         }
@@ -67,11 +69,11 @@ const addVariantToProduct = (products, row, specType) => {
     product.addVariant(row, specType);
 };
 
-const addDescriptionsToProducts = (products, dataSpecs) => {
+const addSpecificationsToProducts = (products, dataSpecs) => {
     for (let row of dataSpecs) {
         let product = products.find(product => product.code === row.pro_code);
         if (product) {
-            product.addDescription(row);
+            product.addSpecification(row);
         }
     }
 };
@@ -84,7 +86,7 @@ const listProductsTwoQuerys = (dataProducts, dataSpecs, type) => {
         addVariantToProduct(products, row, specType);
     }
 
-    addDescriptionsToProducts(products, dataSpecs);
+    addSpecificationsToProducts(products, dataSpecs);
 
     return products;
 };
@@ -96,7 +98,7 @@ const listProductsOneQuery = (dataProductsSpecs) => {
         addVariantToProduct(products, row, 3);
     }
 
-    addDescriptionsToProducts(products, dataProductsSpecs);
+    addSpecificationsToProducts(products, dataProductsSpecs);
 
     return products;
 };
